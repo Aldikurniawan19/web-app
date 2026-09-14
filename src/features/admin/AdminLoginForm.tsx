@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Lock,
   User,
@@ -16,8 +16,6 @@ import { Button } from "@/components/ui/Button";
 
 export function AdminLoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const fromUrl = searchParams.get("from") || "/admin";
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -51,6 +49,13 @@ export function AdminLoginForm() {
 
       if (!res.ok || !data.success) {
         throw new Error(data.message || "Kredensial login tidak valid.");
+      }
+
+      // Ambil parameter redirect tujuan (?from=...) di sisi client saat submit
+      let fromUrl = "/admin";
+      if (typeof window !== "undefined") {
+        const searchParams = new URLSearchParams(window.location.search);
+        fromUrl = searchParams.get("from") || "/admin";
       }
 
       // Berhasil login -> redirect
