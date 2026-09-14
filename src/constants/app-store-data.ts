@@ -351,3 +351,60 @@ export const RELATED_APPS: RelatedAppItem[] = [
     iconColor: "bg-sky-500",
   },
 ];
+
+export const APP_CONFIG = {
+  name: "AppHub",
+  tagline: "Katalog & Unduh Aplikasi Android APK Terpercaya",
+  version: "2.4.0",
+  currentVersion: "v2.4.0",
+  releaseDate: "14 September 2026",
+  shortDescription:
+    "Aplikasi produktivitas dan catatan harian cerdas dengan sinkronisasi instan, antarmuka modern, dan privasi penuh.",
+  fileSize: "28.4 MB",
+  minAndroid: "Android 8.0+",
+  sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  apkFileName: "apphub-v2.4.0-release.apk",
+  downloadUrl: "/downloads/aerosync-v2.4.0-release.apk",
+  downloadApkUrl: "/downloads/aerosync-v2.4.0-release.apk",
+  playStoreUrl: "https://play.google.com/store/apps",
+  githubUrl: "https://github.com",
+};
+
+export const INSTALLATION_STEPS = [
+  {
+    step: "01",
+    title: "Unduh Berkas APK",
+    description: "Klik tombol Download dan simpan berkas APK resmi di penyimpanan ponsel Anda.",
+  },
+  {
+    step: "02",
+    title: "Izinkan Sumber Tak Dikenal",
+    description: "Buka Pengaturan > Keamanan, lalu aktifkan opsi 'Izinkan pemasangan dari sumber ini'.",
+  },
+  {
+    step: "03",
+    title: "Buka & Pasang Aplikasi",
+    description: "Buka berkas APK melalui Pengelola File atau notifikasi unduhan, lalu tekan Pasang.",
+  },
+  {
+    step: "04",
+    title: "Selesai & Siap Digunakan",
+    description: "Buka aplikasi langsung dari layar utama perangkat Anda dan nikmati seluruh fiturnya.",
+  },
+];
+
+export const STORE_BENEFITS = [
+  {
+    title: "Bebas Malware & Aman",
+    description: "Semua paket APK dipindai secara ketat sebelum diterbitkan ke katalog.",
+  },
+  {
+    title: "Unduhan Cepat & Tanpa Iklan",
+    description: "Server unduhan berkecepatan tinggi langsung ke perangkat Anda.",
+  },
+  {
+    title: "Pembaruan Versi Teratur",
+    description: "Dapatkan rilis dan fitur terbaru secara instan tanpa hambatan.",
+  },
+];
+

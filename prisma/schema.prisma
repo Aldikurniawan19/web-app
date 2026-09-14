@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Event {
+  id     String    @id
+  title  String
+  start  DateTime
+  end    DateTime?
+  userId String
+  color  String?   @default("blue")
+  User   User      @relation(fields: [userId], references: [id])
+}
+
+model Project {
+  id           String   @id
+  title        String
+  category     String   @default("Umum")
+  description  String   @default("Tidak ada deskripsi projek.")
+  createdAt    DateTime @default(now())
+  userId       String
+  liveUrl      String?
+  visitorCount Int      @default(0)
+  User         User     @relation(fields: [userId], references: [id])
+  Task         Task[]
+}
+
+model Task {
+  id          String  @id
+  title       String
+  description String  @default("Tidak ada deskripsi detail.")
+  completed   Boolean @default(false)
+  projectId   String
+  parentId    String?
+  Task        Task?   @relation("TaskToTask", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  other_Task  Task[]  @relation("TaskToTask")
+  Project     Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id       String    @id
+  email    String    @unique
+  password String
+  Event    Event[]
+  Project  Project[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model books {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String    @db.VarChar(255)
+  author      String?   @db.VarChar(255)
+  description String?
+  file_path   String
+  file_url    String
+  file_size   Int?
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model App {
+  id                 String   @id
+  name               String
+  tagline            String
+  description        String
+  longDescription    String   @db.Text
+  category           String
+  rating             Float    @default(5.0)
+  reviewsCount       String   @default("Baru")
+  fileSize           String   @default("15.0 MB")
+  version            String   @default("1.0.0")
+  developer          String   @default("AppHub Studio")
+  lastUpdated        String
+  platforms          String[] @default(["android"])
+  iconUrl            String?  @db.Text
+  iconType           String?  @default("document")
+  iconColor          String?  @default("bg-blue-500")
+  features           String[] @default([])
+  screenshots        Json?
+  downloadsCount     String   @default("0+")
+  systemRequirements Json?
+  apkUrl             String?  @db.Text
+  apkFileName        String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("apps")
+}

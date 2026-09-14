@@ -5,6 +5,12 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
   },
+  experimental: {
+    proxyClientMaxBodySize: "500mb",
+    serverActions: {
+      bodySizeLimit: "500mb",
+    },
+  },
 };
 
 export default nextConfig;

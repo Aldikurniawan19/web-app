@@ -1,7 +1,0 @@
-AeroSync Android Application Package (Sample Binary Release v2.4.0)
-Package: com.aerosync.android
-Target SDK: 35 (Android 15)
-Min SDK: 26 (Android 8.0)
-Architecture: arm64-v8a, armeabi-v7a, x86_64
-Integrity Hash (SHA-256): f9b8c7e6d5a43210ef890123456789abcdef0123456789abcdef0123456789ab
-Status: Verified Official Release

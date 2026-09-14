@@ -84,7 +84,7 @@ export function DownloadModal({ app, isOpen, onClose }: DownloadModalProps) {
 
             // Trigger actual download
             const link = document.createElement("a");
-            link.href = "/downloads/aerosync-v2.4.0-release.apk";
+            link.href = app.apkUrl || "/downloads/aerosync-v2.4.0-release.apk";
             link.download = getInstallerName();
             document.body.appendChild(link);
             link.click();
@@ -128,7 +128,7 @@ export function DownloadModal({ app, isOpen, onClose }: DownloadModalProps) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Google Play Store Style"
+      title="Unduh Aplikasi"
       className="max-w-md bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-foreground"
     >
       <div className="space-y-6">
@@ -195,6 +195,7 @@ export function DownloadModal({ app, isOpen, onClose }: DownloadModalProps) {
             <div className="relative z-10 flex items-center justify-center">
               <AppIcon
                 type={app.iconType}
+                iconUrl={app.iconUrl}
                 colorClass={app.iconColor}
                 size="md"
                 className="h-14 w-14 !rounded-full shadow-sm"
@@ -269,7 +270,7 @@ export function DownloadModal({ app, isOpen, onClose }: DownloadModalProps) {
 
         {/* Play Store Interactive Action Controls */}
         <div>
-          {/* Idle State: Install Button */}
+          {/* Idle State: Download Button */}
           {stage === "idle" && (
             <button
               type="button"
@@ -277,7 +278,7 @@ export function DownloadModal({ app, isOpen, onClose }: DownloadModalProps) {
               className="w-full h-11 rounded-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 select-none"
             >
               <Download className="h-4 w-4" />
-              <span>Install APK ({app.fileSize})</span>
+              <span>Download ({app.fileSize})</span>
             </button>
           )}
 

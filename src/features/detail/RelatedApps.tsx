@@ -28,6 +28,7 @@ export function RelatedApps({ onDownloadItem }: RelatedAppsProps) {
             <div className="flex items-center gap-3">
               <AppIcon
                 type={item.iconType}
+                iconUrl={item.iconUrl}
                 colorClass={item.iconColor}
                 size="sm"
                 className="h-10 w-10 rounded-xl"

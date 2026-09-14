@@ -107,12 +107,10 @@ export function QrCodeModal({ isOpen, onClose }: QrCodeModalProps) {
           <a
             href={APP_CONFIG.downloadApkUrl}
             download
-            className="w-full"
+            className="w-full inline-flex items-center justify-center font-bold transition-all duration-150 h-9 px-3.5 text-xs gap-1.5 rounded-xl bg-gradient-to-b from-blue-500 via-primary to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_3px_0_#1d4ed8,0_4px_8px_rgba(37,99,235,0.25)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_4px_0_#1d4ed8,0_6px_12px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_0_#1d4ed8] select-none"
           >
-            <Button variant="primary" size="sm" fullWidth>
-              <Download className="h-4 w-4" />
-              <span>Unduh Langsung</span>
-            </Button>
+            <Download className="h-4 w-4" />
+            <span>Unduh Langsung</span>
           </a>
         </div>
       </div>

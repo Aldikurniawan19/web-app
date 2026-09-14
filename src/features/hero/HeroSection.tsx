@@ -55,17 +55,10 @@ export function HeroSection() {
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-4">
             <a
               href="#unduh"
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto inline-flex items-center justify-center font-bold transition-all duration-150 rounded-2xl h-13 px-7 text-base gap-2.5 bg-gradient-to-b from-blue-500 via-primary to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_3px_0_#1d4ed8,0_4px_8px_rgba(37,99,235,0.25)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_4px_0_#1d4ed8,0_6px_12px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_0_#1d4ed8] select-none"
             >
-              <Button
-                size="lg"
-                variant="primary"
-                fullWidth
-                className="shadow-lg shadow-primary/25"
-              >
-                <Download className="h-5 w-5" />
-                <span>Unduh APK ({APP_CONFIG.fileSize})</span>
-              </Button>
+              <Download className="h-5 w-5" />
+              <span>Unduh APK ({APP_CONFIG.fileSize})</span>
             </a>
 
             <Button
@@ -83,17 +76,10 @@ export function HeroSection() {
               href={APP_CONFIG.playStoreUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto inline-flex items-center justify-center font-bold transition-all duration-150 rounded-2xl h-13 px-7 text-base gap-2.5 bg-gradient-to-b from-white/90 to-slate-50/90 dark:from-slate-800/90 dark:to-slate-900/90 border border-slate-300 dark:border-slate-700 text-foreground hover:border-primary hover:text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_2px_0_#cbd5e1] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_2px_0_#0f172a] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[0_1px_0_#cbd5e1] select-none"
             >
-              <Button
-                size="lg"
-                variant="outline"
-                fullWidth
-                className="w-full sm:w-auto"
-              >
-                <span>Google Play</span>
-                <ExternalLink className="h-4 w-4 opacity-70" />
-              </Button>
+              <span>Google Play</span>
+              <ExternalLink className="h-4 w-4 opacity-70" />
             </a>
           </div>
 

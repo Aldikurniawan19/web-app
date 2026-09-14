@@ -92,6 +92,7 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
             <div className="lg:col-span-8 flex flex-col sm:flex-row gap-5 items-start">
               <AppIcon
                 type={app.iconType}
+                iconUrl={app.iconUrl}
                 colorClass={app.iconColor}
                 size="xl"
                 className="shadow-lg shadow-blue-500/10"

@@ -90,19 +90,12 @@ export function DownloadSection() {
                 <div className="flex flex-col sm:flex-row gap-3">
                   <a
                     href={APP_CONFIG.downloadApkUrl}
-                    download={`aerosync-${APP_CONFIG.currentVersion}.apk`}
+                    download={APP_CONFIG.apkFileName || `aerosync-${APP_CONFIG.currentVersion}.apk`}
                     onClick={handleSimulateDownload}
-                    className="flex-1"
+                    className="flex-1 inline-flex items-center justify-center font-bold transition-all duration-150 rounded-2xl h-14 px-7 text-base gap-2.5 bg-gradient-to-b from-blue-500 via-primary to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_3px_0_#1d4ed8,0_4px_8px_rgba(37,99,235,0.25)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_4px_0_#1d4ed8,0_6px_12px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_0_#1d4ed8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent select-none"
                   >
-                    <Button
-                      size="lg"
-                      variant="primary"
-                      fullWidth
-                      className="h-14 font-semibold text-base shadow-md shadow-primary/20"
-                    >
-                      <Download className="h-5 w-5" />
-                      <span>Unduh APK Resmi ({APP_CONFIG.fileSize})</span>
-                    </Button>
+                    <Download className="h-5 w-5" />
+                    <span>Unduh APK Resmi ({APP_CONFIG.fileSize})</span>
                   </a>
 
                   <Button
@@ -179,7 +172,7 @@ export function DownloadSection() {
               Panduan Pemasangan APK Cepat
             </h3>
 
-            {INSTALLATION_STEPS.map((item) => (
+            {INSTALLATION_STEPS.map((item: { step: string; title: string; description: string }) => (
               <Card key={item.step} className="p-4 sm:p-5 flex items-start gap-4">
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-subtle text-accent font-bold font-display text-sm border border-primary/20">
                   {item.step}

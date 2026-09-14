@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "accent";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "accent" | "danger";
   size?: "sm" | "md" | "lg";
   fullWidth?: boolean;
   isLoading?: boolean;
@@ -42,6 +42,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         "text-foreground-muted hover:text-foreground hover:bg-slate-100 dark:hover:bg-slate-800 active:scale-95",
       accent:
         "bg-gradient-to-b from-sky-400 via-blue-500 to-blue-600 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_3px_0_#1d4ed8,0_4px_8px_rgba(59,130,246,0.25)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_4px_0_#1d4ed8,0_6px_12px_rgba(59,130,246,0.3)] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_0_#1d4ed8]",
+      danger:
+        "bg-gradient-to-b from-rose-500 via-danger to-rose-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_3px_0_#be123c,0_4px_8px_rgba(225,29,72,0.25)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_4px_0_#be123c,0_6px_12px_rgba(225,29,72,0.3)] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_0_#be123c] dark:from-rose-500 dark:via-rose-600 dark:to-rose-700 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_3px_0_#881337,0_4px_10px_rgba(0,0,0,0.4)] dark:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_4px_0_#881337,0_6px_14px_rgba(0,0,0,0.5)] dark:active:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_1px_0_#881337]",
     };
 
     return (

@@ -13,26 +13,45 @@ import { APP_STORE_ITEMS } from "@/constants/app-store-data";
 import { AppItem } from "@/types/store";
 
 export default function AppHubPage() {
+  const [appsList, setAppsList] = useState<AppItem[]>(APP_STORE_ITEMS);
   const [activeView, setActiveView] = useState<"catalog" | "detail">("catalog");
   const [selectedApp, setSelectedApp] = useState<AppItem>(APP_STORE_ITEMS[0]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [downloadModalApp, setDownloadModalApp] = useState<AppItem | null>(null);
   const [activeNav, setActiveNav] = useState<string>("beranda");
 
+  // Fetch updated apps list on mount
+  useEffect(() => {
+    const fetchLatestApps = async () => {
+      try {
+        const res = await fetch("/api/apps");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            setAppsList(json.data);
+          }
+        }
+      } catch (err) {
+        console.error("Gagal sinkronisasi data aplikasi:", err);
+      }
+    };
+    fetchLatestApps();
+  }, []);
+
   // Filter apps based on search query
   const filteredApps = useMemo(() => {
     if (searchQuery.trim() === "") {
-      return APP_STORE_ITEMS;
+      return appsList;
     }
     const q = searchQuery.toLowerCase();
-    return APP_STORE_ITEMS.filter((app) => {
+    return appsList.filter((app) => {
       return (
         app.name.toLowerCase().includes(q) ||
         app.description.toLowerCase().includes(q) ||
         app.category.toLowerCase().includes(q)
       );
     });
-  }, [searchQuery]);
+  }, [searchQuery, appsList]);
 
   // Scroll Spy untuk mengaktifkan menu navbar & bottom navbar secara otomatis saat scrolling
   useEffect(() => {

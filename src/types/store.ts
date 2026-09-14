@@ -14,6 +14,7 @@ export interface AppScreenshot {
   title: string;
   description: string;
   type: "light" | "dark" | "editor" | "calendar";
+  imageUrl?: string;
 }
 
 export interface AppItem {
@@ -30,6 +31,7 @@ export interface AppItem {
   developer: string;
   lastUpdated: string;
   platforms: AppPlatform[];
+  iconUrl?: string;
   iconType: "document" | "education" | "business" | "photo" | "vpn" | "game" | "cloud" | "media";
   iconColor: string;
   features: string[];
@@ -40,6 +42,8 @@ export interface AppItem {
     ram: string;
     storage: string;
   };
+  apkUrl?: string;
+  apkFileName?: string;
 }
 
 export interface RelatedAppItem {
@@ -48,6 +52,13 @@ export interface RelatedAppItem {
   rating: number;
   fileSize: string;
   category: string;
+  iconUrl?: string;
   iconType: "task" | "note" | "todo";
   iconColor: string;
 }
+
+export type CreateAppInput = Omit<
+  AppItem,
+  "rating" | "reviewsCount" | "downloadsCount" | "lastUpdated"
+> &
+  Partial<Pick<AppItem, "rating" | "reviewsCount" | "downloadsCount" | "lastUpdated">>;

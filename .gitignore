@@ -38,3 +38,7 @@ yarn-error.log*
 .idea/
 *.swp
 *.swo
+
+# binary downloads and scratch scripts
+/public/downloads/*.apk
+/scratch/

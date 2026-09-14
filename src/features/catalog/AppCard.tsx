@@ -22,6 +22,7 @@ export function AppCard({ app, onOpenDetail }: AppCardProps) {
       <div className="flex items-start sm:items-center gap-4 sm:gap-5 flex-1 min-w-0">
         <AppIcon
           type={app.iconType}
+          iconUrl={app.iconUrl}
           colorClass={app.iconColor}
           size="md"
           className="h-14 w-14 rounded-2xl shrink-0 group-hover:scale-105 transition-transform"

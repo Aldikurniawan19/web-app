@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   FileText,
   GraduationCap,
@@ -9,29 +9,41 @@ import {
   Cloud,
   Play,
   CheckSquare,
-  BookOpen,
   ListTodo,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AppIconProps {
-  type: string;
+  type?: string;
+  iconUrl?: string | null;
   className?: string;
   size?: "sm" | "md" | "lg" | "xl";
   colorClass?: string;
+  alt?: string;
 }
 
 export function AppIcon({
-  type,
+  type = "document",
+  iconUrl,
   className,
   size = "md",
   colorClass = "bg-primary",
+  alt = "App Icon",
 }: AppIconProps) {
+  const [imageError, setImageError] = useState(false);
+
   const sizeStyles = {
     sm: "h-9 w-9 rounded-xl p-2",
     md: "h-14 w-14 rounded-2xl p-3",
     lg: "h-16 w-16 rounded-2xl p-3.5",
     xl: "h-24 w-24 rounded-3xl p-5",
+  };
+
+  const imageContainerSizeStyles = {
+    sm: "h-9 w-9 rounded-xl",
+    md: "h-14 w-14 rounded-2xl",
+    lg: "h-16 w-16 rounded-2xl",
+    xl: "h-24 w-24 rounded-3xl",
   };
 
   const iconSizeStyles = {
@@ -40,6 +52,27 @@ export function AppIcon({
     lg: "h-9 w-9",
     xl: "h-14 w-14",
   };
+
+  // Jika ada URL gambar ikon dan belum error, tampilkan gambar langsung
+  if (iconUrl && !imageError) {
+    return (
+      <div
+        className={cn(
+          "relative overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 shadow-md shadow-slate-200/50 dark:shadow-none transition-transform duration-200 shrink-0",
+          imageContainerSizeStyles[size],
+          className
+        )}
+      >
+        <img
+          src={iconUrl}
+          alt={alt}
+          onError={() => setImageError(true)}
+          className="h-full w-full object-cover select-none"
+          loading="lazy"
+        />
+      </div>
+    );
+  }
 
   const renderIcon = () => {
     const s = iconSizeStyles[size];
