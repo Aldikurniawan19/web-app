@@ -44,9 +44,9 @@ export function MobileBottomNav({
             onClick={() => onNavClick(item.id)}
             aria-label={item.label}
             className={cn(
-              "flex items-center justify-center transition-all duration-300 select-none",
+              "flex items-center justify-center transition-all duration-300 ease-out select-none",
               isActive
-                ? "gap-2 h-10 px-4 rounded-xl bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2.5px_0_#1e3a8a] -translate-y-0.5 scale-105"
+                ? "gap-2 h-10 px-4 rounded-xl bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2px_0_#1e3a8a]"
                 : "h-10 w-11 rounded-xl text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 hover:bg-slate-100/60 dark:hover:bg-slate-800/60"
             )}
           >

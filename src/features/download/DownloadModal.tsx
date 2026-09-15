@@ -22,11 +22,12 @@ interface DownloadModalProps {
   app: AppItem | null;
   isOpen: boolean;
   onClose: () => void;
+  onOpenGuide?: (app: AppItem) => void;
 }
 
 type DownloadStage = "idle" | "preparing" | "downloading" | "verifying" | "completed";
 
-export function DownloadModal({ app, isOpen, onClose }: DownloadModalProps) {
+export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadModalProps) {
   const [stage, setStage] = useState<DownloadStage>("idle");
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [downloadSpeed, setDownloadSpeed] = useState("0 MB/s");
@@ -116,12 +117,18 @@ export function DownloadModal({ app, isOpen, onClose }: DownloadModalProps) {
 
   const handleGoToGuide = () => {
     onClose();
-    setTimeout(() => {
-      const element = document.getElementById("panduan-apk");
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 150);
+    if (onOpenGuide && app) {
+      setTimeout(() => {
+        onOpenGuide(app);
+      }, 100);
+    } else {
+      setTimeout(() => {
+        const element = document.getElementById("panduan-apk");
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 150);
+    }
   };
 
   return (

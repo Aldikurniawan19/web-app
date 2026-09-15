@@ -2,7 +2,7 @@
 
 import React, { useRef } from "react";
 import Image from "next/image";
-import { Search, Download, ShieldCheck } from "lucide-react";
+import { Search, Download } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -138,10 +138,6 @@ export function StoreHero({
 
             {/* Micro Trust Stats */}
             <div className="hero-anim flex flex-wrap justify-center lg:justify-start items-center gap-4 sm:gap-6 pt-1 text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400">
-              <span className="flex items-center gap-1.5">
-                <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500 dark:text-emerald-400" />
-                <span>100% Bebas Malware</span>
-              </span>
               <span className="flex items-center gap-1.5">
                 <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary dark:text-blue-400" />
                 <span>Unduhan Cepat APK</span>

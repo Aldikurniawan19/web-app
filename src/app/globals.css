@@ -70,41 +70,93 @@
   background: #475569;
 }
 
-/* 3D Bulat / Bubble / Puffy Claymorphic Typography - Thicker Convex Volume & Crisp 3D Bevel (0 Blur) */
-.text-3d-bubble-main {
-  background: linear-gradient(180deg, #334155 0%, #1e293b 22%, #020617 65%, #000000 100%);
+/* -------------------------------------------------------------
+   3D Tactile Text Styling (Mirrors 3D Button Extrusions & Layers - 0 Blur Crisp)
+   ------------------------------------------------------------- */
+.text-3d-bubble-main,
+.text-3d-main {
+  background: linear-gradient(180deg, #334155 0%, #1e293b 35%, #0f172a 75%, #020617 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: 
-    drop-shadow(0 1px 0 #64748b)
-    drop-shadow(0 2px 0 rgba(2, 6, 23, 0.4));
+    drop-shadow(0 1px 0 #0f172a)
+    drop-shadow(0 1px 0 #020617)
+    drop-shadow(0 1px 0 #000000);
 }
 
-.dark .text-3d-bubble-main {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 20%, #cbd5e1 65%, #64748b 100%);
+.dark .text-3d-bubble-main,
+.dark .text-3d-main {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 30%, #e2e8f0 70%, #cbd5e1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: 
     drop-shadow(0 1px 0 #94a3b8)
-    drop-shadow(0 2px 0 #334155);
+    drop-shadow(0 1px 0 #64748b)
+    drop-shadow(0 1px 0 #334155);
 }
 
-.text-3d-bubble-blue {
-  background: linear-gradient(180deg, #93c5fd 0%, #3b82f6 25%, #1d4ed8 70%, #172554 100%);
+.text-3d-bubble-blue,
+.text-3d-blue {
+  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 30%, #2563eb 70%, #1d4ed8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: 
+    drop-shadow(0 1px 0 #1d4ed8)
+    drop-shadow(0 1px 0 #1e40af)
+    drop-shadow(0 1px 0 #172554);
+}
+
+.dark .text-3d-bubble-blue,
+.dark .text-3d-blue {
+  background: linear-gradient(180deg, #93c5fd 0%, #60a5fa 30%, #3b82f6 70%, #2563eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: 
+    drop-shadow(0 1px 0 #2563eb)
+    drop-shadow(0 1px 0 #1d4ed8)
+    drop-shadow(0 1px 0 #172554);
+}
+
+/* White 3D Text (for App on Footer & Blue/Dark Surfaces) */
+.text-3d-white {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 40%, #e2e8f0 75%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: 
+    drop-shadow(0 1px 0 #93c5fd)
+    drop-shadow(0 1px 0 #3b82f6)
+    drop-shadow(0 1px 0 #1d4ed8);
+}
+
+.dark .text-3d-white {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 40%, #e2e8f0 75%, #cbd5e1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: 
     drop-shadow(0 1px 0 #60a5fa)
-    drop-shadow(0 2px 0 #1e3a8a);
+    drop-shadow(0 1px 0 #1d4ed8)
+    drop-shadow(0 1px 0 #0f172a);
 }
 
-.dark .text-3d-bubble-blue {
-  background: linear-gradient(180deg, #eff6ff 0%, #93c5fd 25%, #3b82f6 65%, #1d4ed8 100%);
+/* Sky-300 3D Text (for Hub on Footer) */
+.text-3d-sky {
+  background: linear-gradient(180deg, #f0f9ff 0%, #bae6fd 35%, #7dd3fc 75%, #38bdf8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: 
-    drop-shadow(0 1px 0 #60a5fa)
-    drop-shadow(0 2px 0 #172554);
+    drop-shadow(0 1px 0 #0284c7)
+    drop-shadow(0 1px 0 #0369a1)
+    drop-shadow(0 1px 0 #075985);
+}
+
+.dark .text-3d-sky {
+  background: linear-gradient(180deg, #f0f9ff 0%, #bae6fd 35%, #7dd3fc 75%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: 
+    drop-shadow(0 1px 0 #0284c7)
+    drop-shadow(0 1px 0 #1e3a8a)
+    drop-shadow(0 1px 0 #0f172a);
 }
 
 /* Animated High-Speed Diagonal Stripes for Progress Bar */

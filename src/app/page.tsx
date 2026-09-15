@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { StoreHero } from "@/features/hero/StoreHero";
@@ -8,6 +8,7 @@ import { AppGridSection } from "@/features/catalog/AppGridSection";
 import { ApkGuideSection } from "@/features/guide/ApkGuideSection";
 import { AppDetailView } from "@/features/detail/AppDetailView";
 import { DownloadModal } from "@/features/download/DownloadModal";
+import { InstallGuideModal } from "@/features/guide/InstallGuideModal";
 import { APP_STORE_ITEMS } from "@/constants/app-store-data";
 import { AppItem } from "@/types/store";
 
@@ -18,7 +19,10 @@ export default function AppHubPage() {
   const [selectedApp, setSelectedApp] = useState<AppItem>(APP_STORE_ITEMS[0]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [downloadModalApp, setDownloadModalApp] = useState<AppItem | null>(null);
+  const [guideModalApp, setGuideModalApp] = useState<AppItem | null>(null);
   const [activeNav, setActiveNav] = useState<string>("beranda");
+  const isManualScrollLockRef = useRef<boolean>(false);
+  const scrollLockTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch updated apps list on mount with loading skeleton transition
   useEffect(() => {
@@ -73,6 +77,9 @@ export default function AppHubPage() {
     }
 
     const handleScroll = () => {
+      // Abaikan event scroll saat animasi perpindahan halus sedang berlangsung (mencegah navbar melompat bolak-balik)
+      if (isManualScrollLockRef.current) return;
+
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
       const docHeight = document.documentElement.scrollHeight;
@@ -126,10 +133,17 @@ export default function AppHubPage() {
 
   const handleDownload = (app: AppItem) => {
     setDownloadModalApp(app);
+    setGuideModalApp(app);
   };
 
   const handleNavClick = (navId: string) => {
     setActiveNav(navId);
+    isManualScrollLockRef.current = true;
+    if (scrollLockTimerRef.current) clearTimeout(scrollLockTimerRef.current);
+    scrollLockTimerRef.current = setTimeout(() => {
+      isManualScrollLockRef.current = false;
+    }, 850);
+
     if (navId === "beranda") {
       if (activeView !== "catalog") {
         setActiveView("catalog");
@@ -206,7 +220,9 @@ export default function AppHubPage() {
             />
 
             {/* Panduan Pasang APK Section */}
-            <ApkGuideSection />
+            <ApkGuideSection
+              onOpenGuideModal={() => setGuideModalApp(selectedApp || appsList[0])}
+            />
           </>
         ) : (
           /* App Detail View (persis halaman detail Notely) */
@@ -226,6 +242,14 @@ export default function AppHubPage() {
         app={downloadModalApp}
         isOpen={downloadModalApp !== null}
         onClose={() => setDownloadModalApp(null)}
+        onOpenGuide={(app) => setGuideModalApp(app)}
+      />
+
+      {/* 5. Large Canvas APK Installation Guide Modal */}
+      <InstallGuideModal
+        app={guideModalApp}
+        isOpen={guideModalApp !== null}
+        onClose={() => setGuideModalApp(null)}
       />
     </div>
   );

@@ -112,8 +112,8 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
 
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h1 className="text-2xl sm:text-3xl font-black text-foreground font-display select-none py-0.5">
-                    <span className="inline-block text-3d-bubble-main">{app.name}</span>
+                  <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display select-none py-0.5">
+                    {app.name}
                   </h1>
                   <span className="rounded-md bg-blue-50 dark:bg-blue-950/60 px-2.5 py-0.5 text-xs font-semibold text-primary dark:text-blue-400 border border-blue-100 dark:border-blue-900/50">
                     {app.category}
@@ -204,9 +204,8 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
                 <div className="lg:col-span-7 space-y-6">
                   {/* Card: Tentang Aplikasi */}
                   <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
-                    <h2 className="text-lg font-black font-display select-none py-0.5">
-                      <span className="inline-block text-3d-bubble-main">Tentang</span>{" "}
-                      <span className="inline-block text-3d-bubble-blue">Aplikasi</span>
+                    <h2 className="text-lg font-black text-slate-900 dark:text-white font-display select-none py-0.5">
+                      Tentang Aplikasi
                     </h2>
                     <p className="text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                       {app.longDescription}
@@ -241,9 +240,8 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
 
                   {/* Card: Spesifikasi Singkat */}
                   <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
-                    <h3 className="text-base font-black font-display select-none py-0.5 mb-4">
-                      <span className="inline-block text-3d-bubble-main">Spesifikasi</span>{" "}
-                      <span className="inline-block text-3d-bubble-blue">Singkat</span>
+                    <h3 className="text-base font-black text-slate-900 dark:text-white font-display select-none py-0.5 mb-4">
+                      Spesifikasi Singkat
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs">
                       <div className="space-y-1">
@@ -279,9 +277,8 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
                   {/* Card: Cuplikan Fitur Utama */}
                   <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-base font-black font-display select-none py-0.5">
-                        <span className="inline-block text-3d-bubble-main">Fitur</span>{" "}
-                        <span className="inline-block text-3d-bubble-blue">Utama</span>
+                      <h3 className="text-base font-black text-slate-900 dark:text-white font-display select-none py-0.5">
+                        Fitur Utama
                       </h3>
                       <button
                         type="button"
@@ -315,9 +312,8 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
               <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
                   <div className="space-y-1">
-                    <h2 className="text-xl font-black font-display select-none py-0.5">
-                      <span className="inline-block text-3d-bubble-main">Fitur Unggulan</span>{" "}
-                      <span className="inline-block text-3d-bubble-blue">& Kemampuan</span>
+                    <h2 className="text-xl font-black text-slate-900 dark:text-white font-display select-none py-0.5">
+                      Fitur Unggulan & Kemampuan
                     </h2>
                     <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                       Seluruh fitur bawaan yang tersedia secara gratis di versi {app.version}.
@@ -392,9 +388,8 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                 {/* Card 1: Data Rilis & Paket */}
                 <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
-                  <h3 className="text-base font-black font-display select-none py-0.5 border-b border-slate-100 dark:border-slate-800 pb-3">
-                    <span className="inline-block text-3d-bubble-main">Informasi</span>{" "}
-                    <span className="inline-block text-3d-bubble-blue">Rilis & Berkas</span>
+                  <h3 className="text-base font-black text-slate-900 dark:text-white font-display select-none py-0.5 border-b border-slate-100 dark:border-slate-800 pb-3">
+                    Informasi Rilis & Berkas
                   </h3>
                   <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs sm:text-sm">
                     <div className="flex justify-between py-3">
@@ -431,9 +426,8 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
                 {/* Card 2: Keamanan, Distribusi & Lisensi */}
                 <div className="space-y-6">
                   <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
-                    <h3 className="text-base font-black font-display select-none py-0.5 border-b border-slate-100 dark:border-slate-800 pb-3">
-                      <span className="inline-block text-3d-bubble-main">Distribusi</span>{" "}
-                      <span className="inline-block text-3d-bubble-blue">& Lisensi</span>
+                    <h3 className="text-base font-black text-slate-900 dark:text-white font-display select-none py-0.5 border-b border-slate-100 dark:border-slate-800 pb-3">
+                      Distribusi & Lisensi
                     </h3>
                     <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs sm:text-sm">
                       <div className="flex justify-between py-3">
@@ -466,9 +460,8 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
             <div className="space-y-6">
               <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
                 <div className="space-y-1 border-b border-slate-100 dark:border-slate-800 pb-4">
-                  <h2 className="text-xl font-black font-display select-none py-0.5">
-                    <span className="inline-block text-3d-bubble-main">Catatan Pembaruan</span>{" "}
-                    <span className="inline-block text-3d-bubble-blue">& Changelog</span>
+                  <h2 className="text-xl font-black text-slate-900 dark:text-white font-display select-none py-0.5">
+                    Catatan Pembaruan & Changelog
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                     Riwayat pembaruan fitur, peningkatan performa, dan perbaikan bug pada {app.name}.
@@ -553,9 +546,8 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
             <div className="space-y-6">
               <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
                 <div className="space-y-1 border-b border-slate-100 dark:border-slate-800 pb-4">
-                  <h2 className="text-xl font-black font-display select-none py-0.5">
-                    <span className="inline-block text-3d-bubble-main">Kebutuhan</span>{" "}
-                    <span className="inline-block text-3d-bubble-blue">Sistem Perangkat</span>
+                  <h2 className="text-xl font-black text-slate-900 dark:text-white font-display select-none py-0.5">
+                    Kebutuhan Sistem Perangkat
                   </h2>
                   <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                     Pastikan ponsel Anda memenuhi spesifikasi di bawah ini untuk performa terbaik.

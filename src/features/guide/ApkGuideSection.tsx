@@ -7,10 +7,16 @@ import {
   FolderOpen,
   Smartphone,
   CheckCircle2,
+  BookOpen,
 } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { Button } from "@/components/ui/Button";
+
+interface ApkGuideSectionProps {
+  onOpenGuideModal?: () => void;
+}
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -37,7 +43,7 @@ const GUIDE_STEPS: GuideStep[] = [
     step: "02",
     title: "Izinkan Sumber Tidak Dikenal",
     description:
-      "Jika muncul peringatan keamanan sistem Android, masuk ke Pengaturan > Keamanan > pilih browser atau File Manager Anda dan aktifkan izin 'Instal aplikasi tidak dikenal'.",
+      "Jika muncul peringatan keamanan sistem Android, masuk ke Pengaturan -> Keamanan -> pilih browser atau File Manager Anda dan aktifkan izin 'Instal aplikasi tidak dikenal'.",
     tip: "Izin ini hanya perlu diaktifkan satu kali per aplikasi pengunduh.",
     icon: Settings,
   },
@@ -59,7 +65,7 @@ const GUIDE_STEPS: GuideStep[] = [
   },
 ];
 
-export function ApkGuideSection() {
+export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const cardsGridRef = useRef<HTMLDivElement>(null);
 
@@ -164,6 +170,21 @@ export function ApkGuideSection() {
           <p className="guide-header-anim text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">
             Ikuti 4 langkah sederhana berikut untuk memasang aplikasi format APK langsung di smartphone atau tablet Android Anda dengan aman dan cepat.
           </p>
+
+          {onOpenGuideModal && (
+            <div className="guide-header-anim pt-1 flex justify-center">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={onOpenGuideModal}
+                className="text-xs font-bold gap-2 px-4 shadow-sm"
+              >
+                <BookOpen className="h-3.5 w-3.5 text-primary" />
+                <span>Buka Modal Panduan Lengkap</span>
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* 4 Steps Bento / Grid Cards */}

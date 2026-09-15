@@ -14,9 +14,8 @@ interface RelatedAppsProps {
 export function RelatedApps({ onDownloadItem }: RelatedAppsProps) {
   return (
     <div className="space-y-3">
-      <h3 className="text-base font-black font-display select-none py-0.5">
-        <span className="inline-block text-3d-bubble-main">Aplikasi</span>{" "}
-        <span className="inline-block text-3d-bubble-blue">Terkait</span>
+      <h3 className="text-base font-black text-slate-900 dark:text-white font-display select-none py-0.5">
+        Aplikasi Terkait
       </h3>
 
       <div className="space-y-2.5">

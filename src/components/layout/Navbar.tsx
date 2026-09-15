@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Search, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,7 @@ export function Navbar({
   onNavClick,
 }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
   const navItems = [
     { id: "beranda", label: "Beranda", href: "#beranda" },
@@ -28,13 +29,39 @@ export function Navbar({
     { id: "panduan", label: "Panduan", href: "#panduan-apk" },
   ];
 
+  // Tutup menu otomatis ketika pengguna mengklik area luar menu
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (
+        headerRef.current &&
+        !headerRef.current.contains(event.target as Node)
+      ) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [mobileMenuOpen]);
+
   const handleItemClick = (id: string) => {
     if (onNavClick) onNavClick(id);
     setMobileMenuOpen(false);
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 transition-colors duration-200">
+    <>
+      <header
+        ref={headerRef}
+        className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 transition-colors duration-200"
+      >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div
           onClick={() => handleItemClick("beranda")}
@@ -58,7 +85,7 @@ export function Navbar({
                 className={cn(
                   "relative px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 select-none",
                   isActive
-                    ? "bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2.5px_0_#1e3a8a] scale-105"
+                    ? "bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2.5px_0_#1e3a8a]"
                     : "text-slate-600 hover:text-foreground dark:text-slate-300 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
                 )}
               >
@@ -137,6 +164,16 @@ export function Navbar({
         </div>
       )}
     </header>
+
+    {/* Mobile Menu Click-Outside Backdrop Overlay */}
+    {mobileMenuOpen && (
+      <div
+        className="fixed inset-0 top-16 z-30 bg-black/40 backdrop-blur-xs md:hidden animate-in fade-in duration-200"
+        onClick={() => setMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
+    )}
+    </>
   );
 }
 
