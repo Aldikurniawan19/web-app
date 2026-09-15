@@ -195,6 +195,56 @@
   }
 }
 
+/* -------------------------------------------------------------
+   Animasi Mengkilat (Shimmer Shine Effect) untuk Skeleton Loading
+   ------------------------------------------------------------- */
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    transparent 30%,
+    rgba(255, 255, 255, 0.65) 50%,
+    transparent 70%,
+    transparent 100%
+  );
+  animation: skeleton-shine 1.75s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  animation-delay: var(--shimmer-delay, 0ms);
+  pointer-events: none;
+}
+
+.dark .skeleton-shimmer::after {
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    transparent 30%,
+    rgba(255, 255, 255, 0.14) 50%,
+    transparent 70%,
+    transparent 100%
+  );
+}
+
+@keyframes skeleton-shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+
 
 
 

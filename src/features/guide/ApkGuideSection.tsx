@@ -73,26 +73,26 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
     () => {
       const mm = gsap.matchMedia();
 
-      // Animasi judul header section (semua ukuran layar)
+      // Animasi judul header section (semua ukuran layar): animasi muncul dan animasi keluar
       gsap.fromTo(
         ".guide-header-anim",
         { opacity: 0, y: 24 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.95, // Lebih lambat dan tenang
+          duration: 0.95,
           stagger: 0.16,
           ease: "power3.out",
           scrollTrigger: {
             trigger: containerRef.current,
             start: "top 92%",
-            once: true,
+            end: "bottom top",
+            toggleActions: "play reverse play reverse",
           },
-          clearProps: "transform,opacity",
         }
       );
 
-      // Desktop & Tablet (>= 768px): Animasi kartu mengalir dari kiri ke kanan dengan tempo anggun dan lambat
+      // Desktop & Tablet (>= 768px): Animasi kartu muncul (masuk) dan keluar saat di-scroll
       mm.add("(min-width: 768px)", () => {
         const cards = gsap.utils.toArray<HTMLElement>(".guide-step-card");
         if (!cards || cards.length === 0) return;
@@ -108,21 +108,20 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 1.15, // Durasi lebih lambat dan mewah
-            stagger: 0.24, // Jeda kemunculan antar kartu lebih berirama dan rileks
+            duration: 1.1,
+            stagger: 0.22,
             ease: "power3.out",
             scrollTrigger: {
               trigger: cardsGridRef.current,
               start: "top 90%",
-              once: true,
+              end: "bottom top",
+              toggleActions: "play reverse play reverse",
             },
-            clearProps: "transform,opacity",
           }
         );
       });
 
-      // Mobile (< 768px): Animasi kartu muncul berurutan (stagger) dengan tempo santai & sinematik
-      // Begitu pengguna masuk/berada di section panduan, ke-4 kartu mengalir perlahan satu demi satu
+      // Mobile (< 768px): Animasi kartu muncul (masuk) dan keluar saat di-scroll di tampilan ponsel
       mm.add("(max-width: 767px)", () => {
         const cards = gsap.utils.toArray<HTMLElement>(".guide-step-card");
         if (!cards || cards.length === 0) return;
@@ -138,15 +137,15 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 1.05, // Durasi lebih lambat dan tenang di layar ponsel
-            stagger: 0.22, // Jeda antar kartu lebih jelas terlihat mengalir
+            duration: 1.0,
+            stagger: 0.2,
             ease: "power3.out",
             scrollTrigger: {
               trigger: cardsGridRef.current,
               start: "top 92%",
-              once: true,
+              end: "bottom top",
+              toggleActions: "play reverse play reverse",
             },
-            clearProps: "transform,opacity",
           }
         );
       });

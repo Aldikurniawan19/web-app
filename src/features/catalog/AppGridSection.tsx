@@ -261,7 +261,7 @@ export function AppGridSection({
           >
             {Array.from({ length: 4 }).map((_, idx) => (
               <div key={`skeleton-${idx}`} className="w-full">
-                <AppCardSkeleton />
+                <AppCardSkeleton delayMs={idx * 160} />
               </div>
             ))}
           </div>
