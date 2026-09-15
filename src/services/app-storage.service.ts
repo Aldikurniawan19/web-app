@@ -90,13 +90,21 @@ export class AppStorageService {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static mapToAppItem(record: any): AppItem {
+    const apkFile = record.apkFileName || `${record.id}-v${record.version || "1.0.0"}.apk`;
+    // Prioritaskan URL GitHub Releases resmi
+    const defaultGithubUrl = `https://github.com/Aldikurniawan19/app-release/releases/download/apk-releases/${apkFile}`;
+    const resolvedApkUrl =
+      record.apkUrl && !record.apkUrl.startsWith("/downloads/")
+        ? record.apkUrl
+        : defaultGithubUrl;
+
     return {
       id: record.id,
       name: record.name,
       tagline: record.tagline || record.name,
       description: record.description,
       longDescription: record.longDescription || record.description,
-      category: record.category as AppItem["category"],
+      category: (record.category as AppItem["category"]) || "Produktivitas",
       rating: typeof record.rating === "number" ? record.rating : 5.0,
       reviewsCount: record.reviewsCount || "Baru",
       fileSize: record.fileSize || "15.0 MB",
@@ -115,8 +123,8 @@ export class AppStorageService {
         ram: "2 GB RAM",
         storage: "50 MB",
       },
-      apkUrl: record.apkUrl || undefined,
-      apkFileName: record.apkFileName || undefined,
+      apkUrl: resolvedApkUrl,
+      apkFileName: apkFile,
     };
   }
 
@@ -155,7 +163,7 @@ export class AppStorageService {
 
         const mapped = records.map(this.mapToAppItem);
 
-        // Sinkronkan downloadsCount secara real-time dari akumulasi unduhan aset GitHub Releases
+        // Sinkronkan downloadsCount & URL GitHub Releases secara real-time dari akumulasi unduhan aset GitHub Releases
         try {
           const statsMap = await GithubReleaseService.getAllAppsDownloadStats(
             mapped.map((a) => ({
@@ -166,8 +174,14 @@ export class AppStorageService {
             }))
           );
           for (const app of mapped) {
-            if (statsMap[app.id] && statsMap[app.id].totalDownloads > 0) {
-              app.downloadsCount = statsMap[app.id].formattedTotal;
+            const stats = statsMap[app.id];
+            if (stats) {
+              if (stats.totalDownloads > 0) {
+                app.downloadsCount = stats.formattedTotal;
+              }
+              if (stats.latestDownloadUrl) {
+                app.apkUrl = stats.latestDownloadUrl;
+              }
             }
           }
         } catch {
@@ -208,7 +222,7 @@ export class AppStorageService {
       if (record) {
         const item = this.mapToAppItem(record);
 
-        // Sinkronkan downloadsCount aktual dari akumulasi unduhan seluruh rilis GitHub
+        // Sinkronkan downloadsCount aktual & URL GitHub Releases dari akumulasi unduhan seluruh rilis GitHub
         try {
           const stats = await GithubReleaseService.getAppDownloadStats({
             appId: item.id,
@@ -216,8 +230,13 @@ export class AppStorageService {
             apkFileName: item.apkFileName,
             apkUrl: item.apkUrl,
           });
-          if (stats && stats.totalDownloads > 0) {
-            item.downloadsCount = stats.formattedTotal;
+          if (stats) {
+            if (stats.totalDownloads > 0) {
+              item.downloadsCount = stats.formattedTotal;
+            }
+            if (stats.latestDownloadUrl) {
+              item.apkUrl = stats.latestDownloadUrl;
+            }
           }
         } catch {}
 
@@ -323,22 +342,22 @@ export class AppStorageService {
       return null;
     }
 
-    const hasNewApk = !!updateData.apkUrl;
+    const hasNewApk = Boolean(updateData.apkUrl);
     const isApkUrlChanged =
       hasNewApk &&
-      !!existingApp?.apkUrl &&
+      Boolean(existingApp.apkUrl) &&
       updateData.apkUrl !== existingApp.apkUrl;
 
     const isVersionChanged =
-      !!updateData.version &&
-      !!existingApp?.version &&
-      updateData.version.trim() !== existingApp.version.trim();
+      Boolean(updateData.version) &&
+      Boolean(existingApp.version) &&
+      updateData.version!.trim() !== existingApp.version.trim();
 
     // Arsipkan jika berkas APK baru diunggah ATAU nomor versi diubah saat APK lama tersedia
     const shouldArchive =
       (isApkUrlChanged || isVersionChanged) &&
-      !!existingApp?.apkUrl &&
-      !!existingApp?.apkFileName;
+      Boolean(existingApp.apkUrl) &&
+      Boolean(existingApp.apkFileName);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dataToUpdate: any = {
@@ -357,7 +376,7 @@ export class AppStorageService {
     delete dataToUpdate.changelog;
 
     // 1. Jika perlu mengarsipkan versi lama, simpan ke tabel app_versions
-    if (shouldArchive && existingApp?.apkUrl && existingApp?.apkFileName) {
+    if (shouldArchive && existingApp.apkUrl && existingApp.apkFileName) {
       try {
         await withRetry(() =>
           prisma.appVersion.create({
@@ -479,15 +498,22 @@ export class AppStorageService {
         })
       );
 
-      return records.map((r) => ({
-        id: r.id,
-        version: r.version,
-        fileSize: r.fileSize,
-        apkUrl: r.apkUrl,
-        apkFileName: r.apkFileName,
-        changelog: r.changelog,
-        createdAt: r.createdAt.toISOString(),
-      }));
+      return records.map((r) => {
+        const apkFile = r.apkFileName || `${appId}-${r.version}.apk`;
+        const defaultGithubUrl = `https://github.com/Aldikurniawan19/app-release/releases/download/apk-releases/${apkFile}`;
+        const resolvedApkUrl =
+          r.apkUrl && !r.apkUrl.startsWith("/downloads/") ? r.apkUrl : defaultGithubUrl;
+
+        return {
+          id: r.id,
+          version: r.version,
+          fileSize: r.fileSize,
+          apkUrl: resolvedApkUrl,
+          apkFileName: apkFile,
+          changelog: r.changelog,
+          createdAt: r.createdAt.toISOString(),
+        };
+      });
     } catch (err) {
       console.error(`Gagal membaca riwayat versi untuk ${appId}:`, err);
       return [];

@@ -92,9 +92,10 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
   const selectedArchived = versions.find((v) => v.id === selectedVersionId);
   const activeVersion = selectedArchived ? selectedArchived.version : app.version;
   const activeFileSize = selectedArchived ? selectedArchived.fileSize : app.fileSize;
+  const defaultGithubUrl = `https://github.com/Aldikurniawan19/app-release/releases/download/apk-releases/${app.apkFileName || `${app.id}-v${app.version}.apk`}`;
   const activeApkUrl = selectedArchived
     ? selectedArchived.apkUrl
-    : (app.apkUrl || "/downloads/aerosync-v2.4.0-release.apk");
+    : (app.apkUrl && !app.apkUrl.startsWith("/downloads/") ? app.apkUrl : defaultGithubUrl);
   const activeFileName = selectedArchived
     ? selectedArchived.apkFileName
     : (app.apkFileName || `${app.id}-v${app.version}.apk`);

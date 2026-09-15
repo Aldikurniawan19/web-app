@@ -415,10 +415,16 @@ export class GithubReleaseService {
       }
     }
 
+    const latestDownloadUrl =
+      breakdown.length > 0
+        ? breakdown[0].downloadUrl
+        : `https://github.com/${this.owner}/${this.repo}/releases/download/${this.tag}/${cleanApkName || `${options.appId}.apk`}`;
+
     return {
       appId: options.appId,
       totalDownloads,
       formattedTotal: this.formatDownloadCount(totalDownloads),
+      latestDownloadUrl,
       breakdown,
     };
   }
@@ -468,6 +474,7 @@ export interface AppDownloadStatsResult {
   appId: string;
   totalDownloads: number;
   formattedTotal: string;
+  latestDownloadUrl?: string;
   breakdown: AssetDownloadBreakdown[];
 }
 

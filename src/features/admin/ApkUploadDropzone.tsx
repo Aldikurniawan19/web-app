@@ -34,7 +34,7 @@ export function ApkUploadDropzone({
       ? {
           fileName: currentFileName,
           fileSize: currentFileSize || "15.0 MB",
-          downloadUrl: `/downloads/${currentFileName}`,
+          downloadUrl: `https://github.com/Aldikurniawan19/app-release/releases/download/apk-releases/${currentFileName}`,
         }
       : null
   );
@@ -87,10 +87,11 @@ export function ApkUploadDropzone({
       setUploadProgress(100);
       setTimeout(() => {
         setUploadProgress(null);
+        const defaultGithubUrl = `https://github.com/Aldikurniawan19/app-release/releases/download/apk-releases/${json.data?.fileName || file.name}`;
         const resultData = {
           fileName: json.data?.fileName || file.name,
           fileSize: json.data?.fileSize || formattedSize,
-          downloadUrl: json.data?.downloadUrl || `/downloads/${file.name}`,
+          downloadUrl: json.data?.downloadUrl || defaultGithubUrl,
         };
         setFileDetails(resultData);
         onFileUploaded(resultData);

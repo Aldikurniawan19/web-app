@@ -364,10 +364,10 @@ export const APP_CONFIG = {
   minAndroid: "Android 8.0+",
   sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   apkFileName: "apphub-v2.4.0-release.apk",
-  downloadUrl: "/downloads/aerosync-v2.4.0-release.apk",
-  downloadApkUrl: "/downloads/aerosync-v2.4.0-release.apk",
+  downloadUrl: "https://github.com/Aldikurniawan19/app-release/releases/download/apk-releases/apphub-v2.4.0-release.apk",
+  downloadApkUrl: "https://github.com/Aldikurniawan19/app-release/releases/download/apk-releases/apphub-v2.4.0-release.apk",
   playStoreUrl: "https://play.google.com/store/apps",
-  githubUrl: "https://github.com",
+  githubUrl: "https://github.com/Aldikurniawan19/app-release",
 };
 
 export const INSTALLATION_STEPS = [
