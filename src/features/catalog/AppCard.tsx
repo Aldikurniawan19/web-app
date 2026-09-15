@@ -19,7 +19,7 @@ export function AppCard({ app, onOpenDetail }: AppCardProps) {
       className="group relative flex w-full flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm transition-[border-color,box-shadow,background-color] duration-200 hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 hover:bg-slate-50/40 dark:hover:bg-slate-800/50 active:scale-[0.99] cursor-pointer"
     >
       {/* Left: App Icon & Detailed Content */}
-      <div className="flex items-start sm:items-center gap-4 sm:gap-5 flex-1 min-w-0">
+      <div className="flex items-start sm:items-center gap-4 sm:gap-5 flex-1 min-w-0 w-full">
         <AppIcon
           type={app.iconType}
           iconUrl={app.iconUrl}
@@ -28,7 +28,7 @@ export function AppCard({ app, onOpenDetail }: AppCardProps) {
           className="h-14 w-14 rounded-2xl shrink-0 group-hover:scale-105 transition-transform"
         />
 
-        <div className="flex-1 min-w-0 space-y-1.5">
+        <div className="flex-1 min-w-0 space-y-1.5 w-full">
           {/* Title & Category Row */}
           <div className="flex flex-wrap items-center gap-2.5">
             <h3 className="text-base sm:text-lg font-bold text-foreground font-display group-hover:text-primary transition-colors">
@@ -39,8 +39,8 @@ export function AppCard({ app, onOpenDetail }: AppCardProps) {
             </span>
           </div>
 
-          {/* Description */}
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-1 sm:line-clamp-2 max-w-2xl">
+          {/* Description (Fills available width) */}
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-1 sm:line-clamp-2 w-full">
             {app.description}
           </p>
 
@@ -64,7 +64,7 @@ export function AppCard({ app, onOpenDetail }: AppCardProps) {
       </div>
 
       {/* Right: Lihat Detail Action Button */}
-      <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 sm:border-l border-slate-100 dark:border-slate-800 sm:pl-5">
+      <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 sm:border-l border-slate-100 dark:border-slate-800 sm:pl-5 w-full sm:w-auto">
         <div className="sm:hidden">
           <PlatformBadge platforms={app.platforms} />
         </div>

@@ -3,45 +3,59 @@ import { AppItem, CreateAppInput } from "@/types/store";
 import { APP_STORE_ITEMS } from "@/constants/app-store-data";
 
 /**
+ * In-memory cache untuk performa tinggi & respon instan (sub-millisecond)
+ */
+let cachedApps: AppItem[] | null = null;
+let lastCacheTimestamp = 0;
+const CACHE_TTL_MS = 60 * 1000; // 60 detik cache TTL
+
+let isSeededChecked = false;
+
+/**
  * Service Layer untuk Akses Data Aplikasi di Supabase PostgreSQL melalui Prisma ORM
  */
 export class AppStorageService {
   /**
    * Helper untuk memastikan database memiliki data katalog awal (seed fallback)
+   * Hanya dijalankan 1 kali saat server startup / first request untuk menghemat roundtrip query ke database
    */
   private static async ensureSeeded(): Promise<void> {
+    if (isSeededChecked) return;
+
     try {
+      isSeededChecked = true;
       const count = await prisma.app.count();
       if (count === 0) {
-        // Lakukan auto-seeding dari konstanta awal
-        for (const item of APP_STORE_ITEMS) {
-          await prisma.app.create({
-            data: {
-              id: item.id,
-              name: item.name,
-              tagline: item.tagline,
-              description: item.description,
-              longDescription: item.longDescription,
-              category: item.category,
-              rating: item.rating,
-              reviewsCount: item.reviewsCount,
-              fileSize: item.fileSize,
-              version: item.version,
-              developer: item.developer,
-              lastUpdated: item.lastUpdated,
-              platforms: item.platforms,
-              iconUrl: item.iconUrl || null,
-              iconType: item.iconType,
-              iconColor: item.iconColor,
-              features: item.features,
-              screenshots: JSON.parse(JSON.stringify(item.screenshots)),
-              downloadsCount: item.downloadsCount,
-              systemRequirements: JSON.parse(JSON.stringify(item.systemRequirements)),
-              apkUrl: item.apkUrl || `/downloads/aerosync-v2.4.0-release.apk`,
-              apkFileName: item.apkFileName || `${item.id}-v${item.version}.apk`,
-            },
-          });
-        }
+        // Lakukan batch seeding cepat
+        const seedData = APP_STORE_ITEMS.map((item) => ({
+          id: item.id,
+          name: item.name,
+          tagline: item.tagline,
+          description: item.description,
+          longDescription: item.longDescription,
+          category: item.category,
+          rating: item.rating,
+          reviewsCount: item.reviewsCount,
+          fileSize: item.fileSize,
+          version: item.version,
+          developer: item.developer,
+          lastUpdated: item.lastUpdated,
+          platforms: item.platforms,
+          iconUrl: item.iconUrl || null,
+          iconType: item.iconType,
+          iconColor: item.iconColor,
+          features: item.features,
+          screenshots: JSON.parse(JSON.stringify(item.screenshots)),
+          downloadsCount: item.downloadsCount,
+          systemRequirements: JSON.parse(JSON.stringify(item.systemRequirements)),
+          apkUrl: item.apkUrl || `/downloads/aerosync-v2.4.0-release.apk`,
+          apkFileName: item.apkFileName || `${item.id}-v${item.version}.apk`,
+        }));
+
+        await prisma.app.createMany({
+          data: seedData,
+          skipDuplicates: true,
+        });
       }
     } catch (err) {
       console.warn("Peringatan saat memeriksa database seed Supabase:", err);
@@ -84,30 +98,58 @@ export class AppStorageService {
   }
 
   /**
-   * Mengambil semua daftar aplikasi yang tersedia di Supabase
+   * Invalidate in-memory cache saat ada mutasi data
+   */
+  static invalidateCache(): void {
+    cachedApps = null;
+    lastCacheTimestamp = 0;
+  }
+
+  /**
+   * Mengambil semua daftar aplikasi yang tersedia di Supabase dengan In-Memory Cache Cepat
    */
   static async getAllApps(): Promise<AppItem[]> {
+    const now = Date.now();
+
+    // 1. Jika data ada di cache dan belum expired, kembalikan instan (0ms latency)
+    if (cachedApps && now - lastCacheTimestamp < CACHE_TTL_MS) {
+      return cachedApps;
+    }
+
     try {
       await this.ensureSeeded();
+
       const records = await prisma.app.findMany({
         orderBy: { createdAt: "desc" },
       });
 
       if (records.length === 0) {
+        cachedApps = APP_STORE_ITEMS;
+        lastCacheTimestamp = now;
         return APP_STORE_ITEMS;
       }
 
-      return records.map(this.mapToAppItem);
+      const mapped = records.map(this.mapToAppItem);
+      cachedApps = mapped;
+      lastCacheTimestamp = now;
+      return mapped;
     } catch (err) {
       console.error("Gagal membaca daftar aplikasi dari Supabase:", err);
+      if (cachedApps) return cachedApps;
       return APP_STORE_ITEMS;
     }
   }
 
   /**
-   * Mengambil satu aplikasi berdasarkan ID
+   * Mengambil satu aplikasi berdasarkan ID (Pencarian Cepat di Cache atau DB)
    */
   static async getAppById(id: string): Promise<AppItem | null> {
+    // 1. Cek dari cache jika tersedia
+    if (cachedApps) {
+      const foundInCache = cachedApps.find((a) => a.id === id);
+      if (foundInCache) return foundInCache;
+    }
+
     try {
       await this.ensureSeeded();
       const record = await prisma.app.findUnique({
@@ -128,7 +170,7 @@ export class AppStorageService {
   }
 
   /**
-   * Menambahkan aplikasi APK baru ke database Supabase
+   * Menambahkan aplikasi APK baru ke database Supabase & memperbarui cache instan
    */
   static async createApp(appData: CreateAppInput): Promise<AppItem> {
     const lastUpdated =
@@ -174,11 +216,14 @@ export class AppStorageService {
       },
     });
 
+    // Invalidate cache agar data terbaru langsung tersinkron
+    this.invalidateCache();
+
     return this.mapToAppItem(record);
   }
 
   /**
-   * Memperbarui data aplikasi di Supabase
+   * Memperbarui data aplikasi di Supabase & memperbarui cache instan
    */
   static async updateApp(id: string, updateData: Partial<AppItem>): Promise<AppItem | null> {
     const lastUpdated =
@@ -208,17 +253,23 @@ export class AppStorageService {
       data: dataToUpdate,
     });
 
+    // Invalidate cache
+    this.invalidateCache();
+
     return this.mapToAppItem(record);
   }
 
   /**
-   * Menghapus aplikasi berdasarkan ID dari Supabase
+   * Menghapus aplikasi berdasarkan ID dari Supabase & memperbarui cache instan
    */
   static async deleteApp(id: string): Promise<boolean> {
     try {
       await prisma.app.delete({
         where: { id },
       });
+
+      // Invalidate cache
+      this.invalidateCache();
       return true;
     } catch (err) {
       console.error(`Gagal menghapus aplikasi ${id} di Supabase:`, err);

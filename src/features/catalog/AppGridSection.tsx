@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { AppItem } from "@/types/store";
 import { AppCard } from "@/features/catalog/AppCard";
@@ -32,6 +32,8 @@ export function AppGridSection({
 }: AppGridSectionProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [minListHeight, setMinListHeight] = useState<number | null>(null);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +42,7 @@ export function AppGridSection({
   const totalPages = shouldPaginate ? Math.ceil(apps.length / ITEMS_PER_PAGE) : 1;
 
   // Pastikan currentPage valid saat jumlah data berubah
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [apps.length]);
 
@@ -51,79 +53,97 @@ export function AppGridSection({
     return apps.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [apps, currentPage, shouldPaginate]);
 
-  // Animasi Muncul saat Scroll (Responsive: Stagger di Desktop, Individual saat scroll di Mobile)
+  // Kalkulasi & pertahankan tinggi stabil untuk 7 item penuh agar section tidak mengecil saat paginasi
+  const updateStableHeight = React.useCallback(() => {
+    if (!shouldPaginate || !cardsContainerRef.current) return;
+
+    if (displayedApps.length === ITEMS_PER_PAGE) {
+      const actualHeight = cardsContainerRef.current.offsetHeight;
+      if (actualHeight > 0) {
+        setMinListHeight(actualHeight);
+        return;
+      }
+    }
+
+    // Jika sedang berada di halaman dengan item kurang dari 7, hitung proporsional berdasarkan tinggi 1 card
+    const singleCard = cardsContainerRef.current.querySelector<HTMLElement>(".app-card-item");
+    if (singleCard) {
+      const cardHeight = singleCard.offsetHeight;
+      const isMobile = window.innerWidth < 640;
+      const gap = isMobile ? 14 : 16;
+      const calculatedHeight = cardHeight * ITEMS_PER_PAGE + gap * (ITEMS_PER_PAGE - 1);
+      if (calculatedHeight > 0) {
+        setMinListHeight(calculatedHeight);
+      }
+    }
+  }, [displayedApps.length, shouldPaginate, ITEMS_PER_PAGE]);
+
+  // Ukur tinggi saat data dimuat atau berubah
+  useLayoutEffect(() => {
+    updateStableHeight();
+  }, [updateStableHeight, displayedApps]);
+
+  // Listener resize untuk memperbarui tinggi stabil saat layar diubah atau dirotasi
+  useEffect(() => {
+    if (!shouldPaginate || typeof window === "undefined") return;
+
+    const handleResize = () => {
+      updateStableHeight();
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [updateStableHeight, shouldPaginate]);
+
+  // Fungsi untuk scroll mulus langsung ke posisi atas section katalog
+  const scrollToKatalogTop = () => {
+    const katalogEl = document.getElementById("katalog");
+    if (katalogEl) {
+      const navbarHeight = 64; // h-16
+      const topBuffer = 16; // Jarak bernapas di atas judul katalog
+      const elementPosition = katalogEl.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - navbarHeight - topBuffer;
+
+      window.scrollTo({
+        top: Math.max(0, offsetPosition),
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // Animasi Muncul Kartu Aplikasi
   useGSAP(
     () => {
       if (isLoading || !containerRef.current || displayedApps.length === 0) return;
 
-      const mm = gsap.matchMedia();
+      const cards = gsap.utils.toArray<HTMLElement>(".app-card-item");
+      if (!cards || cards.length === 0) return;
 
-      // Desktop & Tablet (>= 768px): Animasi berurutan dari atas ke bawah secara anggun dan mulus
-      mm.add("(min-width: 768px)", () => {
-        const cards = gsap.utils.toArray<HTMLElement>(".app-card-item");
-        if (!cards || cards.length === 0) return;
-
-        gsap.fromTo(
-          cards,
-          {
-            opacity: 0,
-            y: 40,
-            scale: 0.96,
+      gsap.fromTo(
+        cards,
+        {
+          opacity: 0,
+          y: 24,
+          scale: 0.98,
+        },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.45,
+          stagger: 0.05,
+          ease: "power3.out",
+          clearProps: "transform,opacity",
+          onComplete: () => {
+            setIsTransitioning(false);
           },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.85,
-            stagger: 0.1,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: cardsContainerRef.current,
-              start: "top 86%",
-              toggleActions: "play none none reverse",
-            },
-            clearProps: "transform,opacity",
-          }
-        );
-      });
-
-      // Mobile (< 768px): Animasi dipicu satu per satu tepat saat masing-masing kartu aplikasi di-scroll
-      mm.add("(max-width: 767px)", () => {
-        const cards = gsap.utils.toArray<HTMLElement>(".app-card-item");
-        if (!cards || cards.length === 0) return;
-
-        cards.forEach((card) => {
-          gsap.fromTo(
-            card,
-            {
-              opacity: 0,
-              y: 35,
-              scale: 0.96,
-            },
-            {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              duration: 0.85,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: card,
-                start: "top 85%", // Aktif saat posisi scroll tepat berada pada kartu tersebut
-                toggleActions: "play none none reverse",
-              },
-              clearProps: "transform,opacity",
-            }
-          );
-        });
-      });
-
-      ScrollTrigger.refresh();
-      setIsTransitioning(false);
+        }
+      );
     },
-    { dependencies: [displayedApps, currentPage, isLoading], scope: containerRef }
+    { dependencies: [currentPage, displayedApps, isLoading], scope: containerRef }
   );
 
-  // Animasi Keluar (Exit Animation) saat membuka detail aplikasi
+  // Animasi Keluar saat membuka detail aplikasi
   const handleOpenDetailWithAnimation = (app: AppItem) => {
     if (isTransitioning) return;
     setIsTransitioning(true);
@@ -134,7 +154,7 @@ export function AppGridSection({
         opacity: 0,
         y: 16,
         scale: 0.98,
-        duration: 0.22,
+        duration: 0.2,
         stagger: 0.02,
         ease: "power2.in",
         onComplete: () => {
@@ -148,31 +168,30 @@ export function AppGridSection({
     }
   };
 
-  // Animasi Keluar (Exit Animation) saat berpindah halaman paginasi
+  // Animasi Keluar dan Perpindahan Halaman Paginasi + Auto Scroll ke Atas
   const handlePageChange = (newPage: number) => {
     if (newPage === currentPage || isTransitioning || newPage < 1 || newPage > totalPages) return;
     setIsTransitioning(true);
+
+    // Otomatis langsung scroll ke atas section katalog
+    scrollToKatalogTop();
 
     const cards = containerRef.current?.querySelectorAll(".app-card-item");
     if (cards && cards.length > 0) {
       gsap.to(cards, {
         opacity: 0,
-        y: newPage > currentPage ? -18 : 18,
+        y: newPage > currentPage ? -14 : 14,
         scale: 0.98,
-        duration: 0.22,
-        stagger: 0.02,
+        duration: 0.2,
+        stagger: 0.015,
         ease: "power2.in",
         onComplete: () => {
           setCurrentPage(newPage);
-          // Scroll halus ke header katalog
-          const katalogEl = document.getElementById("katalog");
-          if (katalogEl) {
-            katalogEl.scrollIntoView({ behavior: "smooth" });
-          }
         },
       });
     } else {
       setCurrentPage(newPage);
+      setIsTransitioning(false);
     }
   };
 
@@ -221,18 +240,32 @@ export function AppGridSection({
 
         {/* Loading Skeleton View */}
         {isLoading ? (
-          <div className="mt-8 flex flex-col gap-3.5 sm:gap-4 w-full">
-            {Array.from({ length: 6 }).map((_, idx) => (
+          <div
+            className={cn(
+              "mt-8 flex flex-col gap-3.5 sm:gap-4 w-full",
+              shouldPaginate && "min-h-[1420px] sm:min-h-[960px] md:min-h-[920px]"
+            )}
+            style={{
+              minHeight: minListHeight ? `${minListHeight}px` : undefined,
+            }}
+          >
+            {Array.from({ length: 7 }).map((_, idx) => (
               <div key={`skeleton-${idx}`} className="w-full">
                 <AppCardSkeleton />
               </div>
             ))}
           </div>
         ) : displayedApps.length > 0 ? (
-          /* Full Width Horizontal Rectangular App Cards List */
+          /* Full Width Horizontal Rectangular App Cards List dengan Tinggi Stabil */
           <div
             ref={cardsContainerRef}
-            className="mt-8 flex flex-col gap-3.5 sm:gap-4 w-full"
+            className={cn(
+              "mt-8 flex flex-col gap-3.5 sm:gap-4 w-full justify-start",
+              shouldPaginate && "min-h-[1420px] sm:min-h-[960px] md:min-h-[920px]"
+            )}
+            style={{
+              minHeight: minListHeight ? `${minListHeight}px` : undefined,
+            }}
           >
             {displayedApps.map((app) => (
               <div
@@ -270,7 +303,7 @@ export function AppGridSection({
           </div>
         )}
 
-        {/* Pagination Bar: Hanya muncul jika tidak loading dan list aplikasi > 7 */}
+        {/* Pagination Bar: Muncul saat list aplikasi > 7 */}
         {!isLoading && shouldPaginate && totalPages > 1 && (
           <div className="mt-12 flex items-center justify-center gap-2 animate-in fade-in">
             <button

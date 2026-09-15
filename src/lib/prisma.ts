@@ -2,10 +2,14 @@ import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
-const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL;
+// Prioritaskan DATABASE_URL (Supabase Connection Pooler port 6543) untuk kecepatan & efisiensi koneksi tinggi
+const connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL;
 
 const pool = new Pool({
   connectionString,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
   ssl: {
     rejectUnauthorized: false,
   },

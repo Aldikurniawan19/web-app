@@ -14,7 +14,7 @@ import { AppItem } from "@/types/store";
 
 export default function AppHubPage() {
   const [appsList, setAppsList] = useState<AppItem[]>(APP_STORE_ITEMS);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activeView, setActiveView] = useState<"catalog" | "detail">("catalog");
   const [selectedApp, setSelectedApp] = useState<AppItem>(APP_STORE_ITEMS[0]);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -24,7 +24,7 @@ export default function AppHubPage() {
   const isManualScrollLockRef = useRef<boolean>(false);
   const scrollLockTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch updated apps list on mount with loading skeleton transition
+  // Background SWR sync data aplikasi terbaru dari API/Supabase tanpa memblokir tampilan awal
   useEffect(() => {
     let isMounted = true;
     const fetchLatestApps = async () => {
@@ -38,13 +38,6 @@ export default function AppHubPage() {
         }
       } catch (err) {
         console.error("Gagal sinkronisasi data aplikasi:", err);
-      } finally {
-        if (isMounted) {
-          // Berikan jeda halus agar skeleton terlihat mulus
-          setTimeout(() => {
-            if (isMounted) setIsLoading(false);
-          }, 350);
-        }
       }
     };
     fetchLatestApps();

@@ -26,39 +26,26 @@ export function StoreHero({
       // Staggered text & search bar reveal (berjalan mulus saat mount)
       gsap.fromTo(
         ".hero-anim",
-        { opacity: 0, y: 24 },
+        { opacity: 0, y: 20 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.75,
-          stagger: 0.1,
+          duration: 0.65,
+          stagger: 0.08,
           ease: "power3.out",
           clearProps: "opacity,transform",
         }
       );
 
-      // Hero Image subtle floating loop
+      // Hero Image subtle floating loop (tanpa menunda render awal gambar)
       if (imageRef.current) {
-        gsap.fromTo(
-          imageRef.current,
-          { opacity: 0, scale: 0.94, y: 15 },
-          {
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "power3.out",
-            onComplete: () => {
-              gsap.to(imageRef.current, {
-                y: -8,
-                duration: 2.2,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut",
-              });
-            },
-          }
-        );
+        gsap.to(imageRef.current, {
+          y: -8,
+          duration: 2.4,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        });
       }
     },
     { dependencies: [], scope: containerRef }
@@ -83,12 +70,15 @@ export function StoreHero({
               ref={imageRef}
               className="relative w-full max-w-[190px] sm:max-w-[280px] lg:max-w-lg"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              {/* Next.js Optimized Image with High Priority Preloading & WebP Conversion */}
+              <Image
                 src="/assets/hero.png"
                 alt="Ilustrasi Laptop dan Aplikasi AppHub"
                 width={540}
                 height={400}
+                priority
+                quality={85}
+                sizes="(max-width: 640px) 190px, (max-width: 1024px) 280px, 512px"
                 className="w-full h-auto object-contain drop-shadow-xl select-none"
               />
             </div>
