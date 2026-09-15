@@ -153,34 +153,44 @@ export default function AppHubPage() {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     } else if (navId === "aplikasi") {
-      if (activeView !== "catalog") {
-        setActiveView("catalog");
-        setTimeout(() => {
-          const element = document.getElementById("katalog");
-          if (element) {
-            element.scrollIntoView({ behavior: "smooth" });
-          }
-        }, 50);
-      } else {
+      const scrollToKatalog = () => {
         const element = document.getElementById("katalog");
         if (element) {
-          element.scrollIntoView({ behavior: "smooth" });
+          const navbarHeight = 64;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
+          window.scrollTo({
+            top: Math.max(0, offsetPosition),
+            behavior: "smooth",
+          });
         }
-      }
-    } else if (navId === "panduan") {
+      };
+
       if (activeView !== "catalog") {
         setActiveView("catalog");
-        setTimeout(() => {
-          const element = document.getElementById("panduan-apk");
-          if (element) {
-            element.scrollIntoView({ behavior: "smooth" });
-          }
-        }, 50);
+        setTimeout(scrollToKatalog, 50);
       } else {
+        scrollToKatalog();
+      }
+    } else if (navId === "panduan") {
+      const scrollToPanduan = () => {
         const element = document.getElementById("panduan-apk");
         if (element) {
-          element.scrollIntoView({ behavior: "smooth" });
+          const navbarHeight = 64;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
+          window.scrollTo({
+            top: Math.max(0, offsetPosition),
+            behavior: "smooth",
+          });
         }
+      };
+
+      if (activeView !== "catalog") {
+        setActiveView("catalog");
+        setTimeout(scrollToPanduan, 50);
+      } else {
+        scrollToPanduan();
       }
     }
   };

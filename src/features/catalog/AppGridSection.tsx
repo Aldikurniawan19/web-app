@@ -95,6 +95,16 @@ export function AppGridSection({
     return () => window.removeEventListener("resize", handleResize);
   }, [updateStableHeight, shouldPaginate]);
 
+  // Sinkronisasi posisi ScrollTrigger di seluruh halaman saat data aplikasi berubah atau selesai dimuat
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const timer = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, apps.length, displayedApps.length]);
+
   // Fungsi untuk scroll mulus langsung ke posisi atas section katalog
   const scrollToKatalogTop = () => {
     const katalogEl = document.getElementById("katalog");
@@ -242,25 +252,25 @@ export function AppGridSection({
         {isLoading ? (
           <div
             className={cn(
-              "mt-8 flex flex-col gap-3.5 sm:gap-4 w-full",
+              "mt-8 flex flex-col gap-3.5 sm:gap-4 w-full min-h-[320px] sm:min-h-[360px]",
               shouldPaginate && "min-h-[1420px] sm:min-h-[960px] md:min-h-[920px]"
             )}
             style={{
               minHeight: minListHeight ? `${minListHeight}px` : undefined,
             }}
           >
-            {Array.from({ length: 7 }).map((_, idx) => (
+            {Array.from({ length: 4 }).map((_, idx) => (
               <div key={`skeleton-${idx}`} className="w-full">
                 <AppCardSkeleton />
               </div>
             ))}
           </div>
         ) : displayedApps.length > 0 ? (
-          /* Full Width Horizontal Rectangular App Cards List dengan Tinggi Stabil */
+          /* Full Width Horizontal Rectangular App Cards List dengan Tinggi Stabil & Proporsional */
           <div
             ref={cardsContainerRef}
             className={cn(
-              "mt-8 flex flex-col gap-3.5 sm:gap-4 w-full justify-start",
+              "mt-8 flex flex-col gap-3.5 sm:gap-4 w-full justify-start min-h-[260px] sm:min-h-[300px]",
               shouldPaginate && "min-h-[1420px] sm:min-h-[960px] md:min-h-[920px]"
             )}
             style={{

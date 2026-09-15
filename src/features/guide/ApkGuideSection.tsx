@@ -76,22 +76,23 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
       // Animasi judul header section (semua ukuran layar)
       gsap.fromTo(
         ".guide-header-anim",
-        { opacity: 0, y: 20 },
+        { opacity: 0, y: 24 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.7,
-          stagger: 0.12,
-          ease: "power2.out",
+          duration: 0.95, // Lebih lambat dan tenang
+          stagger: 0.16,
+          ease: "power3.out",
           scrollTrigger: {
             trigger: containerRef.current,
-            start: "top 88%",
-            toggleActions: "play none none reverse",
+            start: "top 92%",
+            once: true,
           },
+          clearProps: "transform,opacity",
         }
       );
 
-      // Desktop & Tablet (>= 768px): Animasi berurutan dari kiri ke kanan dengan tempo lambat & anggun
+      // Desktop & Tablet (>= 768px): Animasi kartu mengalir dari kiri ke kanan dengan tempo anggun dan lambat
       mm.add("(min-width: 768px)", () => {
         const cards = gsap.utils.toArray<HTMLElement>(".guide-step-card");
         if (!cards || cards.length === 0) return;
@@ -101,54 +102,63 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
           {
             opacity: 0,
             y: 45,
-            scale: 0.95,
+            scale: 0.94,
           },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 1.15, // Durasi lebih lambat dan elegan
-            stagger: 0.28, // Jeda kemunculan bergantian antar kartu lebih lambat dan jelas
+            duration: 1.15, // Durasi lebih lambat dan mewah
+            stagger: 0.24, // Jeda kemunculan antar kartu lebih berirama dan rileks
             ease: "power3.out",
             scrollTrigger: {
               trigger: cardsGridRef.current,
-              start: "top 86%",
-              toggleActions: "play none none reverse",
+              start: "top 90%",
+              once: true,
             },
             clearProps: "transform,opacity",
           }
         );
       });
 
-      // Mobile (< 768px): Animasi dipicu satu per satu tepat saat kartu tersebut di-scroll oleh pengguna
+      // Mobile (< 768px): Animasi kartu muncul berurutan (stagger) dengan tempo santai & sinematik
+      // Begitu pengguna masuk/berada di section panduan, ke-4 kartu mengalir perlahan satu demi satu
       mm.add("(max-width: 767px)", () => {
         const cards = gsap.utils.toArray<HTMLElement>(".guide-step-card");
         if (!cards || cards.length === 0) return;
 
-        cards.forEach((card) => {
-          gsap.fromTo(
-            card,
-            {
-              opacity: 0,
-              y: 40,
-              scale: 0.95,
+        gsap.fromTo(
+          cards,
+          {
+            opacity: 0,
+            y: 38,
+            scale: 0.95,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 1.05, // Durasi lebih lambat dan tenang di layar ponsel
+            stagger: 0.22, // Jeda antar kartu lebih jelas terlihat mengalir
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: cardsGridRef.current,
+              start: "top 92%",
+              once: true,
             },
-            {
-              opacity: 1,
-              y: 0,
-              scale: 1,
-              duration: 0.95, // Mulus dan tenang
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: card,
-                start: "top 84%", // Aktif saat posisi scroll tepat berada di kartu tersebut
-                toggleActions: "play none none reverse",
-              },
-              clearProps: "transform,opacity",
-            }
-          );
-        });
+            clearProps: "transform,opacity",
+          }
+        );
       });
+
+      // Refresh ScrollTrigger setelah render untuk mengantisipasi perubahan ukuran layout dinamis
+      const timer = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 200);
+
+      return () => {
+        clearTimeout(timer);
+      };
     },
     { scope: containerRef, dependencies: [] }
   );
