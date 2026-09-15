@@ -31,9 +31,9 @@
   --color-danger: #ef4444;
   --color-danger-subtle: #fee2e2;
 
-  /* Font Family - Menggunakan font web resmi (Plus Jakarta Sans & Inter), bukan font bawaan perangkat pengguna */
-  --font-display: var(--font-plus-jakarta-sans), "Plus Jakarta Sans", sans-serif;
-  --font-body: var(--font-inter), "Inter", sans-serif;
+  /* Font Family - Menggunakan font web modern, luwes & ramah (Outfit & DM Sans) */
+  --font-display: var(--font-outfit), "Outfit", sans-serif;
+  --font-body: var(--font-dm-sans), "DM Sans", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
   /* Skala Radius Konsisten */

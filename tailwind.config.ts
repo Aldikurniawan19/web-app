@@ -47,15 +47,15 @@ const config: Config = {
       },
       fontFamily: {
         display: [
-          "var(--font-plus-jakarta-sans)",
+          "var(--font-outfit)",
           "var(--font-display)",
-          "Plus Jakarta Sans",
+          "Outfit",
           "sans-serif",
         ],
         body: [
-          "var(--font-inter)",
+          "var(--font-dm-sans)",
           "var(--font-body)",
-          "Inter",
+          "DM Sans",
           "sans-serif",
         ],
         mono: [

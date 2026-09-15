@@ -224,7 +224,7 @@ export function AppGridSection({
         {/* Section Header: Title & Total Count */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <h2 className="text-2xl font-black tracking-tight sm:text-3xl font-display select-none py-0.5">
+            <h2 className="text-2xl font-extrabold tracking-normal sm:text-3xl font-display select-none py-0.5">
               <span className="inline-block text-3d-bubble-main">Aplikasi</span>{" "}
               <span className="inline-block text-3d-bubble-blue">Terbaru</span>
             </h2>

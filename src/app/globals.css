@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Outfit:wght@400..800&family=JetBrains+Mono:wght@400;500;600&display=swap");
 @import "../styles/tokens.css";
 
 @tailwind base;
@@ -30,7 +30,7 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -72,61 +72,57 @@
 }
 
 /* -------------------------------------------------------------
-   3D Tactile Text Styling (Mirrors 3D Button Extrusions & Layers - 0 Blur Crisp)
+   Clean & Crisp Modern Typography Styling (Titik huruf i tetap jelas & terbaca)
    ------------------------------------------------------------- */
 .text-3d-bubble-main,
 .text-3d-main {
-  background: linear-gradient(180deg, #334155 0%, #1e293b 35%, #0f172a 75%, #020617 100%);
+  color: #0f172a;
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 70%, #334155 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: 
-    drop-shadow(0 1px 0 #0f172a)
-    drop-shadow(0 1px 0 #020617)
-    drop-shadow(0 1px 0 #000000);
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 .dark .text-3d-bubble-main,
 .dark .text-3d-main {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 30%, #e2e8f0 70%, #cbd5e1 100%);
+  color: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 70%, #e2e8f0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: 
-    drop-shadow(0 1px 0 #94a3b8)
-    drop-shadow(0 1px 0 #64748b)
-    drop-shadow(0 1px 0 #334155);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .text-3d-bubble-blue,
 .text-3d-blue {
-  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 30%, #2563eb 70%, #1d4ed8 100%);
+  color: #2563eb;
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 70%, #1e40af 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: 
-    drop-shadow(0 1px 0 #1d4ed8)
-    drop-shadow(0 1px 0 #1e40af)
-    drop-shadow(0 1px 0 #172554);
+  text-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
 }
 
 .dark .text-3d-bubble-blue,
 .dark .text-3d-blue {
-  background: linear-gradient(180deg, #93c5fd 0%, #60a5fa 30%, #3b82f6 70%, #2563eb 100%);
+  color: #60a5fa;
+  background: linear-gradient(180deg, #93c5fd 0%, #60a5fa 70%, #3b82f6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: 
-    drop-shadow(0 1px 0 #2563eb)
-    drop-shadow(0 1px 0 #1d4ed8)
-    drop-shadow(0 1px 0 #172554);
+  text-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
 }
 
 /* White 3D Text (for App on Footer & Blue/Dark Surfaces) */
 .text-3d-white {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 40%, #e2e8f0 75%, #cbd5e1 100%);
+  color: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 60%, #e2e8f0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: 
-    drop-shadow(0 1px 0 #93c5fd)
-    drop-shadow(0 1px 0 #3b82f6)
-    drop-shadow(0 1px 0 #1d4ed8);
+}
+
+.dark .text-3d-white {
+  color: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 60%, #e2e8f0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .dark .text-3d-white {

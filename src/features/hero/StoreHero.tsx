@@ -86,7 +86,7 @@ export function StoreHero({
 
           {/* 2. Text & Search: Di Bawah pada tampilan mobile (order-2), di Kiri pada desktop (lg:order-1 lg:col-span-7) */}
           <div className="order-2 lg:order-1 lg:col-span-7 space-y-3 sm:space-y-6 text-center lg:text-left w-full">
-            <h1 className="hero-anim text-2xl sm:text-4xl lg:text-[54px] font-black tracking-tight lg:leading-[1.18] font-display select-none py-1">
+            <h1 className="hero-anim text-2xl sm:text-4xl lg:text-[52px] font-extrabold tracking-normal lg:leading-[1.2] font-display select-none py-1">
               <span className="inline-block text-3d-bubble-main">
                 Temukan Aplikasi
               </span>{" "}
