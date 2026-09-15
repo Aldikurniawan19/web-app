@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Save,
@@ -16,6 +16,7 @@ import {
   Download,
   Calendar,
   Settings2,
+  History,
 } from "lucide-react";
 import { AppCategory, AppItem, AppScreenshot } from "@/types/store";
 import { CATEGORIES } from "@/constants/app-store-data";
@@ -23,6 +24,7 @@ import { ApkUploadDropzone } from "@/features/admin/ApkUploadDropzone";
 import { IconUploadDropzone } from "@/features/admin/IconUploadDropzone";
 import { ScreenshotUploadDropzone } from "@/features/admin/ScreenshotUploadDropzone";
 import { Button } from "@/components/ui/Button";
+import { VersionHistoryPanel } from "@/features/admin/VersionHistoryPanel";
 
 interface AppFormProps {
   initialData?: AppItem | null;
@@ -66,6 +68,8 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
   // 4. Berkas APK
   const [apkUrl, setApkUrl] = useState<string | null>(initialData?.apkUrl || null);
   const [apkFileName, setApkFileName] = useState<string | null>(initialData?.apkFileName || null);
+  const [changelog, setChangelog] = useState("");
+  const [apkChanged, setApkChanged] = useState(false);
 
   // 5. Screenshot Aplikasi (Maksimal 8 Gambar)
   const [screenshots, setScreenshots] = useState<AppScreenshot[]>(
@@ -104,12 +108,18 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
     setFileSize(data.fileSize);
     setApkUrl(data.downloadUrl);
     setApkFileName(data.fileName);
+    setApkChanged(true);
     if (!name) {
       const cleanName = data.fileName
         .replace(/\.apk$/i, "")
         .replace(/[-_]v?[0-9].*$/i, "")
         .replace(/[-_]/g, " ");
       setName(cleanName.charAt(0).toUpperCase() + cleanName.slice(1));
+    }
+    // Deteksi nomor versi otomatis dari nama berkas jika tersedia (misal app-v1.2.0.apk)
+    const versionMatch = data.fileName.match(/v?(\d+\.\d+(?:\.\d+)?)/i);
+    if (versionMatch && versionMatch[1]) {
+      setVersion(versionMatch[1]);
     }
   };
 
@@ -156,6 +166,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
         },
         apkUrl: apkUrl || initialData?.apkUrl || null,
         apkFileName: apkFileName || initialData?.apkFileName || null,
+        ...(isEditing && apkChanged && changelog.trim() ? { changelog: changelog.trim() } : {}),
       };
 
       const res = await fetch("/api/admin/apps", {
@@ -266,6 +277,37 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
           currentFileName={apkFileName || (initialData?.apkUrl ? "Paket APK Tersedia" : undefined)}
           currentFileSize={fileSize}
         />
+
+        {isEditing && (apkChanged || (initialData?.version && version.trim() !== initialData.version.trim())) && (
+          <div className="mt-4 space-y-2 p-3.5 rounded-xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/40 dark:bg-blue-950/20">
+            <div className="flex items-center justify-between flex-wrap gap-1">
+              <label htmlFor="changelog-input" className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <History className="h-3.5 w-3.5 text-primary" />
+                <span>Catatan Perubahan (Changelog)</span>
+              </label>
+              <span className="text-[11px] font-semibold text-primary">
+                Arsip Otomatis Aktif
+              </span>
+            </div>
+            <textarea
+              id="changelog-input"
+              value={changelog}
+              onChange={(e) => setChangelog(e.target.value)}
+              rows={3}
+              placeholder="Contoh: Perbaikan bug crash saat buka aplikasi, peningkatan performa 2x lebih cepat..."
+              className="block w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"
+            />
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+              {apkChanged
+                ? "Berkas APK baru terdeteksi. Berkas versi lama akan otomatis diarsipkan ke riwayat versi."
+                : `Nomor versi diubah dari v${initialData?.version} ke v${version}. Berkas versi sebelumnya akan otomatis diarsipkan.`}
+            </p>
+          </div>
+        )}
+
+        {isEditing && initialData?.id && (
+          <VersionHistoryPanel appId={initialData.id} />
+        )}
       </div>
 
       {/* 2. Upload Gambar Ikon Aplikasi */}

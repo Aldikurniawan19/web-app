@@ -115,7 +115,12 @@ export class GithubReleaseService {
     originalFileName: string
   ): Promise<GithubReleaseAssetResult> {
     const buffer = Buffer.isBuffer(fileBuffer) ? fileBuffer : Buffer.from(fileBuffer);
-    const safeFileName = originalFileName.replace(/[^a-zA-Z0-9.-]/g, "_").toLowerCase();
+    const sanitizedName = originalFileName.replace(/[^a-zA-Z0-9.-]/g, "_").toLowerCase();
+    const ext = path.extname(sanitizedName) || ".apk";
+    const base = path.basename(sanitizedName, ext);
+    // Tambahkan timestamp unik pada nama aset fisik agar berkas APK versi lama tidak tertimpa
+    const uniqueAssetFileName = `${base}-${Date.now()}${ext}`;
+
     const sizeInBytes = buffer.length;
     const sizeInMb = (sizeInBytes / (1024 * 1024)).toFixed(1);
     const formattedSize = `${sizeInMb} MB`;
@@ -124,10 +129,10 @@ export class GithubReleaseService {
     try {
       const release = await this.ensureRelease();
 
-      // Jika sudah ada asset dengan nama yang sama, hapus terlebih dahulu untuk mencegah duplikasi
+      // Jika sudah ada asset dengan nama unik yang sama, hapus terlebih dahulu
       if (Array.isArray(release.assets)) {
         const existingAsset = release.assets.find(
-          (a) => a.name.toLowerCase() === safeFileName
+          (a) => a.name.toLowerCase() === uniqueAssetFileName.toLowerCase()
         );
         if (existingAsset) {
           try {
@@ -147,7 +152,7 @@ export class GithubReleaseService {
         ? release.upload_url.replace(/\{\?name,label\}/, "")
         : `https://uploads.github.com/repos/${this.owner}/${this.repo}/releases/${release.id}/assets`;
 
-      const uploadUrl = `${uploadUrlBase}?name=${encodeURIComponent(safeFileName)}`;
+      const uploadUrl = `${uploadUrlBase}?name=${encodeURIComponent(uniqueAssetFileName)}`;
 
       const uploadRes = await fetch(uploadUrl, {
         method: "POST",
@@ -167,12 +172,12 @@ export class GithubReleaseService {
       const assetData = await uploadRes.json();
 
       return {
-        fileName: safeFileName,
+        fileName: sanitizedName,
         fileSize: formattedSize,
         fileSizeBytes: sizeInBytes,
         downloadUrl:
           assetData.browser_download_url ||
-          `https://github.com/${this.owner}/${this.repo}/releases/download/${this.tag}/${safeFileName}`,
+          `https://github.com/${this.owner}/${this.repo}/releases/download/${this.tag}/${uniqueAssetFileName}`,
         assetId: assetData.id,
         storageProvider: "github",
       };
@@ -190,17 +195,17 @@ export class GithubReleaseService {
         if (!fs.existsSync(downloadsDir)) {
           fs.mkdirSync(downloadsDir, { recursive: true });
         }
-        const filePath = path.join(downloadsDir, safeFileName);
+        const filePath = path.join(downloadsDir, uniqueAssetFileName);
         fs.writeFileSync(filePath, buffer);
       } catch (fsErr) {
         console.warn("Gagal menulis fallback file ke disk:", fsErr);
       }
 
       return {
-        fileName: safeFileName,
+        fileName: sanitizedName,
         fileSize: formattedSize,
         fileSizeBytes: sizeInBytes,
-        downloadUrl: `/downloads/${safeFileName}`,
+        downloadUrl: `/downloads/${uniqueAssetFileName}`,
         storageProvider: "local",
         warning: `GitHub API error: ${errMsg}`,
       };

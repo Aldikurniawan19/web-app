@@ -22,6 +22,7 @@ import { PlatformBadge } from "@/components/ui/PlatformBadge";
 import { Button } from "@/components/ui/Button";
 import { ScreenshotSlider } from "@/features/detail/ScreenshotSlider";
 import { cn } from "@/lib/utils";
+import { VersionHistoryTab } from "@/features/detail/VersionHistoryTab";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 
@@ -34,7 +35,7 @@ interface AppDetailViewProps {
 export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<
-    "tentang" | "fitur" | "informasi" | "changelog" | "system"
+    "tentang" | "fitur" | "versi" | "informasi" | "changelog" | "system"
   >("tentang");
 
   // Reset tab aktif ke "tentang" setiap kali aplikasi dibuka
@@ -63,6 +64,7 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
   const tabs = [
     { id: "tentang", label: "Tentang" },
     { id: "fitur", label: "Fitur" },
+    { id: "versi", label: "Riwayat Versi" },
     { id: "informasi", label: "Informasi" },
     { id: "changelog", label: "Changelog" },
     { id: "system", label: "System Requirements" },
@@ -380,6 +382,11 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* TAB: RIWAYAT VERSI */}
+          {activeTab === "versi" && (
+            <VersionHistoryTab app={app} onDownload={onDownload} />
           )}
 
           {/* 3. TAB: INFORMASI */}

@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { AppItem, CreateAppInput } from "@/types/store";
+import { AppItem, AppVersionItem, CreateAppInput } from "@/types/store";
+
+const MAX_VERSIONS_PER_APP = 4;
 
 /**
  * In-memory cache untuk mengurangi frekuensi query ke database Supabase.
@@ -259,8 +261,13 @@ export class AppStorageService {
 
   /**
    * Memperbarui data aplikasi di Supabase dan memperbarui cache.
+   * Jika ada file APK baru (apkUrl berubah), versi lama otomatis diarsipkan
+   * ke tabel app_versions sebelum data utama diperbarui.
    */
-  static async updateApp(id: string, updateData: Partial<AppItem>): Promise<AppItem | null> {
+  static async updateApp(
+    id: string,
+    updateData: Partial<AppItem> & { changelog?: string }
+  ): Promise<AppItem | null> {
     const lastUpdated =
       updateData.lastUpdated ||
       new Date().toLocaleDateString("id-ID", {
@@ -268,6 +275,31 @@ export class AppStorageService {
         month: "long",
         year: "numeric",
       });
+
+    // Ambil data aplikasi yang ada saat ini untuk membandingkan perubahan berkas atau versi
+    const existingApp = await withRetry(() =>
+      prisma.app.findUnique({
+        where: { id },
+        select: { apkUrl: true, apkFileName: true, version: true, fileSize: true },
+      })
+    );
+
+    const hasNewApk = !!updateData.apkUrl;
+    const isApkUrlChanged =
+      hasNewApk &&
+      !!existingApp?.apkUrl &&
+      updateData.apkUrl !== existingApp.apkUrl;
+
+    const isVersionChanged =
+      !!updateData.version &&
+      !!existingApp?.version &&
+      updateData.version.trim() !== existingApp.version.trim();
+
+    // Arsipkan jika berkas APK baru diunggah ATAU nomor versi diubah saat APK lama tersedia
+    const shouldArchive =
+      (isApkUrlChanged || isVersionChanged) &&
+      !!existingApp?.apkUrl &&
+      !!existingApp?.apkFileName;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dataToUpdate: any = {
@@ -280,14 +312,55 @@ export class AppStorageService {
     if (updateData.systemRequirements) {
       dataToUpdate.systemRequirements = JSON.parse(JSON.stringify(updateData.systemRequirements));
     }
+    // Hapus field yang bukan kolom database
     delete dataToUpdate.id;
+    delete dataToUpdate.versions;
+    delete dataToUpdate.changelog;
 
-    const record = await withRetry(() =>
-      prisma.app.update({
+    // Jalankan archive + update dalam satu transaction
+    const record = await withRetry(async () => {
+      if (shouldArchive && existingApp?.apkUrl && existingApp?.apkFileName) {
+        return prisma.$transaction(async (tx) => {
+          // 1. Arsipkan versi lama
+          await tx.appVersion.create({
+            data: {
+              appId: id,
+              version: existingApp.version,
+              fileSize: existingApp.fileSize,
+              apkUrl: existingApp.apkUrl!,
+              apkFileName: existingApp.apkFileName!,
+              changelog: updateData.changelog || "",
+            },
+          });
+
+          // 2. Hapus versi terlama jika melebihi batas
+          const allVersions = await tx.appVersion.findMany({
+            where: { appId: id },
+            orderBy: { createdAt: "desc" },
+            select: { id: true },
+          });
+          if (allVersions.length > MAX_VERSIONS_PER_APP) {
+            const idsToDelete = allVersions
+              .slice(MAX_VERSIONS_PER_APP)
+              .map((v) => v.id);
+            await tx.appVersion.deleteMany({
+              where: { id: { in: idsToDelete } },
+            });
+          }
+
+          // 3. Update data aplikasi utama
+          return tx.app.update({
+            where: { id },
+            data: dataToUpdate,
+          });
+        });
+      }
+
+      return prisma.app.update({
         where: { id },
         data: dataToUpdate,
-      })
-    );
+      });
+    });
 
     const updatedItem = this.mapToAppItem(record);
 
@@ -345,5 +418,59 @@ export class AppStorageService {
       latestUpdated: apps[0]?.lastUpdated || "-",
       categoriesCount: Array.from(new Set(apps.map((a) => a.category))).length,
     };
+  }
+
+  /**
+   * Mengambil daftar semua versi APK untuk satu aplikasi,
+   * diurutkan dari yang terbaru.
+   */
+  static async getVersionsByAppId(appId: string): Promise<AppVersionItem[]> {
+    try {
+      const records = await withRetry(() =>
+        prisma.appVersion.findMany({
+          where: { appId },
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            version: true,
+            fileSize: true,
+            apkUrl: true,
+            apkFileName: true,
+            changelog: true,
+            createdAt: true,
+          },
+        })
+      );
+
+      return records.map((r) => ({
+        id: r.id,
+        version: r.version,
+        fileSize: r.fileSize,
+        apkUrl: r.apkUrl,
+        apkFileName: r.apkFileName,
+        changelog: r.changelog,
+        createdAt: r.createdAt.toISOString(),
+      }));
+    } catch (err) {
+      console.error(`Gagal membaca riwayat versi untuk ${appId}:`, err);
+      return [];
+    }
+  }
+
+  /**
+   * Menghapus satu versi APK dari riwayat berdasarkan ID.
+   */
+  static async deleteVersion(versionId: string): Promise<boolean> {
+    try {
+      await withRetry(() =>
+        prisma.appVersion.delete({
+          where: { id: versionId },
+        })
+      );
+      return true;
+    } catch (err) {
+      console.error(`Gagal menghapus versi ${versionId}:`, err);
+      return false;
+    }
   }
 }

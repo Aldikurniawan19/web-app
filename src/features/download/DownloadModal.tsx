@@ -12,8 +12,9 @@ import {
   Smartphone,
   Star,
   HardDrive,
+  History,
 } from "lucide-react";
-import { AppItem } from "@/types/store";
+import { AppItem, AppVersionItem } from "@/types/store";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { Modal } from "@/components/ui/Modal";
 import { cn } from "@/lib/utils";
@@ -33,7 +34,41 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
   const [downloadSpeed, setDownloadSpeed] = useState("0 MB/s");
   const [downloadedMb, setDownloadedMb] = useState("0");
   const [timeLeft, setTimeLeft] = useState("");
+  const [versions, setVersions] = useState<AppVersionItem[]>([]);
+  const [selectedVersionId, setSelectedVersionId] = useState<string>("latest");
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Ambil riwayat versi APK saat modal dibuka
+  useEffect(() => {
+    if (!isOpen || !app) {
+      setVersions([]);
+      setSelectedVersionId("latest");
+      return;
+    }
+
+    let isCancelled = false;
+    fetch(`/api/apps/versions?appId=${encodeURIComponent(app.id)}`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (!isCancelled && json.success && Array.isArray(json.data)) {
+          setVersions(json.data);
+          // Cek apakah app yang dibuka saat ini cocok dengan versi lama
+          const matchingOld = json.data.find(
+            (v: AppVersionItem) => v.version === app.version && v.apkUrl === app.apkUrl
+          );
+          if (matchingOld) {
+            setSelectedVersionId(matchingOld.id);
+          } else {
+            setSelectedVersionId("latest");
+          }
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [isOpen, app?.id, app?.version, app?.apkUrl]);
 
   // Circle progress calculation (radius = 36, circumference = 2 * PI * 36 = 226.19)
   const circleRadius = 36;
@@ -54,8 +89,18 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
 
   if (!app) return null;
 
-  const totalMb = parseFloat(app.fileSize.replace(/[^0-9.]/g, "")) || 20.0;
-  const getInstallerName = () => `${app.id}-v${app.version}.apk`;
+  const selectedArchived = versions.find((v) => v.id === selectedVersionId);
+  const activeVersion = selectedArchived ? selectedArchived.version : app.version;
+  const activeFileSize = selectedArchived ? selectedArchived.fileSize : app.fileSize;
+  const activeApkUrl = selectedArchived
+    ? selectedArchived.apkUrl
+    : (app.apkUrl || "/downloads/aerosync-v2.4.0-release.apk");
+  const activeFileName = selectedArchived
+    ? selectedArchived.apkFileName
+    : (app.apkFileName || `${app.id}-v${app.version}.apk`);
+
+  const totalMb = parseFloat(activeFileSize.replace(/[^0-9.]/g, "")) || 20.0;
+  const getInstallerName = () => activeFileName;
 
   const handleStartDownload = () => {
     if (stage !== "idle" && stage !== "completed") return;
@@ -85,7 +130,7 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
 
             // Trigger actual download
             const link = document.createElement("a");
-            link.href = app.apkUrl || "/downloads/aerosync-v2.4.0-release.apk";
+            link.href = activeApkUrl;
             link.download = getInstallerName();
             document.body.appendChild(link);
             link.click();
@@ -230,14 +275,14 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
             <div className="mt-1.5">
               {stage === "idle" && (
                 <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <span>{app.fileSize}</span>
+                  <span>{activeFileSize}</span>
+                  <span>•</span>
+                  <span>Versi {activeVersion}</span>
                   <span>•</span>
                   <div className="flex items-center gap-0.5 text-amber-500 font-medium">
                     <Star className="h-3 w-3 fill-amber-500" />
                     <span>{app.rating}</span>
                   </div>
-                  <span>•</span>
-                  <span>Android 7.0+</span>
                 </div>
               )}
 
@@ -275,6 +320,48 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
           </div>
         </div>
 
+        {/* Opsi Pemilihan Versi APK jika terdapat riwayat versi */}
+        {versions.length > 0 && (
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-3 space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <label htmlFor="version-select" className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                <History className="h-3.5 w-3.5 text-primary" />
+                <span>Pilih Versi APK:</span>
+              </label>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                {selectedVersionId === "latest" ? "Rilis Terkini" : "Rilis Terdahulu"}
+              </span>
+            </div>
+
+            <select
+              id="version-select"
+              value={selectedVersionId}
+              onChange={(e) => {
+                setSelectedVersionId(e.target.value);
+                setStage("idle");
+                setDownloadProgress(0);
+              }}
+              disabled={stage === "downloading" || stage === "verifying"}
+              className="w-full text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-slate-800 dark:text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+            >
+              <option value="latest">
+                v{app.version} (Terbaru) • {app.fileSize}
+              </option>
+              {versions.map((v) => (
+                <option key={v.id} value={v.id}>
+                  v{v.version} • {v.fileSize}
+                </option>
+              ))}
+            </select>
+
+            {selectedArchived?.changelog && (
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight pt-0.5">
+                Catatan: {selectedArchived.changelog}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Play Store Interactive Action Controls */}
         <div>
           {/* Idle State: Download Button */}
@@ -285,7 +372,7 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
               className="w-full h-11 rounded-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 select-none"
             >
               <Download className="h-4 w-4" />
-              <span>Download ({app.fileSize})</span>
+              <span>Download ({activeFileSize})</span>
             </button>
           )}
 

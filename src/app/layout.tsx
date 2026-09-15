@@ -5,14 +5,14 @@ import "./globals.css";
 
 const fontDisplay = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-plus-jakarta-sans",
   weight: ["500", "600", "700", "800"],
   display: "swap",
 });
 
 const fontBody = Inter({
   subsets: ["latin"],
-  variable: "--font-body",
+  variable: "--font-inter",
   weight: ["400", "500", "600", "700"],
   display: "swap",
 });
@@ -83,6 +83,12 @@ export default function RootLayout({
       className={`${fontDisplay.variable} ${fontBody.variable} scroll-smooth`}
     >
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `

@@ -46,9 +46,23 @@ const config: Config = {
         },
       },
       fontFamily: {
-        display: ["var(--font-display)"],
-        body: ["var(--font-body)"],
-        mono: ["var(--font-mono)"],
+        display: [
+          "var(--font-plus-jakarta-sans)",
+          "var(--font-display)",
+          "Plus Jakarta Sans",
+          "sans-serif",
+        ],
+        body: [
+          "var(--font-inter)",
+          "var(--font-body)",
+          "Inter",
+          "sans-serif",
+        ],
+        mono: [
+          "var(--font-mono)",
+          "JetBrains Mono",
+          "monospace",
+        ],
       },
       borderRadius: {
         sm: "var(--radius-sm)",

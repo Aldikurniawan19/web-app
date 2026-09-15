@@ -62,30 +62,45 @@ model books {
 }
 
 model App {
-  id                 String   @id
+  id                 String       @id
   name               String
   tagline            String
   description        String
-  longDescription    String   @db.Text
+  longDescription    String       @db.Text
   category           String
-  rating             Float    @default(5.0)
-  reviewsCount       String   @default("Baru")
-  fileSize           String   @default("15.0 MB")
-  version            String   @default("1.0.0")
-  developer          String   @default("AppHub Studio")
+  rating             Float        @default(5.0)
+  reviewsCount       String       @default("Baru")
+  fileSize           String       @default("15.0 MB")
+  version            String       @default("1.0.0")
+  developer          String       @default("AppHub Studio")
   lastUpdated        String
-  platforms          String[] @default(["android"])
-  iconUrl            String?  @db.Text
-  iconType           String?  @default("document")
-  iconColor          String?  @default("bg-blue-500")
-  features           String[] @default([])
+  platforms          String[]     @default(["android"])
+  iconUrl            String?      @db.Text
+  iconType           String?      @default("document")
+  iconColor          String?      @default("bg-blue-500")
+  features           String[]     @default([])
   screenshots        Json?
-  downloadsCount     String   @default("0+")
+  downloadsCount     String       @default("0+")
   systemRequirements Json?
-  apkUrl             String?  @db.Text
+  apkUrl             String?      @db.Text
   apkFileName        String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  versions           AppVersion[]
 
   @@map("apps")
+}
+
+model AppVersion {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  appId       String
+  version     String
+  fileSize    String   @default("0 MB")
+  apkUrl      String   @db.Text
+  apkFileName String
+  changelog   String   @default("")
+  createdAt   DateTime @default(now())
+  App         App      @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@map("app_versions")
 }

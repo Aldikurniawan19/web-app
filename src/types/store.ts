@@ -17,6 +17,16 @@ export interface AppScreenshot {
   imageUrl?: string;
 }
 
+export interface AppVersionItem {
+  id: string;
+  version: string;
+  fileSize: string;
+  apkUrl: string;
+  apkFileName: string;
+  changelog: string;
+  createdAt: string;
+}
+
 export interface AppItem {
   id: string;
   name: string;
@@ -44,6 +54,7 @@ export interface AppItem {
   };
   apkUrl?: string;
   apkFileName?: string;
+  versions?: AppVersionItem[];
 }
 
 export interface RelatedAppItem {
