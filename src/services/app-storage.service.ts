@@ -284,6 +284,10 @@ export class AppStorageService {
       })
     );
 
+    if (!existingApp) {
+      return null;
+    }
+
     const hasNewApk = !!updateData.apkUrl;
     const isApkUrlChanged =
       hasNewApk &&
@@ -317,12 +321,11 @@ export class AppStorageService {
     delete dataToUpdate.versions;
     delete dataToUpdate.changelog;
 
-    // Jalankan archive + update dalam satu transaction
-    const record = await withRetry(async () => {
-      if (shouldArchive && existingApp?.apkUrl && existingApp?.apkFileName) {
-        return prisma.$transaction(async (tx) => {
-          // 1. Arsipkan versi lama
-          await tx.appVersion.create({
+    // 1. Jika perlu mengarsipkan versi lama, simpan ke tabel app_versions
+    if (shouldArchive && existingApp?.apkUrl && existingApp?.apkFileName) {
+      try {
+        await withRetry(() =>
+          prisma.appVersion.create({
             data: {
               appId: id,
               version: existingApp.version,
@@ -331,36 +334,35 @@ export class AppStorageService {
               apkFileName: existingApp.apkFileName!,
               changelog: updateData.changelog || "",
             },
-          });
+          })
+        );
 
-          // 2. Hapus versi terlama jika melebihi batas
-          const allVersions = await tx.appVersion.findMany({
-            where: { appId: id },
-            orderBy: { createdAt: "desc" },
-            select: { id: true },
-          });
-          if (allVersions.length > MAX_VERSIONS_PER_APP) {
-            const idsToDelete = allVersions
-              .slice(MAX_VERSIONS_PER_APP)
-              .map((v) => v.id);
-            await tx.appVersion.deleteMany({
-              where: { id: { in: idsToDelete } },
-            });
-          }
-
-          // 3. Update data aplikasi utama
-          return tx.app.update({
-            where: { id },
-            data: dataToUpdate,
-          });
+        // Bersihkan versi lama jika melebihi batas maksimal
+        const allVersions = await prisma.appVersion.findMany({
+          where: { appId: id },
+          orderBy: { createdAt: "desc" },
+          select: { id: true },
         });
+        if (allVersions.length > MAX_VERSIONS_PER_APP) {
+          const idsToDelete = allVersions
+            .slice(MAX_VERSIONS_PER_APP)
+            .map((v) => v.id);
+          await prisma.appVersion.deleteMany({
+            where: { id: { in: idsToDelete } },
+          });
+        }
+      } catch (archiveErr) {
+        console.warn("Peringatan: Gagal mengarsipkan versi lama:", archiveErr);
       }
+    }
 
-      return prisma.app.update({
+    // 2. Perbarui data aplikasi utama secara langsung tanpa interactive transaction timeout
+    const record = await withRetry(() =>
+      prisma.app.update({
         where: { id },
         data: dataToUpdate,
-      });
-    });
+      })
+    );
 
     const updatedItem = this.mapToAppItem(record);
 
