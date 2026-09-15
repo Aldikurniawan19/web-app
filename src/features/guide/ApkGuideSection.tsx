@@ -61,37 +61,92 @@ const GUIDE_STEPS: GuideStep[] = [
 
 export function ApkGuideSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const cardsGridRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
-      const isDesktop = window.innerWidth >= 768;
+      const mm = gsap.matchMedia();
 
-      // Animasi masuk & keluar interaktif (berjalan saat pengguna berada di dalam section)
+      // Animasi judul header section (semua ukuran layar)
       gsap.fromTo(
-        ".guide-step-card",
-        {
-          opacity: 0,
-          x: isDesktop ? -55 : 0,
-          y: isDesktop ? 0 : 30,
-        },
+        ".guide-header-anim",
+        { opacity: 0, y: 20 },
         {
           opacity: 1,
-          x: 0,
           y: 0,
-          duration: 0.9,
-          stagger: 0.22, // Muncul bertahap dari kiri ke kanan (dan keluar bertahap saat scroll pergi)
+          duration: 0.7,
+          stagger: 0.12,
           ease: "power2.out",
           scrollTrigger: {
             trigger: containerRef.current,
-            start: "top 75%", // Animasi masuk saat bagian atas section mencapai 75% viewport
-            end: "bottom 15%", // Animasi keluar saat bagian bawah section meninggalkan 15% viewport
-            toggleActions: "play reverse play reverse", // Masuk saat berada di section, keluar saat meninggalkan section
+            start: "top 88%",
+            toggleActions: "play none none reverse",
           },
         }
       );
+
+      // Desktop & Tablet (>= 768px): Animasi berurutan dari kiri ke kanan dengan tempo lambat & anggun
+      mm.add("(min-width: 768px)", () => {
+        const cards = gsap.utils.toArray<HTMLElement>(".guide-step-card");
+        if (!cards || cards.length === 0) return;
+
+        gsap.fromTo(
+          cards,
+          {
+            opacity: 0,
+            y: 45,
+            scale: 0.95,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 1.15, // Durasi lebih lambat dan elegan
+            stagger: 0.28, // Jeda kemunculan bergantian antar kartu lebih lambat dan jelas
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: cardsGridRef.current,
+              start: "top 86%",
+              toggleActions: "play none none reverse",
+            },
+            clearProps: "transform,opacity",
+          }
+        );
+      });
+
+      // Mobile (< 768px): Animasi dipicu satu per satu tepat saat kartu tersebut di-scroll oleh pengguna
+      mm.add("(max-width: 767px)", () => {
+        const cards = gsap.utils.toArray<HTMLElement>(".guide-step-card");
+        if (!cards || cards.length === 0) return;
+
+        cards.forEach((card) => {
+          gsap.fromTo(
+            card,
+            {
+              opacity: 0,
+              y: 40,
+              scale: 0.95,
+            },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.95, // Mulus dan tenang
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: card,
+                start: "top 84%", // Aktif saat posisi scroll tepat berada di kartu tersebut
+                toggleActions: "play none none reverse",
+              },
+              clearProps: "transform,opacity",
+            }
+          );
+        });
+      });
     },
     { scope: containerRef, dependencies: [] }
   );
+
   return (
     <section
       ref={containerRef}
@@ -101,24 +156,27 @@ export function ApkGuideSection() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="mx-auto max-w-3xl text-center space-y-3">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight font-display select-none py-1">
+          <h2 className="guide-header-anim text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight font-display select-none py-1">
             <span className="inline-block text-3d-bubble-main">Panduan Mudah</span>{" "}
             <span className="inline-block text-3d-bubble-blue">Pasang APK</span>
           </h2>
 
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">
+          <p className="guide-header-anim text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">
             Ikuti 4 langkah sederhana berikut untuk memasang aplikasi format APK langsung di smartphone atau tablet Android Anda dengan aman dan cepat.
           </p>
         </div>
 
         {/* 4 Steps Bento / Grid Cards */}
-        <div className="mt-10 sm:mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div
+          ref={cardsGridRef}
+          className="mt-10 sm:mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
+        >
           {GUIDE_STEPS.map((item, index) => {
             const Icon = item.icon;
             return (
               <div
                 key={item.step}
-                className="guide-step-card group relative flex flex-col justify-between rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-5 sm:p-6 shadow-xs hover:shadow-lg hover:shadow-primary/5 hover:border-primary/40 dark:hover:border-primary/40 transition-all duration-300 hover:-translate-y-1 will-change-transform"
+                className="guide-step-card group relative flex flex-col justify-between rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-5 sm:p-6 shadow-xs hover:shadow-lg hover:shadow-primary/5 hover:border-primary/40 dark:hover:border-primary/40 transition-[border-color,box-shadow,background-color] duration-200 hover:-translate-y-1 will-change-transform"
               >
                 <div>
                   {/* Top Row: 3D Icon Badge & Step Number */}

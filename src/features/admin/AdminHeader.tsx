@@ -1,17 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import {
   Menu,
-  Sun,
-  Moon,
   ShieldCheck,
   UploadCloud,
-  Layers,
-  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 interface AdminHeaderProps {
   onToggleSidebar: () => void;
@@ -19,27 +16,6 @@ interface AdminHeaderProps {
 }
 
 export function AdminHeader({ onToggleSidebar, title = "Dashboard Administrator" }: AdminHeaderProps) {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const isDark = document.documentElement.classList.contains("dark");
-      setIsDarkMode(isDark);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const nextDark = !isDarkMode;
-    setIsDarkMode(nextDark);
-    if (nextDark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("apphub-theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("apphub-theme", "light");
-    }
-  };
-
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 px-4 sm:px-8 backdrop-blur-md transition-colors">
       {/* Left: Mobile Toggle & Page Title */}
@@ -68,15 +44,8 @@ export function AdminHeader({ onToggleSidebar, title = "Dashboard Administrator"
           <span>Akses Terenkripsi & Terproteksi</span>
         </div>
 
-        {/* Theme Toggle Button */}
-        <button
-          type="button"
-          onClick={toggleTheme}
-          aria-label="Ubah tema tampilan"
-          className="rounded-xl border border-slate-200 dark:border-slate-800 p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-        >
-          {isDarkMode ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-slate-600" />}
-        </button>
+        {/* Unified Theme Toggle */}
+        <ThemeToggle />
 
         {/* Quick Upload CTA */}
         <Link href="/admin/apps/new">

@@ -16,7 +16,7 @@ export function AppCard({ app, onOpenDetail }: AppCardProps) {
   return (
     <div
       onClick={() => onOpenDetail(app)}
-      className="group relative flex w-full flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm transition-all duration-300 ease-out hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 hover:bg-slate-50/40 dark:hover:bg-slate-800/50 active:scale-[0.99] cursor-pointer"
+      className="group relative flex w-full flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm transition-[border-color,box-shadow,background-color] duration-200 hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 hover:bg-slate-50/40 dark:hover:bg-slate-800/50 active:scale-[0.99] cursor-pointer"
     >
       {/* Left: App Icon & Detailed Content */}
       <div className="flex items-start sm:items-center gap-4 sm:gap-5 flex-1 min-w-0">

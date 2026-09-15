@@ -4,6 +4,7 @@ import React, { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { AppItem } from "@/types/store";
 import { AppCard } from "@/features/catalog/AppCard";
+import { AppCardSkeleton } from "@/features/catalog/AppCardSkeleton";
 import { cn } from "@/lib/utils";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -16,6 +17,7 @@ if (typeof window !== "undefined") {
 
 interface AppGridSectionProps {
   apps: AppItem[];
+  isLoading?: boolean;
   onOpenDetail: (app: AppItem) => void;
   onDownload: (app: AppItem) => void;
   onResetSearch?: () => void;
@@ -23,6 +25,7 @@ interface AppGridSectionProps {
 
 export function AppGridSection({
   apps,
+  isLoading = false,
   onOpenDetail,
   onDownload,
   onResetSearch,
@@ -48,41 +51,76 @@ export function AppGridSection({
     return apps.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [apps, currentPage, shouldPaginate]);
 
-  // Animasi Muncul & Keluar saat Scroll (Scroll-Triggered Per-Card Animation)
+  // Animasi Muncul saat Scroll (Responsive: Stagger di Desktop, Individual saat scroll di Mobile)
   useGSAP(
     () => {
-      if (!containerRef.current || displayedApps.length === 0) return;
+      if (isLoading || !containerRef.current || displayedApps.length === 0) return;
 
-      const cards = gsap.utils.toArray<HTMLElement>(".app-card-item");
+      const mm = gsap.matchMedia();
 
-      cards.forEach((card) => {
+      // Desktop & Tablet (>= 768px): Animasi berurutan dari atas ke bawah secara anggun dan mulus
+      mm.add("(min-width: 768px)", () => {
+        const cards = gsap.utils.toArray<HTMLElement>(".app-card-item");
+        if (!cards || cards.length === 0) return;
+
         gsap.fromTo(
-          card,
+          cards,
           {
             opacity: 0,
-            y: 35,
-            scale: 0.97,
+            y: 40,
+            scale: 0.96,
           },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 0.45,
+            duration: 0.85,
+            stagger: 0.1,
             ease: "power3.out",
             scrollTrigger: {
-              trigger: card,
-              start: "top 92%",
-              end: "bottom 8%",
-              toggleActions: "play reverse play reverse",
+              trigger: cardsContainerRef.current,
+              start: "top 86%",
+              toggleActions: "play none none reverse",
             },
+            clearProps: "transform,opacity",
           }
         );
+      });
+
+      // Mobile (< 768px): Animasi dipicu satu per satu tepat saat masing-masing kartu aplikasi di-scroll
+      mm.add("(max-width: 767px)", () => {
+        const cards = gsap.utils.toArray<HTMLElement>(".app-card-item");
+        if (!cards || cards.length === 0) return;
+
+        cards.forEach((card) => {
+          gsap.fromTo(
+            card,
+            {
+              opacity: 0,
+              y: 35,
+              scale: 0.96,
+            },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.85,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: card,
+                start: "top 85%", // Aktif saat posisi scroll tepat berada pada kartu tersebut
+                toggleActions: "play none none reverse",
+              },
+              clearProps: "transform,opacity",
+            }
+          );
+        });
       });
 
       ScrollTrigger.refresh();
       setIsTransitioning(false);
     },
-    { dependencies: [displayedApps, currentPage], scope: containerRef }
+    { dependencies: [displayedApps, currentPage, isLoading], scope: containerRef }
   );
 
   // Animasi Keluar (Exit Animation) saat membuka detail aplikasi
@@ -162,8 +200,8 @@ export function AppGridSection({
   };
 
   return (
-    <section ref={containerRef} id="katalog" className="py-12 sm:py-16 bg-background">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section ref={containerRef} id="katalog" className="py-12 sm:py-16 bg-background w-full">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header: Title & Total Count */}
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -172,15 +210,26 @@ export function AppGridSection({
               <span className="inline-block text-3d-bubble-blue">Terbaru</span>
             </h2>
           </div>
-          {apps.length > 0 && (
-            <span className="text-xs font-semibold text-slate-500">
+          {isLoading ? (
+            <div className="h-4 w-28 rounded-md bg-slate-200 dark:bg-slate-800 animate-pulse" />
+          ) : apps.length > 0 ? (
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
               {apps.length} aplikasi ditemukan
             </span>
-          )}
+          ) : null}
         </div>
 
-        {/* Full Width Horizontal Rectangular App Cards List */}
-        {displayedApps.length > 0 ? (
+        {/* Loading Skeleton View */}
+        {isLoading ? (
+          <div className="mt-8 flex flex-col gap-3.5 sm:gap-4 w-full">
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <div key={`skeleton-${idx}`} className="w-full">
+                <AppCardSkeleton />
+              </div>
+            ))}
+          </div>
+        ) : displayedApps.length > 0 ? (
+          /* Full Width Horizontal Rectangular App Cards List */
           <div
             ref={cardsContainerRef}
             className="mt-8 flex flex-col gap-3.5 sm:gap-4 w-full"
@@ -221,8 +270,8 @@ export function AppGridSection({
           </div>
         )}
 
-        {/* Pagination Bar: Hanya muncul jika jumlah list aplikasi > 7 dan total halaman > 1 */}
-        {shouldPaginate && totalPages > 1 && (
+        {/* Pagination Bar: Hanya muncul jika tidak loading dan list aplikasi > 7 */}
+        {!isLoading && shouldPaginate && totalPages > 1 && (
           <div className="mt-12 flex items-center justify-center gap-2 animate-in fade-in">
             <button
               type="button"
@@ -266,4 +315,3 @@ export function AppGridSection({
     </section>
   );
 }
-

@@ -23,15 +23,15 @@ export function StoreHero({
 
   useGSAP(
     () => {
-      // Staggered text & search bar reveal (hanya berjalan 1x saat mount dan membersihkan inline style)
+      // Staggered text & search bar reveal (berjalan mulus saat mount)
       gsap.fromTo(
         ".hero-anim",
-        { opacity: 0, y: 20 },
+        { opacity: 0, y: 24 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.6,
-          stagger: 0.08,
+          duration: 0.75,
+          stagger: 0.1,
           ease: "power3.out",
           clearProps: "opacity,transform",
         }
@@ -113,7 +113,7 @@ export function StoreHero({
             {/* Interactive Search Bar Input */}
             <form
               onSubmit={handleSubmit}
-              className="hero-anim relative flex max-w-xl mx-auto lg:mx-0 items-center rounded-2xl bg-white dark:bg-slate-800 p-1.5 sm:p-2 shadow-md sm:shadow-lg shadow-blue-900/5 dark:shadow-none border border-slate-200 dark:border-slate-700 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all"
+              className="hero-anim relative flex max-w-xl mx-auto lg:mx-0 items-center rounded-2xl bg-white dark:bg-slate-800 p-1.5 sm:p-2 shadow-md sm:shadow-lg shadow-blue-900/5 dark:shadow-none border border-slate-200 dark:border-slate-700 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-[border-color,box-shadow] duration-200"
             >
               <div className="flex items-center pl-2.5 sm:pl-3 text-slate-400 dark:text-slate-500">
                 <Search className="h-4 w-4 sm:h-5 sm:w-5" />

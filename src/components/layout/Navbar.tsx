@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Search, Layers, Download, Menu, X } from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -38,15 +38,9 @@ export function Navbar({
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div
           onClick={() => handleItemClick("beranda")}
-          className="flex items-center gap-0 cursor-pointer select-none group"
+          className="flex items-center cursor-pointer select-none group"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/assets/logo.png"
-            alt="AppHub Logo"
-            className="h-11 w-11 sm:h-12 sm:w-12 object-contain drop-shadow-sm transition-transform group-hover:scale-105 -mr-1"
-          />
-          <span className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5">
+          <span className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5 transition-transform group-hover:scale-105">
             <span className="inline-block text-3d-bubble-main">App</span>
             <span className="inline-block text-3d-bubble-blue">Hub</span>
           </span>

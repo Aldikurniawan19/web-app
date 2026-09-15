@@ -3,7 +3,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { StoreHero } from "@/features/hero/StoreHero";
 import { AppGridSection } from "@/features/catalog/AppGridSection";
 import { ApkGuideSection } from "@/features/guide/ApkGuideSection";
@@ -14,28 +13,41 @@ import { AppItem } from "@/types/store";
 
 export default function AppHubPage() {
   const [appsList, setAppsList] = useState<AppItem[]>(APP_STORE_ITEMS);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [activeView, setActiveView] = useState<"catalog" | "detail">("catalog");
   const [selectedApp, setSelectedApp] = useState<AppItem>(APP_STORE_ITEMS[0]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [downloadModalApp, setDownloadModalApp] = useState<AppItem | null>(null);
   const [activeNav, setActiveNav] = useState<string>("beranda");
 
-  // Fetch updated apps list on mount
+  // Fetch updated apps list on mount with loading skeleton transition
   useEffect(() => {
+    let isMounted = true;
     const fetchLatestApps = async () => {
       try {
         const res = await fetch("/api/apps");
         if (res.ok) {
           const json = await res.json();
-          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          if (isMounted && json.success && Array.isArray(json.data) && json.data.length > 0) {
             setAppsList(json.data);
           }
         }
       } catch (err) {
         console.error("Gagal sinkronisasi data aplikasi:", err);
+      } finally {
+        if (isMounted) {
+          // Berikan jeda halus agar skeleton terlihat mulus
+          setTimeout(() => {
+            if (isMounted) setIsLoading(false);
+          }, 350);
+        }
       }
     };
     fetchLatestApps();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Filter apps based on search query
@@ -187,6 +199,7 @@ export default function AppHubPage() {
             {/* Catalog List Section without Category Filters */}
             <AppGridSection
               apps={filteredApps}
+              isLoading={isLoading}
               onOpenDetail={handleOpenDetail}
               onDownload={handleDownload}
               onResetSearch={() => setSearchQuery("")}
@@ -208,13 +221,7 @@ export default function AppHubPage() {
       {/* 3. Footer */}
       <Footer />
 
-      {/* 4. Mobile Bottom Navigation Bar (Fixed for Mobile Screens) */}
-      <MobileBottomNav
-        activeNav={activeNav}
-        onNavClick={handleNavClick}
-      />
-
-      {/* 5. Download Multi-Platform Modal */}
+      {/* 4. Download Multi-Platform Modal */}
       <DownloadModal
         app={downloadModalApp}
         isOpen={downloadModalApp !== null}
