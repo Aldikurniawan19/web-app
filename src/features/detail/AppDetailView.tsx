@@ -583,14 +583,6 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
                         <span className="text-slate-500 dark:text-slate-400">Ruang Bebas</span>
                         <span className="font-semibold text-slate-800 dark:text-slate-200">{app.systemRequirements.storage}</span>
                       </div>
-                      <div className="flex justify-between py-1">
-                        <span className="text-slate-500 dark:text-slate-400">Arsitektur CPU</span>
-                        <span className="font-mono text-slate-800 dark:text-slate-200">ARMv7 / ARM64 / x86</span>
-                      </div>
-                      <div className="flex justify-between py-1">
-                        <span className="text-slate-500 dark:text-slate-400">Koneksi Internet</span>
-                        <span className="text-slate-800 dark:text-slate-200">Opsional (Dapat Offline)</span>
-                      </div>
                     </div>
                   </div>
 
@@ -613,14 +605,6 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
                       <div className="flex justify-between py-1">
                         <span className="text-slate-500 dark:text-slate-400">Ruang Bebas</span>
                         <span className="font-semibold text-slate-800 dark:text-slate-200">100 MB ruang penyimpanan</span>
-                      </div>
-                      <div className="flex justify-between py-1">
-                        <span className="text-slate-500 dark:text-slate-400">Arsitektur CPU</span>
-                        <span className="font-mono text-slate-800 dark:text-slate-200">Octa-Core 64-bit</span>
-                      </div>
-                      <div className="flex justify-between py-1">
-                        <span className="text-slate-500 dark:text-slate-400">Koneksi Internet</span>
-                        <span className="text-slate-800 dark:text-slate-200">Wi-Fi / 4G LTE stabil</span>
                       </div>
                     </div>
                   </div>

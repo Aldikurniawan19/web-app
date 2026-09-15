@@ -21,6 +21,7 @@ interface ScreenshotSliderProps {
 
 export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [desktopIndex, setDesktopIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -30,6 +31,7 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
   const hasRealScreenshots = realScreenshots.length > 0;
 
   const totalItems = hasRealScreenshots ? realScreenshots.length : 4;
+  const maxDesktopIndex = Math.max(0, totalItems - 4);
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev === 0 ? totalItems - 1 : prev - 1));
@@ -37,6 +39,14 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev === totalItems - 1 ? 0 : prev + 1));
+  };
+
+  const handleDesktopPrev = () => {
+    setDesktopIndex((prev) => Math.max(0, prev - 1));
+  };
+
+  const handleDesktopNext = () => {
+    setDesktopIndex((prev) => Math.min(maxDesktopIndex, prev + 1));
   };
 
   const minSwipeDistance = 40;
@@ -165,9 +175,33 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
             </p>
           </div>
           {hasRealScreenshots && (
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-              {realScreenshots.length} Gambar
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                {realScreenshots.length} Gambar
+              </span>
+              {totalItems > 4 && (
+                <div className="hidden sm:flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={handleDesktopPrev}
+                    disabled={desktopIndex === 0}
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:pointer-events-none hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-2xs"
+                    aria-label="Tangkapan layar sebelumnya"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDesktopNext}
+                    disabled={desktopIndex >= maxDesktopIndex}
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:pointer-events-none hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-2xs"
+                    aria-label="Tangkapan layar berikutnya"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -263,44 +297,104 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
           )}
         </div>
 
-        {/* 2. Desktop View (Responsive Grid with hover zoom & Lightbox click) */}
-        <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {hasRealScreenshots
-            ? realScreenshots.map((sc, idx) => (
-                <div
-                  key={sc.id || idx}
-                  onClick={() => setLightboxIndex(idx)}
-                  className="group relative cursor-pointer flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:border-primary/50 hover:shadow-md transition-all hover:-translate-y-0.5"
-                >
-                  <div className="relative aspect-[9/16] max-h-72 w-full overflow-hidden bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center p-2">
-                    <img
-                      src={sc.imageUrl}
-                      alt={sc.title || `${appName} screenshot ${idx + 1}`}
-                      className="h-full w-full object-contain select-none group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-colors">
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-xs">
-                        <Maximize2 className="h-4 w-4" />
+        {/* 2. Desktop View (Menampilkan tepat 4 gambar, jika > 4 menjadi slider) */}
+        <div className="hidden sm:block relative">
+          <div className="overflow-hidden -mx-2 py-1 px-1">
+            <div
+              className="flex transition-transform duration-350 ease-out"
+              style={{
+                transform: `translateX(-${desktopIndex * 25}%)`,
+              }}
+            >
+              {hasRealScreenshots
+                ? realScreenshots.map((sc, idx) => (
+                    <div
+                      key={sc.id || idx}
+                      className="w-1/4 flex-shrink-0 px-2"
+                    >
+                      <div
+                        onClick={() => setLightboxIndex(idx)}
+                        className="group relative cursor-pointer flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:border-primary/50 hover:shadow-md transition-all hover:-translate-y-0.5 h-full"
+                      >
+                        <div className="relative aspect-[9/16] max-h-72 w-full overflow-hidden bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center p-2">
+                          <img
+                            src={sc.imageUrl}
+                            alt={sc.title || `${appName} screenshot ${idx + 1}`}
+                            className="h-full w-full object-contain select-none group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-colors">
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-xs">
+                              <Maximize2 className="h-4 w-4" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-3.5 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+                          <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                            {sc.title}
+                          </h4>
+                          {sc.description && (
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                              {sc.description}
+                            </p>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="p-3.5 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                      {sc.title}
-                    </h4>
-                    {sc.description && (
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
-                        {sc.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))
-            : fallbackMockups.map((mockup, idx) => (
-                <div key={idx} className="w-full">
-                  {mockup}
-                </div>
+                  ))
+                : fallbackMockups.map((mockup, idx) => (
+                    <div key={idx} className="w-1/4 flex-shrink-0 px-2">
+                      {mockup}
+                    </div>
+                  ))}
+            </div>
+          </div>
+
+          {/* Tombol Navigasi Mengambang Desktop (Jika ada lebih dari 4 gambar) */}
+          {totalItems > 4 && (
+            <>
+              {desktopIndex > 0 && (
+                <button
+                  type="button"
+                  onClick={handleDesktopPrev}
+                  className="absolute -left-3.5 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-md hover:scale-110 hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-95 transition-all"
+                  aria-label="Tangkapan layar sebelumnya"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </button>
+              )}
+
+              {desktopIndex < maxDesktopIndex && (
+                <button
+                  type="button"
+                  onClick={handleDesktopNext}
+                  className="absolute -right-3.5 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-md hover:scale-110 hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-95 transition-all"
+                  aria-label="Tangkapan layar berikutnya"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              )}
+            </>
+          )}
+
+          {/* Indikator Titik Paginasi Desktop (Jika ada lebih dari 4 gambar) */}
+          {totalItems > 4 && (
+            <div className="mt-4 flex items-center justify-center gap-1.5">
+              {Array.from({ length: maxDesktopIndex + 1 }).map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setDesktopIndex(idx)}
+                  aria-label={`Lihat slide ${idx + 1}`}
+                  className={cn(
+                    "h-2 rounded-full transition-all duration-300",
+                    desktopIndex === idx
+                      ? "w-6 bg-primary"
+                      : "w-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400"
+                  )}
+                />
               ))}
+            </div>
+          )}
         </div>
       </div>
 
