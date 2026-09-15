@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { AppItem, AppVersionItem, CreateAppInput } from "@/types/store";
+import { GithubReleaseService } from "./github-release.service";
 
 const MAX_VERSIONS_PER_APP = 4;
 
@@ -153,6 +154,26 @@ export class AppStorageService {
         );
 
         const mapped = records.map(this.mapToAppItem);
+
+        // Sinkronkan downloadsCount secara real-time dari akumulasi unduhan aset GitHub Releases
+        try {
+          const statsMap = await GithubReleaseService.getAllAppsDownloadStats(
+            mapped.map((a) => ({
+              id: a.id,
+              name: a.name,
+              apkFileName: a.apkFileName,
+              apkUrl: a.apkUrl,
+            }))
+          );
+          for (const app of mapped) {
+            if (statsMap[app.id] && statsMap[app.id].totalDownloads > 0) {
+              app.downloadsCount = statsMap[app.id].formattedTotal;
+            }
+          }
+        } catch {
+          // Tetap gunakan fallback downloadsCount dari database jika API GitHub tidak dapat diakses
+        }
+
         cachedApps = mapped;
         lastCacheTimestamp = Date.now();
         return mapped;
@@ -186,6 +207,20 @@ export class AppStorageService {
       );
       if (record) {
         const item = this.mapToAppItem(record);
+
+        // Sinkronkan downloadsCount aktual dari akumulasi unduhan seluruh rilis GitHub
+        try {
+          const stats = await GithubReleaseService.getAppDownloadStats({
+            appId: item.id,
+            appName: item.name,
+            apkFileName: item.apkFileName,
+            apkUrl: item.apkUrl,
+          });
+          if (stats && stats.totalDownloads > 0) {
+            item.downloadsCount = stats.formattedTotal;
+          }
+        } catch {}
+
         if (cachedApps !== null) {
           cachedApps = [item, ...cachedApps.filter((a) => a.id !== id)];
         }
