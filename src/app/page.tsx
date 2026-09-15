@@ -9,14 +9,13 @@ import { ApkGuideSection } from "@/features/guide/ApkGuideSection";
 import { AppDetailView } from "@/features/detail/AppDetailView";
 import { DownloadModal } from "@/features/download/DownloadModal";
 import { InstallGuideModal } from "@/features/guide/InstallGuideModal";
-import { APP_STORE_ITEMS } from "@/constants/app-store-data";
 import { AppItem } from "@/types/store";
 
 export default function AppHubPage() {
-  const [appsList, setAppsList] = useState<AppItem[]>(APP_STORE_ITEMS);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [appsList, setAppsList] = useState<AppItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [activeView, setActiveView] = useState<"catalog" | "detail">("catalog");
-  const [selectedApp, setSelectedApp] = useState<AppItem>(APP_STORE_ITEMS[0]);
+  const [selectedApp, setSelectedApp] = useState<AppItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [downloadModalApp, setDownloadModalApp] = useState<AppItem | null>(null);
   const [guideModalApp, setGuideModalApp] = useState<AppItem | null>(null);
@@ -24,7 +23,7 @@ export default function AppHubPage() {
   const isManualScrollLockRef = useRef<boolean>(false);
   const scrollLockTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Background SWR sync data aplikasi terbaru dari API/Supabase tanpa memblokir tampilan awal
+  // Ambil data aplikasi terkini langsung dari API database Supabase
   useEffect(() => {
     let isMounted = true;
     const fetchLatestApps = async () => {
@@ -32,12 +31,21 @@ export default function AppHubPage() {
         const res = await fetch("/api/apps");
         if (res.ok) {
           const json = await res.json();
-          if (isMounted && json.success && Array.isArray(json.data) && json.data.length > 0) {
+          if (isMounted && json.success && Array.isArray(json.data)) {
             setAppsList(json.data);
+            if (json.data.length > 0) {
+              setSelectedApp(json.data[0]);
+            } else {
+              setSelectedApp(null);
+            }
           }
         }
       } catch (err) {
-        console.error("Gagal sinkronisasi data aplikasi:", err);
+        console.error("Gagal memuat data aplikasi dari database:", err);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
     fetchLatestApps();
@@ -70,14 +78,12 @@ export default function AppHubPage() {
     }
 
     const handleScroll = () => {
-      // Abaikan event scroll saat animasi perpindahan halus sedang berlangsung (mencegah navbar melompat bolak-balik)
       if (isManualScrollLockRef.current) return;
 
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
       const docHeight = document.documentElement.scrollHeight;
 
-      // Jika user sudah berada di ujung bawah halaman (Panduan / Footer)
       if (scrollY + windowHeight >= docHeight - 120) {
         setActiveNav("panduan");
         return;
@@ -214,17 +220,17 @@ export default function AppHubPage() {
 
             {/* Panduan Pasang APK Section */}
             <ApkGuideSection
-              onOpenGuideModal={() => setGuideModalApp(selectedApp || appsList[0])}
+              onOpenGuideModal={() => setGuideModalApp(selectedApp || appsList[0] || null)}
             />
           </>
-        ) : (
-          /* App Detail View (persis halaman detail Notely) */
+        ) : selectedApp ? (
+          /* App Detail View */
           <AppDetailView
             app={selectedApp}
             onBack={handleBackToCatalog}
             onDownload={handleDownload}
           />
-        )}
+        ) : null}
       </main>
 
       {/* 3. Footer */}

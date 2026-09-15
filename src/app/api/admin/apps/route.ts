@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { AppStorageService } from "@/services/app-storage.service";
 import { AUTH_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 // Helper untuk validasi autentikasi admin di API
 function isAuthenticated(request: NextRequest): boolean {
   const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
@@ -89,6 +92,10 @@ export async function POST(request: NextRequest) {
       description: body.description,
       longDescription: body.longDescription || body.description,
       category: body.category,
+      rating: typeof body.rating === "number" ? body.rating : 5.0,
+      reviewsCount: body.reviewsCount || "Baru",
+      downloadsCount: body.downloadsCount || "10 rb+",
+      lastUpdated: body.lastUpdated,
       fileSize: body.fileSize || "15.0 MB",
       version: body.version || "1.0.0",
       developer: body.developer || "AppHub Studio",

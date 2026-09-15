@@ -1,18 +1,27 @@
-import { Pool } from "pg";
+import pg from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
-// Prioritaskan DATABASE_URL (Supabase Connection Pooler port 6543) untuk kecepatan & efisiensi koneksi tinggi
-const connectionString = process.env.DATABASE_URL || process.env.DIRECT_URL;
+/**
+ * Konfigurasi koneksi database Supabase PostgreSQL via Prisma 7 Driver Adapter.
+ *
+ * Menggunakan pg.Pool dengan konfigurasi pool yang dioptimalkan untuk
+ * koneksi ke Supabase Pooler (mode Session/Transaction).
+ */
 
-const pool = new Pool({
+const connectionString =
+  process.env.DIRECT_URL || process.env.DATABASE_URL || "";
+
+const pool = new pg.Pool({
   connectionString,
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  max: 3,
+  idleTimeoutMillis: 30_000,
+  connectionTimeoutMillis: 10_000,
+  allowExitOnIdle: true,
+});
+
+pool.on("error", (err) => {
+  console.error("[Database Pool] Koneksi pool error:", err.message);
 });
 
 const adapter = new PrismaPg(pool);
@@ -25,7 +34,7 @@ export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
     adapter,
-    log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
+    log: ["error"],
   });
 
 if (process.env.NODE_ENV !== "production") {

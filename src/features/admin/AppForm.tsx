@@ -11,14 +11,17 @@ import {
   AlertCircle,
   Smartphone,
   Layers,
-  Sparkles,
-  Info,
   Image as ImageIcon,
+  Star,
+  Download,
+  Calendar,
+  Settings2,
 } from "lucide-react";
-import { AppCategory, AppItem } from "@/types/store";
+import { AppCategory, AppItem, AppScreenshot } from "@/types/store";
 import { CATEGORIES } from "@/constants/app-store-data";
 import { ApkUploadDropzone } from "@/features/admin/ApkUploadDropzone";
 import { IconUploadDropzone } from "@/features/admin/IconUploadDropzone";
+import { ScreenshotUploadDropzone } from "@/features/admin/ScreenshotUploadDropzone";
 import { Button } from "@/components/ui/Button";
 
 interface AppFormProps {
@@ -32,7 +35,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // Form states
+  // 1. Informasi Dasar
   const [name, setName] = useState(initialData?.name || "");
   const [tagline, setTagline] = useState(initialData?.tagline || "");
   const [category, setCategory] = useState<Exclude<AppCategory, "Semua">>(
@@ -41,25 +44,46 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
   const [developer, setDeveloper] = useState(initialData?.developer || "AppHub Studio");
   const [version, setVersion] = useState(initialData?.version || "1.0.0");
   const [fileSize, setFileSize] = useState(initialData?.fileSize || "15.0 MB");
+  const [downloadsCount, setDownloadsCount] = useState(initialData?.downloadsCount || "10 rb+");
+  const [rating, setRating] = useState<number>(initialData?.rating ?? 5.0);
+  const [reviewsCount, setReviewsCount] = useState(initialData?.reviewsCount || "Baru");
+  const [lastUpdated, setLastUpdated] = useState(
+    initialData?.lastUpdated ||
+      new Date().toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+  );
+
+  // 2. Deskripsi Lengkap
   const [description, setDescription] = useState(initialData?.description || "");
   const [longDescription, setLongDescription] = useState(initialData?.longDescription || "");
-  
-  // Icon image state
+
+  // 3. Ikon Aplikasi
   const [iconUrl, setIconUrl] = useState<string | null>(initialData?.iconUrl || null);
 
-  // APK file state
+  // 4. Berkas APK
   const [apkUrl, setApkUrl] = useState<string | null>(initialData?.apkUrl || null);
   const [apkFileName, setApkFileName] = useState<string | null>(initialData?.apkFileName || null);
 
+  // 5. Screenshot Aplikasi (Maksimal 8 Gambar)
+  const [screenshots, setScreenshots] = useState<AppScreenshot[]>(
+    initialData?.screenshots || []
+  );
+
+  // 6. Poin Fitur Utama
   const [features, setFeatures] = useState<string[]>(
     initialData?.features || [
-      "Antarmuka cepat dan responsif",
-      "Dukungan mode gelap dan terang",
-      "Ringan dan hemat konsumsi baterai",
+      "Antarmuka cepat, intuitif, dan responsif",
+      "Dukungan mode gelap dan terang otomatis",
+      "Ringan dan hemat konsumsi memori baterai",
+      "Penyimpanan lokal terenkripsi dan aman",
     ]
   );
   const [newFeatureText, setNewFeatureText] = useState("");
 
+  // 7. Persyaratan Sistem
   const [osReq, setOsReq] = useState(initialData?.systemRequirements?.os || "Android 8.0 ke atas");
   const [ramReq, setRamReq] = useState(initialData?.systemRequirements?.ram || "Minimum 2 GB RAM");
   const [storageReq, setStorageReq] = useState(
@@ -81,7 +105,6 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
     setApkUrl(data.downloadUrl);
     setApkFileName(data.fileName);
     if (!name) {
-      // Auto-extract readable name from filename
       const cleanName = data.fileName
         .replace(/\.apk$/i, "")
         .replace(/[-_]v?[0-9].*$/i, "")
@@ -115,12 +138,17 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
         developer: developer.trim(),
         version: version.trim(),
         fileSize: fileSize.trim(),
+        rating: Number(rating) || 5.0,
+        reviewsCount: reviewsCount.trim() || "Baru",
+        downloadsCount: downloadsCount.trim() || "10 rb+",
+        lastUpdated: lastUpdated.trim(),
         description: description.trim(),
         longDescription: longDescription.trim() || description.trim(),
         iconUrl,
         iconType: "document",
         iconColor: "bg-blue-500",
         features,
+        screenshots,
         systemRequirements: {
           os: osReq,
           ram: ramReq,
@@ -162,7 +190,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-5xl mx-auto pb-12">
-      {/* Top action & back bar */}
+      {/* Top Action & Back Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <button
           type="button"
@@ -216,7 +244,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
         </div>
       )}
 
-      {/* Card 1: Upload APK File */}
+      {/* 1. Upload APK Package File */}
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-4">
         <div className="flex items-start justify-between">
           <div>
@@ -225,7 +253,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
               <span>1. Berkas Android Package (.APK)</span>
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Berkas APK akan diunggah otomatis ke GitHub Releases dan URL publiknya disimpan di Supabase.
+              Berkas APK akan diunggah otomatis ke GitHub Releases dan tautan unduhannya disimpan di Supabase.
             </p>
           </div>
           <span className="rounded-full bg-blue-50 dark:bg-slate-800 px-2.5 py-0.5 text-[11px] font-bold text-primary">
@@ -240,7 +268,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
         />
       </div>
 
-      {/* Card 2: Upload Gambar Ikon Aplikasi */}
+      {/* 2. Upload Gambar Ikon Aplikasi */}
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-4">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
@@ -258,21 +286,40 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
         />
       </div>
 
-      {/* Card 3: Informasi Dasar Aplikasi */}
+      {/* 3. Upload Screenshot Tampilan Aplikasi (Maksimal 8 Gambar) */}
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-4">
+        <div>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
+            <ImageIcon className="h-5 w-5 text-primary" />
+            <span>3. Tangkapan Layar Aplikasi (Screenshot)</span>
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Unggah hingga <strong>maksimal 8 gambar</strong> screenshot antarmuka aplikasi. Gambar akan ditampilkan di galeri slider pada halaman detail aplikasi.
+          </p>
+        </div>
+
+        <ScreenshotUploadDropzone
+          screenshots={screenshots}
+          onChange={(newScreenshots) => setScreenshots(newScreenshots)}
+          maxScreenshots={8}
+        />
+      </div>
+
+      {/* 4. Informasi Utama & Metadata Aplikasi */}
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
             <Layers className="h-5 w-5 text-primary" />
-            <span>3. Informasi Dasar Aplikasi</span>
+            <span>4. Informasi & Metadata Aplikasi</span>
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Detail ini akan ditampilkan pada landing page publik, kartu katalog, dan halaman detail.
+            Informasi ini akan muncul di kartu katalog dan header halaman detail aplikasi.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {/* Nama Aplikasi */}
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 sm:col-span-2">
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
               Nama Aplikasi <span className="text-rose-500">*</span>
             </label>
@@ -282,20 +329,6 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Contoh: Notely, AeroSync"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-            />
-          </div>
-
-          {/* Tagline */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Tagline Ringkas
-            </label>
-            <input
-              type="text"
-              value={tagline}
-              onChange={(e) => setTagline(e.target.value)}
-              placeholder="Contoh: Aplikasi Pencatat Modern & Cepat"
               className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
@@ -316,6 +349,20 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Tagline */}
+          <div className="space-y-1.5 sm:col-span-2">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Tagline Ringkas
+            </label>
+            <input
+              type="text"
+              value={tagline}
+              onChange={(e) => setTagline(e.target.value)}
+              placeholder="Contoh: Aplikasi Pencatat Modern, Cepat & Terenkripsi"
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
           </div>
 
           {/* Developer */}
@@ -355,21 +402,80 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
               type="text"
               value={fileSize}
               onChange={(e) => setFileSize(e.target.value)}
-              placeholder="12.5 MB"
+              placeholder="15.0 MB"
               className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground font-mono focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+
+          {/* Total Unduhan */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Jumlah Unduhan
+            </label>
+            <input
+              type="text"
+              value={downloadsCount}
+              onChange={(e) => setDownloadsCount(e.target.value)}
+              placeholder="Contoh: 10 rb+, 50k+"
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+
+          {/* Rating */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Rating (1.0 - 5.0)
+            </label>
+            <input
+              type="number"
+              step="0.1"
+              min="1.0"
+              max="5.0"
+              value={rating}
+              onChange={(e) => setRating(parseFloat(e.target.value) || 5.0)}
+              placeholder="5.0"
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+
+          {/* Reviews Count */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Jumlah Ulasan
+            </label>
+            <input
+              type="text"
+              value={reviewsCount}
+              onChange={(e) => setReviewsCount(e.target.value)}
+              placeholder="Contoh: 1.2k Ulasan, Baru"
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+
+          {/* Tanggal Pembaruan */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Tanggal Pembaruan
+            </label>
+            <input
+              type="text"
+              value={lastUpdated}
+              onChange={(e) => setLastUpdated(e.target.value)}
+              placeholder="Contoh: 15 September 2026"
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
         </div>
       </div>
 
-      {/* Card 4: Deskripsi Singkat & Lengkap */}
+      {/* 5. Deskripsi Singkat & Lengkap (Tentang Aplikasi) */}
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white font-display">
-            4. Deskripsi & Konten Informasi
+            5. Deskripsi & Konten Ulasan Aplikasi
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Tuliskan ringkasan untuk kartu katalog dan ulasan lengkap untuk halaman detail.
+            Tuliskan ringkasan untuk kartu katalog dan ulasan lengkap untuk tab &ldquo;Tentang Aplikasi&rdquo; pada halaman detail.
           </p>
         </div>
 
@@ -377,7 +483,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
         <div className="space-y-1.5">
           <div className="flex justify-between items-center">
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Deskripsi Singkat (Ringkasan Katalog) <span className="text-rose-500">*</span>
+              Deskripsi Singkat (Kartu Katalog) <span className="text-rose-500">*</span>
             </label>
             <span className="text-[10px] text-slate-400 font-mono">
               {description.length} karakter
@@ -395,27 +501,32 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
 
         {/* Deskripsi Lengkap */}
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-            Deskripsi Lengkap (Tentang Aplikasi)
-          </label>
+          <div className="flex justify-between items-center">
+            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Deskripsi Lengkap (Halaman Detail &ldquo;Tentang Aplikasi&rdquo;)
+            </label>
+            <span className="text-[10px] text-slate-400 font-mono">
+              {longDescription.length} karakter
+            </span>
+          </div>
           <textarea
-            rows={5}
+            rows={6}
             value={longDescription}
             onChange={(e) => setLongDescription(e.target.value)}
-            placeholder="Jelaskan secara komprehensif apa yang membuat aplikasi ini istimewa, kegunaan utamanya, dan keunggulannya..."
+            placeholder="Jelaskan secara menyeluruh fungsi utama aplikasi, fitur kunci, manfaat untuk pengguna, keamanan penyimpanan, dan keunggulan desainnya..."
             className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 p-3.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all leading-relaxed"
           />
         </div>
       </div>
 
-      {/* Card 5: Fitur Utama Aplikasi */}
+      {/* 6. Poin Fitur Unggulan (Tab Fitur) */}
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white font-display">
-            5. Poin Fitur Utama
+            6. Poin Fitur Utama & Keunggulan
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Daftar fitur kunci yang akan disorot dengan tanda centang pada halaman detail aplikasi.
+            Daftar fitur kunci yang akan ditampilkan dengan ikon centang pada tab &ldquo;Fitur&rdquo; di halaman detail.
           </p>
         </div>
 
@@ -444,7 +555,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
           ))}
         </div>
 
-        {/* Add new feature row */}
+        {/* Add new feature input */}
         <div className="flex gap-2">
           <input
             type="text"
@@ -456,7 +567,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
                 handleAddFeature();
               }
             }}
-            placeholder="Tambah poin fitur baru (tekan Enter)..."
+            placeholder="Ketik fitur baru lalu tekan Enter..."
             className="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           />
           <Button
@@ -467,26 +578,26 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
             className="shrink-0"
           >
             <Plus className="h-4 w-4" />
-            <span>Tambah</span>
+            <span>Tambah Fitur</span>
           </Button>
         </div>
       </div>
 
-      {/* Card 6: Persyaratan Sistem */}
+      {/* 7. Kebutuhan Sistem Minimum (Tab System Requirements) */}
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white font-display">
-            6. Persyaratan Minimum Sistem
+            7. Persyaratan Sistem Perangkat
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Spesifikasi perangkat minimum yang direkomendasikan untuk menjalankan APK ini.
+            Spesifikasi perangkat minimum yang ditampilkan pada tab &ldquo;System Requirements&rdquo; detail aplikasi.
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Sistem Operasi
+              Sistem Operasi Minimum
             </label>
             <input
               type="text"
@@ -499,7 +610,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
 
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Minimum RAM
+              Minimum Memori RAM
             </label>
             <input
               type="text"
@@ -512,20 +623,20 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
 
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Ruang Penyimpanan
+              Ruang Penyimpanan Bebas
             </label>
             <input
               type="text"
               value={storageReq}
               onChange={(e) => setStorageReq(e.target.value)}
-              placeholder="50 MB bebas"
+              placeholder="50 MB ruang bebas"
               className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
         </div>
       </div>
 
-      {/* Bottom Action Submit Button */}
+      {/* Bottom Action Submit Buttons */}
       <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
         <Button
           type="button"
