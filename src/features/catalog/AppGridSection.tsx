@@ -244,7 +244,7 @@ export function AppGridSection({
             <div className="h-4 w-28 rounded-md bg-slate-200 dark:bg-slate-800 animate-pulse" />
           ) : apps.length > 0 ? (
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-              {apps.length} aplikasi ditemukan
+              {apps.length} aplikasi tersedia
             </span>
           ) : null}
         </div>

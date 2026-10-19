@@ -285,6 +285,129 @@
   }
 }
 
+/* -------------------------------------------------------------
+   Animasi Cahaya Mengalir di Border Card Panduan APK (Card 1-4)
+   ------------------------------------------------------------- */
+.guide-card-border-beam {
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 1rem;
+  padding: 2px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 15;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  will-change: opacity;
+  filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.75)) drop-shadow(0 0 10px rgba(37, 99, 235, 0.4));
+}
+
+.dark .guide-card-border-beam {
+  filter: drop-shadow(0 0 6px rgba(96, 165, 250, 0.85)) drop-shadow(0 0 12px rgba(59, 130, 246, 0.5));
+}
+
+.guide-card-border-spinner {
+  position: absolute;
+  width: 500%;
+  aspect-ratio: 1 / 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  pointer-events: none;
+  will-change: transform;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0deg,
+    transparent 260deg,
+    rgba(37, 99, 235, 0.25) 285deg,
+    rgba(59, 130, 246, 0.8) 315deg,
+    rgba(56, 189, 248, 0.95) 338deg,
+    #ffffff 350deg,
+    rgba(147, 197, 253, 0.95) 356deg,
+    transparent 360deg
+  );
+}
+
+.dark .guide-card-border-spinner {
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0deg,
+    transparent 255deg,
+    rgba(30, 64, 175, 0.3) 280deg,
+    rgba(59, 130, 246, 0.85) 310deg,
+    rgba(96, 165, 250, 1) 335deg,
+    #ffffff 350deg,
+    rgba(191, 219, 254, 0.95) 356deg,
+    transparent 360deg
+  );
+}
+
+/* -------------------------------------------------------------
+   Penghubung Antar Card Panduan APK (Step Connectors)
+   ------------------------------------------------------------- */
+.guide-connector-node {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+}
+
+.guide-connector-track-beam {
+  filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.9));
+  will-change: opacity;
+}
+
+/* -------------------------------------------------------------
+   Animasi Kilauan Nomor Urut Card Panduan APK (Kanan Atas)
+   ------------------------------------------------------------- */
+.guide-step-number {
+  display: inline-block;
+  font-family: var(--font-display, "Outfit", sans-serif);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  background-image: linear-gradient(
+    115deg,
+    #94a3b8 0%,
+    #cbd5e1 20%,
+    #60a5fa 38%,
+    #ffffff 48%,
+    #93c5fd 58%,
+    #3b82f6 75%,
+    #94a3b8 100%
+  );
+  background-size: 260% 100%;
+  background-position: 200% 0;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  will-change: background-position;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.05));
+  transition: filter 0.3s ease;
+}
+
+.dark .guide-step-number {
+  background-image: linear-gradient(
+    115deg,
+    #334155 0%,
+    #475569 20%,
+    #60a5fa 38%,
+    #ffffff 48%,
+    #93c5fd 58%,
+    #3b82f6 75%,
+    #334155 100%
+  );
+  background-size: 260% 100%;
+  background-position: 200% 0;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.guide-step-sparkle {
+  will-change: transform, opacity;
+}
+
 
 
 
