@@ -276,6 +276,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
           onFileUploaded={handleFileUploaded}
           currentFileName={apkFileName || (initialData?.apkUrl ? "Paket APK Tersedia" : undefined)}
           currentFileSize={fileSize}
+          currentDownloadUrl={apkUrl || initialData?.apkUrl || undefined}
         />
 
         {isEditing && (apkChanged || (initialData?.version && version.trim() !== initialData.version.trim())) && (
