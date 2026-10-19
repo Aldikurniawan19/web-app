@@ -112,7 +112,7 @@ export function StoreHero({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Cari aplikasi, game, atau utilitas..."
+                placeholder="Cari aplikasi..."
                 className="w-full bg-transparent px-2 sm:px-3 py-1.5 sm:py-2.5 text-xs sm:text-sm text-foreground placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none"
               />
               <Button

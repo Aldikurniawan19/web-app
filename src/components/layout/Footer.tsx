@@ -14,7 +14,7 @@ export function Footer() {
     { label: "Pusat Bantuan", href: "#" },
     { label: "Kebijakan Privasi", href: "#" },
     { label: "Syarat & Ketentuan", href: "#" },
-    { label: "Hubungi Tim AppHub", href: "#" },
+    { label: "Hubungi Tim AllProjects", href: "#" },
   ];
 
   return (
@@ -50,8 +50,8 @@ export function Footer() {
             <div className="space-y-4 md:col-span-6">
               <div className="flex items-center">
                 <span className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5">
-                  <span className="inline-block text-3d-white">App</span>
-                  <span className="inline-block text-3d-sky">Hub</span>
+                  <span className="inline-block text-3d-white">All</span>
+                  <span className="inline-block text-3d-sky">Project</span>
                 </span>
               </div>
               <p className="text-xs text-blue-100 dark:text-blue-200/80 leading-relaxed max-w-md">
@@ -100,7 +100,7 @@ export function Footer() {
 
           {/* Bottom Copyright Bar */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-blue-500/30 dark:border-blue-900/50 pt-8 text-xs text-blue-200/90 dark:text-blue-300/70">
-            <p>© {currentYear} AppHub Studio.</p>
+            <p>© {currentYear} AllProject Studio.</p>
             <div className="flex items-center gap-6 text-xs text-blue-100 dark:text-blue-200/80">
              
             </div>
