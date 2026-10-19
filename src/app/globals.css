@@ -110,6 +110,47 @@
   text-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
 }
 
+/* Animasi Berkilau (Shimmer Light Sweep) untuk Judul Biru */
+.text-shimmer-blue {
+  background-image: linear-gradient(
+    115deg,
+    #1d4ed8 0%,
+    #2563eb 18%,
+    #60a5fa 36%,
+    #ffffff 48%,
+    #bfdbfe 58%,
+    #2563eb 74%,
+    #1d4ed8 100%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-position: 200% 0;
+  display: inline-block;
+  will-change: background-position;
+  filter: drop-shadow(0 1px 2px rgba(37, 99, 235, 0.25));
+}
+
+.dark .text-shimmer-blue {
+  background-image: linear-gradient(
+    115deg,
+    #2563eb 0%,
+    #60a5fa 18%,
+    #93c5fd 36%,
+    #ffffff 48%,
+    #dbeafe 58%,
+    #60a5fa 74%,
+    #2563eb 100%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-position: 200% 0;
+  display: inline-block;
+  will-change: background-position;
+  filter: drop-shadow(0 1px 3px rgba(59, 130, 246, 0.4));
+}
+
 /* White 3D Text (for App on Footer & Blue/Dark Surfaces) */
 .text-3d-white {
   color: #ffffff;

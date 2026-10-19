@@ -13,6 +13,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/ui/Button";
+import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
 
 interface ApkGuideSectionProps {
   onOpenGuideModal?: () => void;
@@ -173,7 +174,7 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
         <div className="mx-auto max-w-3xl text-center space-y-3">
           <h2 className="guide-header-anim text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight font-display select-none py-1">
             <span className="inline-block text-3d-bubble-main">Panduan Mudah</span>{" "}
-            <span className="inline-block text-3d-bubble-blue">Pasang APK</span>
+            <ShimmerTitleText>Pasang APK</ShimmerTitleText>
           </h2>
 
           <p className="guide-header-anim text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">

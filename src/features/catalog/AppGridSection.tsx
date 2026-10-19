@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
 
 // Register ScrollTrigger plugin on client side
 if (typeof window !== "undefined") {
@@ -236,7 +237,7 @@ export function AppGridSection({
           <div className="flex items-center gap-2">
             <h2 className="text-2xl font-extrabold tracking-normal sm:text-3xl font-display select-none py-0.5">
               <span className="inline-block text-3d-bubble-main">Aplikasi</span>{" "}
-              <span className="inline-block text-3d-bubble-blue">Terbaru</span>
+              <ShimmerTitleText>Terbaru</ShimmerTitleText>
             </h2>
           </div>
           {isLoading ? (

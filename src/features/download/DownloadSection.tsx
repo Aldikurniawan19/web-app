@@ -16,6 +16,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { QrCodeModal } from "@/features/download/QrCodeModal";
+import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
 
 export function DownloadSection() {
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
@@ -53,7 +54,7 @@ export function DownloadSection() {
           </Badge>
           <h2 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl font-display select-none py-1">
             <span className="inline-block text-3d-bubble-main">Unduh Aplikasi</span>{" "}
-            <span className="inline-block text-3d-bubble-blue">Hari Ini</span>
+            <ShimmerTitleText>Hari Ini</ShimmerTitleText>
           </h2>
           <p className="mt-3 text-base text-foreground-muted">
             Tersedia paket instalasi mandiri (APK) langsung bebas perantara serta tautan ke saluran resmi.

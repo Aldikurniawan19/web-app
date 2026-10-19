@@ -6,6 +6,7 @@ import { Search, Download } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
 
 interface StoreHeroProps {
   searchQuery: string;
@@ -91,9 +92,9 @@ export function StoreHero({
                 Temukan Aplikasi
               </span>{" "}
               <br className="hidden sm:inline" />
-              <span className="inline-block text-3d-bubble-blue">
+              <ShimmerTitleText>
                 yang Kamu Butuhkan
-              </span>
+              </ShimmerTitleText>
             </h1>
 
             <p className="hero-anim max-w-xl mx-auto lg:mx-0 text-xs sm:text-base lg:text-lg text-foreground-muted dark:text-slate-300 leading-relaxed">
