@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { FloatingBottomBar } from "@/components/layout/FloatingBottomBar";
 import { StoreHero } from "@/features/hero/StoreHero";
 import { AppGridSection } from "@/features/catalog/AppGridSection";
 import { ApkGuideSection } from "@/features/guide/ApkGuideSection";
@@ -245,6 +246,12 @@ export default function AppHubPage() {
 
       {/* 3. Footer */}
       <Footer />
+
+      {/* Floating Bottom Bar Navigation (Muncul mengambang saat di-scroll) */}
+      <FloatingBottomBar
+        activeNav={activeNav}
+        onNavClick={handleNavClick}
+      />
 
       {/* 4. Download Multi-Platform Modal */}
       <DownloadModal
