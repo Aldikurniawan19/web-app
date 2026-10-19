@@ -1,4 +1,5 @@
 import React from "react";
+import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -51,7 +52,7 @@ export function Footer() {
               <div className="flex items-center">
                 <span className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5">
                   <span className="inline-block text-3d-white">All</span>
-                  <span className="inline-block text-3d-sky">Project</span>
+                  <ShimmerTitleText variant="sky">Projects</ShimmerTitleText>
                 </span>
               </div>
               <p className="text-xs text-blue-100 dark:text-blue-200/80 leading-relaxed max-w-md">

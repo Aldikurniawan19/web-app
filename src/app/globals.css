@@ -151,6 +151,47 @@
   filter: drop-shadow(0 1px 3px rgba(59, 130, 246, 0.4));
 }
 
+/* Animasi Berkilau Sky Blue (Shimmer Light Sweep untuk Footer di Permukaan Biru) */
+.text-shimmer-sky {
+  background-image: linear-gradient(
+    115deg,
+    #38bdf8 0%,
+    #7dd3fc 18%,
+    #bae6fd 36%,
+    #ffffff 48%,
+    #f0f9ff 58%,
+    #7dd3fc 74%,
+    #38bdf8 100%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-position: 200% 0;
+  display: inline-block;
+  will-change: background-position;
+  filter: drop-shadow(0 1px 2px rgba(2, 132, 199, 0.45));
+}
+
+.dark .text-shimmer-sky {
+  background-image: linear-gradient(
+    115deg,
+    #38bdf8 0%,
+    #60a5fa 18%,
+    #93c5fd 36%,
+    #ffffff 48%,
+    #bae6fd 58%,
+    #38bdf8 74%,
+    #0284c7 100%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-position: 200% 0;
+  display: inline-block;
+  will-change: background-position;
+  filter: drop-shadow(0 1px 3px rgba(3, 105, 161, 0.55));
+}
+
 /* White 3D Text (for App on Footer & Blue/Dark Surfaces) */
 .text-3d-white {
   color: #ffffff;

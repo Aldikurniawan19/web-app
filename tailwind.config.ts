@@ -70,6 +70,9 @@ const config: Config = {
         lg: "var(--radius-lg)",
         xl: "var(--radius-xl)",
       },
+      spacing: {
+        "4.5": "1.125rem",
+      },
     },
   },
   plugins: [],
