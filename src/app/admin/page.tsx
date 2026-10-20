@@ -165,9 +165,9 @@ export default function AdminDashboardPage() {
 
             <Link href="/admin/web-projects/new">
               <Button
-                variant="outline"
+                variant="glass"
                 size="md"
-                className="bg-white/10 hover:bg-white/20 text-white font-bold text-xs border-white/30"
+                className="font-bold text-xs"
               >
                 <Globe className="h-4 w-4" />
                 <span>Tambah Projek Web</span>
@@ -176,9 +176,9 @@ export default function AdminDashboardPage() {
 
             <Link href="/" target="_blank">
               <Button
-                variant="outline"
+                variant="glass"
                 size="md"
-                className="border-white/30 text-white hover:bg-white/10 text-xs"
+                className="bg-white/10 hover:bg-white/20 border-white/25 text-xs font-semibold"
               >
                 <span>Lihat Web Publik</span>
                 <ExternalLink className="h-3.5 w-3.5" />
