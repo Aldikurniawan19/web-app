@@ -84,8 +84,7 @@ export default function AllAppsPage() {
       <main className="flex-1 w-full">
         {activeView === "catalog" ? (
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
-            <>
-              {/* Breadcrumb & Title */}
+            {/* Breadcrumb & Title */}
               <div className="space-y-4">
                 <Breadcrumb
                   items={[
