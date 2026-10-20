@@ -63,6 +63,13 @@ const config: Config = {
           "JetBrains Mono",
           "monospace",
         ],
+        script: [
+          "var(--font-script)",
+          '"Dancing Script"',
+          '"Brush Script MT"',
+          '"Segoe Script"',
+          "cursive",
+        ],
       },
       borderRadius: {
         sm: "var(--radius-sm)",

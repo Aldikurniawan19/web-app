@@ -83,7 +83,7 @@ export function AdminLoginForm() {
             <span>Area Khusus Terproteksi</span>
           </div>
           <h1 className="text-xl font-black text-white font-display">
-            Portal Admin AppHub
+            Portal Admin AllProjects
           </h1>
           <p className="text-xs text-slate-400">
             Silakan masuk dengan akun administrator Anda untuk mengelola upload APK dan deskripsi.

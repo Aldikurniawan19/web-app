@@ -50,8 +50,10 @@ export function Footer() {
             {/* Col 1: Brand Info (Spans 6 cols on md) */}
             <div className="space-y-4 md:col-span-6">
               <div className="flex items-center">
-                <span className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5">
-                  <span className="inline-block text-3d-white">All</span>
+                <span className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5 flex items-baseline">
+                  <span className="inline-block font-script text-2xl sm:text-3xl font-bold text-3d-white pr-1">
+                    All
+                  </span>
                   <ShimmerTitleText variant="sky">Projects</ShimmerTitleText>
                 </span>
               </div>
@@ -100,7 +102,7 @@ export function Footer() {
           </div>
 
           {/* Bottom Copyright Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-blue-500/30 dark:border-blue-900/50 pt-8 text-xs text-blue-200/90 dark:text-blue-300/70">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-blue-500/30 dark:border-blue-900/50 pt-8 pb-16 md:pb-0 text-xs text-blue-200/90 dark:text-blue-300/70">
             <p>© {currentYear} AllProject Studio.</p>
             <div className="flex items-center gap-6 text-xs text-blue-100 dark:text-blue-200/80">
              

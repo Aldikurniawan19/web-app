@@ -74,7 +74,7 @@ export function StoreHero({
               {/* Next.js Optimized Image with High Priority Preloading & WebP Conversion */}
               <Image
                 src="/assets/hero.png"
-                alt="Ilustrasi Laptop dan Aplikasi AppHub"
+                alt="Ilustrasi Laptop dan Aplikasi Allprojects"
                 width={540}
                 height={400}
                 priority

@@ -38,7 +38,7 @@ const GUIDE_STEPS: GuideStep[] = [
     step: "01",
     title: "Unduh Berkas APK",
     description:
-      "Pilih aplikasi yang diinginkan di katalog AppHub, lalu klik tombol Unduh APK. Berkas installer resmi (.apk) akan langsung tersimpan di folder Download perangkat Anda.",
+      "Pilih aplikasi yang diinginkan di katalog Allprojects, lalu klik tombol Unduh APK. Berkas installer resmi (.apk) akan langsung tersimpan di folder Download perangkat Anda.",
     tip: "Ukuran berkas & hash SHA-256 tertera jelas di halaman detail.",
     icon: Download,
   },

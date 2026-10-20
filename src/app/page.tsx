@@ -247,7 +247,7 @@ export default function AppHubPage() {
       {/* 3. Footer */}
       <Footer />
 
-      {/* Floating Bottom Bar Navigation (Muncul mengambang saat di-scroll) */}
+      {/* Floating Bottom Bar Navigation (khusus tampilan mobile, langsung terlihat tanpa scroll) */}
       <FloatingBottomBar
         activeNav={activeNav}
         onNavClick={handleNavClick}

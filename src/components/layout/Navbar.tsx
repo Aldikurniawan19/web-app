@@ -54,8 +54,10 @@ export function Navbar({
           onClick={() => handleItemClick("beranda")}
           className="flex items-center cursor-pointer select-none group"
         >
-          <span className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5 transition-transform group-hover:scale-105">
-            <span className="inline-block text-3d-bubble-main">All</span>
+          <span className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5 transition-transform group-hover:scale-105 flex items-baseline">
+            <span className="inline-block font-script text-2xl sm:text-3xl font-bold text-3d-bubble-main pr-1">
+              All
+            </span>
             <ShimmerTitleText>Projects</ShimmerTitleText>
           </span>
         </div>

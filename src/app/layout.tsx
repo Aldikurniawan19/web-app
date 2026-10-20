@@ -18,13 +18,14 @@ const fontBody = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "AppHub — Temukan dan Download Aplikasi Android Terbaik",
+  title: "Allprojects — Temukan dan Download Aplikasi Android Terbaik",
   description:
-    "Download berbagai aplikasi Android terbaik dengan format APK yang mudah, cepat dan aman. Semua kebutuhan digitalmu ada di AppHub!",
-  applicationName: "AppHub",
-  authors: [{ name: "AppHub Studio", url: "https://apphub.com" }],
+    "Download berbagai aplikasi Android terbaik dengan format APK yang mudah, cepat dan aman. Semua kebutuhan digitalmu ada di Allprojects!",
+  applicationName: "Allprojects",
+  authors: [{ name: "Allprojects Studio", url: "https://allprojects.com" }],
   keywords: [
-    "AppHub",
+    "Allprojects",
+    "AllProjects",
     "Download Aplikasi",
     "Aplikasi Android",
     "APK Download",
@@ -34,24 +35,32 @@ export const metadata: Metadata = {
     "PhotoEditor",
     "Android Store",
   ],
-  metadataBase: new URL("https://apphub.com"),
+  metadataBase: new URL("https://allprojects.com"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "AppHub — Temukan dan Download Aplikasi Android Terbaik",
+    title: "Allprojects — Temukan dan Download Aplikasi Android Terbaik",
     description:
       "Download berbagai aplikasi Android terbaik dengan format APK yang mudah, cepat dan aman.",
-    url: "https://apphub.com",
-    siteName: "AppHub",
+    url: "https://allprojects.com",
+    siteName: "Allprojects",
     locale: "id_ID",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "AppHub — Temukan dan Download Aplikasi Android Terbaik",
+    title: "Allprojects — Temukan dan Download Aplikasi Android Terbaik",
     description:
       "Download berbagai aplikasi Android terbaik dengan format APK yang mudah, cepat dan aman.",
+  },
+  icons: {
+    icon: [
+      { url: "/assets/logoAllProjects.png" },
+      { url: "/assets/logoAllProjects.png", type: "image/png" },
+    ],
+    shortcut: "/assets/logoAllProjects.png",
+    apple: "/assets/logoAllProjects.png",
   },
 };
 
@@ -64,7 +73,7 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "AppHub",
+    name: "Allprojects",
     operatingSystem: "Android",
     applicationCategory: "MobileApplication",
     description:
@@ -85,8 +94,11 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="icon" href="/assets/logoAllProjects.png" type="image/png" sizes="any" />
+        <link rel="shortcut icon" href="/assets/logoAllProjects.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/assets/logoAllProjects.png" />
         <link
-          href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Outfit:wght@400..800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Dancing+Script:wght@600;700&family=Outfit:wght@400..800&family=JetBrains+Mono:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
         <script

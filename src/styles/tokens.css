@@ -31,10 +31,11 @@
   --color-danger: #ef4444;
   --color-danger-subtle: #fee2e2;
 
-  /* Font Family - Menggunakan font web modern, luwes & ramah (Outfit & DM Sans) */
+  /* Font Family - Menggunakan font web modern, luwes & ramah (Outfit & DM Sans) serta font teks latin artistik (Dancing Script) */
   --font-display: var(--font-outfit), "Outfit", sans-serif;
   --font-body: var(--font-dm-sans), "DM Sans", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  --font-script: "Dancing Script", "Brush Script MT", "Segoe Script", cursive;
 
   /* Skala Radius Konsisten */
   --radius-sm: 6px;
