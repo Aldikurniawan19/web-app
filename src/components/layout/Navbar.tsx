@@ -91,82 +91,139 @@ export function Navbar({
     const distance = Math.abs(targetIndex - prevIndex);
     const direction = targetIndex > prevIndex ? 1 : -1; // 1 = ke kanan, -1 = ke kiri
 
-    // Bersihkan animasi yang sedang berjalan agar transisi selalu responsif
+    const currentX = gsap.getProperty(pillEl, "x") as number;
+    const currentWidth = gsap.getProperty(pillEl, "width") as number;
+    const startX = typeof currentX === "number" && !isNaN(currentX) ? currentX : targetX;
+    const startWidth = typeof currentWidth === "number" && !isNaN(currentWidth) ? currentWidth : targetWidth;
+
+    const startRight = startX + startWidth;
+    const targetRight = targetX + targetWidth;
+    const isMovingRight = targetX > startX;
+
     gsap.killTweensOf(pillEl);
 
-    if (distance > 1) {
-      // KASUS 1: Melompati menu di antaranya (misal: Beranda <-> Panduan melewati Aplikasi)
-      // Meluncur lebih santai dan mengalir halus dengan efek samar-samar saat melintas
-      const tl = gsap.timeline();
+    // Animasi pergerakan fluida independen: ujung depan melesat lebih dulu, ujung ekor menyusul
+    // sehingga pill benar-benar "molor" dan meluncur ke arah tujuan (bukan membesar di tempat)
+    const state = {
+      left: startX,
+      right: startRight,
+    };
 
-      // Pergerakan posisi x, y, width, height lembut ke tombol tujuan
-      tl.to(pillEl, {
-        x: targetX,
+    const updatePill = () => {
+      const curWidth = Math.max(state.right - state.left, 24);
+      gsap.set(pillEl, {
+        x: state.left,
+        width: curWidth,
         y: targetY,
-        width: targetWidth,
         height: targetHeight,
-        duration: 0.68,
-        ease: "power2.inOut",
       });
+    };
 
-      // Fase melintas di tengah: Memanjang & memudar samar-samar secara halus
+    const tl = gsap.timeline();
+
+    if (isMovingRight) {
+      // BERGERAK KE KANAN:
+      // Ujung kanan (depan) melesat duluan ke target
+      tl.to(
+        state,
+        {
+          right: targetRight,
+          duration: 0.52,
+          ease: "power2.out",
+          onUpdate: updatePill,
+        },
+        0
+      );
+
+      // Ujung kiri (ekor) menyusul dengan jeda sedikit (molor ke arah kanan!)
+      tl.to(
+        state,
+        {
+          left: targetX,
+          duration: 0.62,
+          ease: "elastic.out(1.05, 0.72)",
+          onUpdate: updatePill,
+        },
+        0.08
+      );
+    } else {
+      // BERGERAK KE KIRI:
+      // Ujung kiri (depan) melesat duluan ke target
+      tl.to(
+        state,
+        {
+          left: targetX,
+          duration: 0.52,
+          ease: "power2.out",
+          onUpdate: updatePill,
+        },
+        0
+      );
+
+      // Ujung kanan (ekor) menyusul dengan jeda sedikit (molor ke arah kiri!)
+      tl.to(
+        state,
+        {
+          right: targetRight,
+          duration: 0.62,
+          ease: "elastic.out(1.05, 0.72)",
+          onUpdate: updatePill,
+        },
+        0.08
+      );
+    }
+
+    // Efek ketebalan fluida air: menipis saat melar memanjang, lalu membal kenyal di tujuan
+    tl.to(
+      pillEl,
+      {
+        scaleY: 0.88,
+        duration: 0.22,
+        ease: "power1.out",
+        transformOrigin: "center center",
+      },
+      0
+    );
+    tl.to(
+      pillEl,
+      {
+        scaleY: 1.05,
+        duration: 0.26,
+        ease: "power1.inOut",
+        transformOrigin: "center center",
+      },
+      0.22
+    );
+    tl.to(
+      pillEl,
+      {
+        scaleY: 1,
+        duration: 0.3,
+        ease: "elastic.out(1.05, 0.65)",
+        transformOrigin: "center center",
+      },
+      0.48
+    );
+
+    if (distance > 1) {
+      // Efek air menipis samar-samar saat melompati menu di antaranya
       tl.to(
         pillEl,
         {
           opacity: 0.3,
-          scaleX: 1.25,
-          scaleY: 0.9,
-          duration: 0.28,
+          duration: 0.26,
           ease: "power2.in",
-          transformOrigin: "center center",
         },
         0
       );
-
-      // Fase tiba di tujuan: Kembali solid dan kenyal lembut (spring lebih rileks dan mulus)
       tl.to(
         pillEl,
         {
           opacity: 1,
-          scaleX: 1,
-          scaleY: 1,
-          duration: 0.52,
-          ease: "elastic.out(1.08, 0.68)",
-          transformOrigin: "center center",
+          duration: 0.42,
+          ease: "power2.out",
         },
-        0.26
-      );
-    } else {
-      // KASUS 2: Bergeser ke menu tetangga (misal: Beranda <-> Aplikasi atau Aplikasi <-> Panduan)
-      const tl = gsap.timeline();
-
-      // Bergerak mulus dan halus ke posisi target
-      tl.to(pillEl, {
-        x: targetX,
-        y: targetY,
-        width: targetWidth,
-        height: targetHeight,
-        duration: 0.62,
-        ease: "power3.out",
-      });
-
-      // Efek melar kenyal yang lembut dan santai (spring lembut dan halus)
-      tl.fromTo(
-        pillEl,
-        {
-          scaleX: 1.14,
-          scaleY: 0.92,
-          transformOrigin: "center center",
-        },
-        {
-          scaleX: 1,
-          scaleY: 1,
-          opacity: 1,
-          duration: 0.68,
-          ease: "elastic.out(1.08, 0.65)",
-          transformOrigin: "center center",
-        },
-        0
+        0.24
       );
     }
 

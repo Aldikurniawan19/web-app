@@ -119,35 +119,118 @@ export function AppGridSection({
       return;
     }
 
+    const currentX = gsap.getProperty(pill, "x") as number;
+    const currentWidth = gsap.getProperty(pill, "width") as number;
+    const startX = typeof currentX === "number" && !isNaN(currentX) ? currentX : targetX;
+    const startWidth = typeof currentWidth === "number" && !isNaN(currentWidth) ? currentWidth : targetWidth;
+
+    const startRight = startX + startWidth;
+    const targetRight = targetX + targetWidth;
+    const isMovingRight = targetX > startX;
+
     gsap.killTweensOf(pill);
 
-    const tl = gsap.timeline();
-    // Bergerak mulus dan halus ke tab target
-    tl.to(pill, {
-      x: targetX,
-      y: targetY,
-      width: targetWidth,
-      height: targetHeight,
-      duration: 0.62,
-      ease: "power3.out",
-    });
+    // Animasi pergerakan fluida independen: ujung depan melesat lebih dulu, ujung ekor menyusul
+    // sehingga pill benar-benar "molor" dan meluncur ke arah tujuan (bukan membesar di tempat)
+    const state = {
+      left: startX,
+      right: startRight,
+    };
 
-    // Efek kenyal lembut yang lebih luwes dan santai
-    tl.fromTo(
+    const updatePill = () => {
+      const curWidth = Math.max(state.right - state.left, 24);
+      gsap.set(pill, {
+        x: state.left,
+        width: curWidth,
+        y: targetY,
+        height: targetHeight,
+      });
+    };
+
+    const tl = gsap.timeline();
+
+    if (isMovingRight) {
+      // BERGERAK KE KANAN:
+      // Ujung kanan (depan) melesat duluan ke target
+      tl.to(
+        state,
+        {
+          right: targetRight,
+          duration: 0.52,
+          ease: "power2.out",
+          onUpdate: updatePill,
+        },
+        0
+      );
+
+      // Ujung kiri (ekor) menyusul dengan jeda sedikit (molor ke arah kanan!)
+      tl.to(
+        state,
+        {
+          left: targetX,
+          duration: 0.62,
+          ease: "elastic.out(1.05, 0.72)",
+          onUpdate: updatePill,
+        },
+        0.08
+      );
+    } else {
+      // BERGERAK KE KIRI:
+      // Ujung kiri (depan) melesat duluan ke target
+      tl.to(
+        state,
+        {
+          left: targetX,
+          duration: 0.52,
+          ease: "power2.out",
+          onUpdate: updatePill,
+        },
+        0
+      );
+
+      // Ujung kanan (ekor) menyusul dengan jeda sedikit (molor ke arah kiri!)
+      tl.to(
+        state,
+        {
+          right: targetRight,
+          duration: 0.62,
+          ease: "elastic.out(1.05, 0.72)",
+          onUpdate: updatePill,
+        },
+        0.08
+      );
+    }
+
+    // Efek ketebalan fluida air: menipis saat melar memanjang, lalu membal kenyal di tujuan
+    tl.to(
       pill,
       {
-        scaleX: 1.14,
-        scaleY: 0.92,
-        transformOrigin: "center center",
-      },
-      {
-        scaleX: 1,
-        scaleY: 1,
-        duration: 0.68,
-        ease: "elastic.out(1.08, 0.65)",
+        scaleY: 0.88,
+        duration: 0.22,
+        ease: "power1.out",
         transformOrigin: "center center",
       },
       0
+    );
+    tl.to(
+      pill,
+      {
+        scaleY: 1.05,
+        duration: 0.26,
+        ease: "power1.inOut",
+        transformOrigin: "center center",
+      },
+      0.22
+    );
+    tl.to(
+      pill,
+      {
+        scaleY: 1,
+        duration: 0.3,
+        ease: "elastic.out(1.05, 0.65)",
+        transformOrigin: "center center",
+      },
+      0.48
     );
 
     prevTabRef.current = activeTab;
