@@ -280,31 +280,31 @@ export function Navbar({
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95 transition-colors duration-200">
+    <header className="sticky top-0 z-40 w-full border-b border-blue-500/40 bg-blue-600/95 backdrop-blur-md transition-colors duration-200 text-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo / Brand Name */}
+        {/* Logo / Brand Name — Teks 3D putih & Shimmer Sky seperti di Footer */}
         <div
           onClick={handleLogoClick}
           className="flex items-center cursor-pointer select-none group"
         >
           <span className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5 transition-transform group-hover:scale-105 flex items-baseline">
-            <span className="inline-block font-script text-2xl sm:text-3xl font-bold text-3d-bubble-main pr-1">
+            <span className="inline-block font-script text-2xl sm:text-3xl font-bold text-3d-white pr-1">
               All
             </span>
-            <ShimmerTitleText>Projects</ShimmerTitleText>
+            <ShimmerTitleText variant="sky">Projects</ShimmerTitleText>
           </span>
         </div>
 
-        {/* Desktop Navigation Links — Tanpa background luar terpisah, menyatu langsung dengan navbar */}
+        {/* Desktop Navigation Links — Menyatu dengan navbar */}
         <nav
           ref={navRef}
           aria-label="Navigasi Menu Utama"
           className="relative hidden md:flex items-center gap-1"
         >
-          {/* Animated Sliding Jelly Indicator Pill — Diposisikan top-0 left-0 agar translate akurat 100% */}
+          {/* Animated Sliding Glass Transparent Indicator Pill */}
           <div
             ref={activePillRef}
-            className="absolute top-0 left-0 pointer-events-none rounded-full bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.25)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2.5px_0_#1e3a8a] z-0 will-change-transform will-change-opacity"
+            className="absolute top-0 left-0 pointer-events-none rounded-full bg-white/20 backdrop-blur-md border border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_8px_rgba(0,0,0,0.15)] z-0 will-change-transform will-change-opacity"
             style={{ opacity: 0 }}
           />
 
@@ -322,7 +322,7 @@ export function Navbar({
                   "relative z-10 flex h-9 items-center justify-center px-4 rounded-full text-xs sm:text-sm font-bold transition-colors duration-200 select-none",
                   isActive
                     ? "text-white"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/50"
+                    : "text-blue-100 hover:text-white hover:bg-white/10"
                 )}
               >
                 {item.label}
@@ -331,7 +331,7 @@ export function Navbar({
           })}
         </nav>
 
-        {/* Right Controls: GitHub Link & Theme Toggle */}
+        {/* Right Controls: GitHub Link & Theme Toggle dengan Glass Styling */}
         <div className="flex items-center gap-2.5 sm:gap-3">
           {/* GitHub Profile Link */}
           <a
@@ -340,13 +340,13 @@ export function Navbar({
             rel="noopener noreferrer"
             aria-label="GitHub Profile Aldikurniawan19"
             title="Kunjungi GitHub Aldikurniawan19"
-            className="group relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/90 dark:border-slate-700 bg-gradient-to-b from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 text-slate-800 dark:text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_0_#cbd5e1] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_0_#0f172a] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_2.5px_0_#cbd5e1] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[0_1px_0_#cbd5e1] transition-all duration-200 select-none"
+            className="group relative flex h-9 w-9 items-center justify-center rounded-xl border border-white/25 bg-white/15 hover:bg-white/25 active:bg-white/20 backdrop-blur-sm text-white shadow-sm hover:-translate-y-0.5 active:translate-y-0.5 transition-all duration-200 select-none"
           >
-            <GithubBrandIcon className="h-4.5 w-4.5 text-slate-800 dark:text-white transition-transform duration-300 group-hover:scale-110" />
+            <GithubBrandIcon className="h-4.5 w-4.5 text-white transition-transform duration-300 group-hover:scale-110" />
           </a>
 
           {/* Theme Toggle Button */}
-          <ThemeToggle />
+          <ThemeToggle variant="glass" />
         </div>
       </div>
     </header>
