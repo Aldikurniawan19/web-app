@@ -12,6 +12,8 @@ import {
   LogOut,
   Sparkles,
   Smartphone,
+  Globe,
+  PlusCircle,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -39,7 +41,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     }
   };
 
-  const navItems = [
+  const appNavItems = [
     {
       label: "Overview",
       href: "/admin",
@@ -56,6 +58,21 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       label: "Unggah APK Baru",
       href: "/admin/apps/new",
       icon: UploadCloud,
+      exact: true,
+    },
+  ];
+
+  const webNavItems = [
+    {
+      label: "Kelola Projek Web",
+      href: "/admin/web-projects",
+      icon: Globe,
+      exact: false,
+    },
+    {
+      label: "Tambah Projek Web",
+      href: "/admin/web-projects/new",
+      icon: PlusCircle,
       exact: true,
     },
   ];
@@ -110,12 +127,45 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
 
           {/* Navigation Links */}
           <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+            {/* Group 1: Aplikasi APK */}
             <div>
               <div className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
                 Manajemen APK
               </div>
               <nav className="space-y-1">
-                {navItems.map((item) => {
+                {appNavItems.map((item) => {
+                  const isActive = item.exact
+                    ? pathname === item.href
+                    : pathname.startsWith(item.href);
+                  const Icon = item.icon;
+
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={onClose}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all select-none",
+                        isActive
+                          ? "bg-primary text-white shadow-md shadow-primary/25"
+                          : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white"
+                      )}
+                    >
+                      <Icon className="h-4 w-4 shrink-0" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+
+            {/* Group 2: Projek Web */}
+            <div>
+              <div className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+                Manajemen Projek Web
+              </div>
+              <nav className="space-y-1">
+                {webNavItems.map((item) => {
                   const isActive = item.exact
                     ? pathname === item.href
                     : pathname.startsWith(item.href);

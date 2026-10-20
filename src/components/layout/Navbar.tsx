@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
@@ -36,14 +37,35 @@ export function Navbar({
   activeNav = "aplikasi",
   onNavClick,
 }: NavbarProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+
   const navItems = [
-    { id: "beranda", label: "Beranda", href: "#beranda" },
-    { id: "aplikasi", label: "Aplikasi", href: "#katalog" },
-    { id: "panduan", label: "Panduan", href: "#panduan-apk" },
+    { id: "beranda", label: "Beranda" },
+    { id: "aplikasi", label: "Aplikasi" },
+    { id: "panduan", label: "Panduan" },
   ];
 
   const handleItemClick = (id: string) => {
+    if (pathname !== "/") {
+      if (id === "beranda") {
+        router.push("/");
+      } else if (id === "aplikasi") {
+        router.push("/aplikasi");
+      } else if (id === "panduan") {
+        router.push("/#panduan-apk");
+      }
+      return;
+    }
     if (onNavClick) onNavClick(id);
+  };
+
+  const handleLogoClick = () => {
+    if (pathname !== "/") {
+      router.push("/");
+    } else if (onNavClick) {
+      onNavClick("beranda");
+    }
   };
 
   return (
@@ -51,7 +73,7 @@ export function Navbar({
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo / Brand Name */}
         <div
-          onClick={() => handleItemClick("beranda")}
+          onClick={handleLogoClick}
           className="flex items-center cursor-pointer select-none group"
         >
           <span className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5 transition-transform group-hover:scale-105 flex items-baseline">

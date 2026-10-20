@@ -15,7 +15,9 @@ import {
   Zap,
   Sliders,
   RefreshCw,
+  Home,
 } from "lucide-react";
+import { Breadcrumb, BreadcrumbItem } from "@/components/ui/Breadcrumb";
 import { AppItem } from "@/types/store";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { PlatformBadge } from "@/components/ui/PlatformBadge";
@@ -30,9 +32,15 @@ interface AppDetailViewProps {
   app: AppItem;
   onBack: () => void;
   onDownload: (app: AppItem) => void;
+  breadcrumbs?: BreadcrumbItem[];
 }
 
-export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
+export function AppDetailView({
+  app,
+  onBack,
+  onDownload,
+  breadcrumbs,
+}: AppDetailViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<
     "tentang" | "fitur" | "versi" | "informasi" | "changelog" | "system"
@@ -70,7 +78,7 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
     { id: "system", label: "System Requirements" },
   ] as const;
 
-  const handleBackWithAnimation = () => {
+  const handleBackWithAnimation = (action?: () => void) => {
     const animEls = containerRef.current?.querySelectorAll(".detail-anim");
     if (animEls && animEls.length > 0) {
       gsap.to(animEls, {
@@ -79,25 +87,44 @@ export function AppDetailView({ app, onBack, onDownload }: AppDetailViewProps) {
         duration: 0.22,
         stagger: 0.02,
         ease: "power2.in",
-        onComplete: onBack,
+        onComplete: action || onBack,
       });
     } else {
-      onBack();
+      if (action) {
+        action();
+      } else {
+        onBack();
+      }
     }
   };
+
+  const defaultBreadcrumbs: BreadcrumbItem[] = [
+    {
+      label: "Beranda",
+      icon: Home,
+      onClick: () => handleBackWithAnimation(),
+    },
+    {
+      label: `Detail ${app.name}`,
+      isCurrent: true,
+    },
+  ];
+
+  const resolvedBreadcrumbs: BreadcrumbItem[] =
+    breadcrumbs && breadcrumbs.length > 0
+      ? breadcrumbs.map((bc) => ({
+          ...bc,
+          onClick: bc.onClick ? () => handleBackWithAnimation(bc.onClick) : undefined,
+        }))
+      : defaultBreadcrumbs;
 
   return (
     <div ref={containerRef} className="py-8 sm:py-12 bg-background min-h-screen">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-        {/* Back navigation link */}
-        <button
-          type="button"
-          onClick={handleBackWithAnimation}
-          className="detail-anim group inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:text-primary-hover active:scale-95"
-        >
-          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-          <span>Kembali ke Semua Aplikasi</span>
-        </button>
+        {/* Dynamic Breadcrumb Navigation Bar (Home > [Katalog] > Detail) */}
+        <div className="detail-anim">
+          <Breadcrumb items={resolvedBreadcrumbs} />
+        </div>
 
         {/* Main App Hero Header Card */}
         <div className="detail-anim rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm transition-colors duration-200">

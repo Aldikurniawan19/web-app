@@ -4,19 +4,23 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingBottomBar } from "@/components/layout/FloatingBottomBar";
+import { Home } from "lucide-react";
 import { StoreHero } from "@/features/hero/StoreHero";
 import { AppGridSection } from "@/features/catalog/AppGridSection";
 import { ApkGuideSection } from "@/features/guide/ApkGuideSection";
 import { AppDetailView } from "@/features/detail/AppDetailView";
+import { WebProjectDetailView } from "@/features/detail/WebProjectDetailView";
 import { DownloadModal } from "@/features/download/DownloadModal";
 import { InstallGuideModal } from "@/features/guide/InstallGuideModal";
 import { AppItem } from "@/types/store";
+import { WebProjectItem } from "@/types/web-project";
+import { useCatalog } from "@/context/CatalogContext";
 
 export default function AppHubPage() {
-  const [appsList, setAppsList] = useState<AppItem[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [activeView, setActiveView] = useState<"catalog" | "detail">("catalog");
+  const { apps: appsList, webProjects: webProjectsList, isLoading } = useCatalog();
+  const [activeView, setActiveView] = useState<"catalog" | "detail" | "detail-web">("catalog");
   const [selectedApp, setSelectedApp] = useState<AppItem | null>(null);
+  const [selectedWebProject, setSelectedWebProject] = useState<WebProjectItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [downloadModalApp, setDownloadModalApp] = useState<AppItem | null>(null);
   const [guideModalApp, setGuideModalApp] = useState<AppItem | null>(null);
@@ -24,37 +28,12 @@ export default function AppHubPage() {
   const isManualScrollLockRef = useRef<boolean>(false);
   const scrollLockTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Ambil data aplikasi terkini langsung dari API database Supabase
+  // Set default selectedApp saat appsList tersedia
   useEffect(() => {
-    let isMounted = true;
-    const fetchLatestApps = async () => {
-      try {
-        const res = await fetch("/api/apps");
-        if (res.ok) {
-          const json = await res.json();
-          if (isMounted && json.success && Array.isArray(json.data)) {
-            setAppsList(json.data);
-            if (json.data.length > 0) {
-              setSelectedApp(json.data[0]);
-            } else {
-              setSelectedApp(null);
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Gagal memuat data aplikasi dari database:", err);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-    fetchLatestApps();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    if (appsList.length > 0 && !selectedApp) {
+      setSelectedApp(appsList[0]);
+    }
+  }, [appsList, selectedApp]);
 
   // Filter apps based on search query
   const filteredApps = useMemo(() => {
@@ -70,6 +49,22 @@ export default function AppHubPage() {
       );
     });
   }, [searchQuery, appsList]);
+
+  // Filter web projects based on search query
+  const filteredWebProjects = useMemo(() => {
+    if (searchQuery.trim() === "") {
+      return webProjectsList;
+    }
+    const q = searchQuery.toLowerCase();
+    return webProjectsList.filter((proj) => {
+      return (
+        proj.name.toLowerCase().includes(q) ||
+        proj.description.toLowerCase().includes(q) ||
+        (proj.category && proj.category.toLowerCase().includes(q)) ||
+        proj.technologies.some((t) => t.toLowerCase().includes(q))
+      );
+    });
+  }, [searchQuery, webProjectsList]);
 
   // Scroll Spy untuk mengaktifkan menu navbar & bottom navbar secara otomatis saat scrolling
   useEffect(() => {
@@ -123,6 +118,12 @@ export default function AppHubPage() {
   const handleOpenDetail = (app: AppItem) => {
     setSelectedApp(app);
     setActiveView("detail");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleOpenWebDetail = (project: WebProjectItem) => {
+    setSelectedWebProject(project);
+    setActiveView("detail-web");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -220,13 +221,16 @@ export default function AppHubPage() {
               }}
             />
 
-            {/* Catalog List Section without Category Filters */}
+            {/* Catalog List Section with Dual Filters (Aplikasi & Web) - Limit 3 di Beranda */}
             <AppGridSection
               apps={filteredApps}
+              webProjects={filteredWebProjects}
               isLoading={isLoading}
               onOpenDetail={handleOpenDetail}
+              onOpenWebDetail={handleOpenWebDetail}
               onDownload={handleDownload}
               onResetSearch={() => setSearchQuery("")}
+              limit={3}
             />
 
             {/* Panduan Pasang APK Section */}
@@ -234,12 +238,40 @@ export default function AppHubPage() {
               onOpenGuideModal={() => setGuideModalApp(selectedApp || appsList[0] || null)}
             />
           </>
-        ) : selectedApp ? (
+        ) : activeView === "detail" && selectedApp ? (
           /* App Detail View */
           <AppDetailView
             app={selectedApp}
             onBack={handleBackToCatalog}
             onDownload={handleDownload}
+            breadcrumbs={[
+              {
+                label: "Beranda",
+                icon: Home,
+                onClick: handleBackToCatalog,
+              },
+              {
+                label: `Detail ${selectedApp.name}`,
+                isCurrent: true,
+              },
+            ]}
+          />
+        ) : activeView === "detail-web" && selectedWebProject ? (
+          /* Web Project Detail View */
+          <WebProjectDetailView
+            project={selectedWebProject}
+            onBack={handleBackToCatalog}
+            breadcrumbs={[
+              {
+                label: "Beranda",
+                icon: Home,
+                onClick: handleBackToCatalog,
+              },
+              {
+                label: `Detail ${selectedWebProject.name}`,
+                isCurrent: true,
+              },
+            ]}
           />
         ) : null}
       </main>

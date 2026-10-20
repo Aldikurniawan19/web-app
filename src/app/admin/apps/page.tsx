@@ -20,6 +20,7 @@ import { AppCategory, AppItem } from "@/types/store";
 import { CATEGORIES } from "@/constants/app-store-data";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { Button } from "@/components/ui/Button";
+import { clearCatalogSessionCache } from "@/context/CatalogContext";
 
 export default function AdminAppsListPage() {
   const [apps, setApps] = useState<AppItem[]>([]);
@@ -58,6 +59,7 @@ export default function AdminAppsListPage() {
         method: "DELETE",
       });
       if (res.ok) {
+        clearCatalogSessionCache();
         setDeleteTargetApp(null);
         fetchApps();
       }

@@ -104,3 +104,19 @@ model AppVersion {
 
   @@map("app_versions")
 }
+
+model WebProject {
+  id           String   @id
+  name         String
+  description  String   @db.Text
+  imageUrl     String?  @db.Text
+  technologies String[] @default([])
+  liveUrl      String?  @db.Text
+  githubUrl    String?  @db.Text
+  category     String   @default("Web App")
+  featured     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("web_projects")
+}

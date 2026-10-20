@@ -1,12 +1,13 @@
 "use client";
 
 import React from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Home, LayoutGrid, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FloatingBottomBarProps {
   activeNav: string;
-  onNavClick: (navId: string) => void;
+  onNavClick?: (navId: string) => void;
 }
 
 /**
@@ -18,11 +19,28 @@ export function FloatingBottomBar({
   activeNav,
   onNavClick,
 }: FloatingBottomBarProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+
   const navItems = [
     { id: "beranda", label: "Beranda", icon: Home },
     { id: "aplikasi", label: "Aplikasi", icon: LayoutGrid },
     { id: "panduan", label: "Panduan", icon: BookOpen },
   ];
+
+  const handleClick = (id: string) => {
+    if (pathname !== "/") {
+      if (id === "beranda") {
+        router.push("/");
+      } else if (id === "aplikasi") {
+        router.push("/aplikasi");
+      } else if (id === "panduan") {
+        router.push("/#panduan-apk");
+      }
+      return;
+    }
+    if (onNavClick) onNavClick(id);
+  };
 
   return (
     <aside
@@ -38,7 +56,7 @@ export function FloatingBottomBar({
             <button
               key={item.id}
               type="button"
-              onClick={() => onNavClick(item.id)}
+              onClick={() => handleClick(item.id)}
               aria-label={item.label}
               className={cn(
                 "flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 select-none",

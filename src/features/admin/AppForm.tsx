@@ -25,6 +25,7 @@ import { IconUploadDropzone } from "@/features/admin/IconUploadDropzone";
 import { ScreenshotUploadDropzone } from "@/features/admin/ScreenshotUploadDropzone";
 import { Button } from "@/components/ui/Button";
 import { VersionHistoryPanel } from "@/features/admin/VersionHistoryPanel";
+import { clearCatalogSessionCache } from "@/context/CatalogContext";
 
 interface AppFormProps {
   initialData?: AppItem | null;
@@ -180,6 +181,8 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
       if (!res.ok || !json.success) {
         throw new Error(json.message || "Gagal menyimpan data aplikasi ke database Supabase.");
       }
+
+      clearCatalogSessionCache();
 
       setSuccessMsg(
         isEditing

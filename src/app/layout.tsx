@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, DM_Sans } from "next/font/google";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { CatalogProvider } from "@/context/CatalogContext";
 import "./globals.css";
 
 const fontDisplay = Outfit({
@@ -125,7 +126,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-white transition-colors duration-200">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <CatalogProvider>{children}</CatalogProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
