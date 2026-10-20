@@ -254,7 +254,7 @@ export function FloatingBottomBar({
     >
       <nav
         ref={navRef}
-        className="relative flex items-center justify-between sm:justify-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-700/80 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.2),0_0_0_1px_rgba(0,0,0,0.04)] dark:shadow-[0_16px_40px_-8px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.06)] w-full"
+        className="relative flex items-center justify-between sm:justify-center gap-1.5 sm:gap-2 p-2 sm:p-2.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-700/80 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.2),0_0_0_1px_rgba(0,0,0,0.04)] dark:shadow-[0_16px_40px_-8px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.06)] w-full"
       >
         {/* Animated Sliding Jelly Indicator Pill — Diposisikan top-0 left-0 agar translate akurat 100% */}
         <div
@@ -277,13 +277,13 @@ export function FloatingBottomBar({
               onClick={() => handleClick(item.id)}
               aria-label={item.label}
               className={cn(
-                "relative z-10 flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-bold transition-colors duration-200 select-none active:scale-95",
+                "relative z-10 flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4.5 sm:px-6 py-3.5 sm:py-4 rounded-full text-xs sm:text-sm font-bold transition-colors duration-200 select-none active:scale-95",
                 isActive
                   ? "text-white"
                   : "text-slate-600 dark:text-slate-400 hover:text-foreground dark:hover:text-white"
               )}
             >
-              <Icon className="h-4 w-4 sm:h-[18px] sm:w-[18px] shrink-0" />
+              <Icon className="h-4.5 w-4.5 sm:h-5 sm:w-5 shrink-0" />
               <span>{item.label}</span>
             </button>
           );
