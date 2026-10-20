@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { FloatingBottomBar } from "@/components/layout/FloatingBottomBar";
 import { AppCard } from "@/features/catalog/AppCard";
 import { AppCardSkeleton } from "@/features/catalog/AppCardSkeleton";
 import { AppDetailView } from "@/features/detail/AppDetailView";
@@ -267,8 +266,6 @@ export default function AllAppsPage() {
       {/* 3. Footer */}
       <Footer />
 
-      {/* Mobile Floating Bar */}
-      <FloatingBottomBar activeNav="aplikasi" />
 
       {/* Modals */}
       <DownloadModal

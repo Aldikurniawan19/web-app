@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
+import gsap from "gsap";
 
 /**
  * Official GitHub Mark (Octocat) SVG Silhouette
@@ -46,6 +47,159 @@ export function Navbar({
     { id: "panduan", label: "Panduan" },
   ];
 
+  const navRef = useRef<HTMLElement>(null);
+  const activePillRef = useRef<HTMLDivElement>(null);
+  const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const prevNavRef = useRef<string | null>(null);
+  const isInitialMount = useRef<boolean>(true);
+
+  // Animasi Background Pill Kenyal (Elastic) & Samar-Samar saat Melintas Banyak Menu
+  useEffect(() => {
+    const pillEl = activePillRef.current;
+    const targetBtn = buttonRefs.current[activeNav];
+
+    if (!pillEl || !targetBtn) return;
+
+    // Gunakan offsetLeft/offsetTop karena navRef berposisi relative sehingga presisi 100%
+    const targetX = targetBtn.offsetLeft;
+    const targetY = targetBtn.offsetTop;
+    const targetWidth = targetBtn.offsetWidth;
+    const targetHeight = targetBtn.offsetHeight;
+
+    const navIds = ["beranda", "aplikasi", "panduan"];
+    const targetIndex = navIds.indexOf(activeNav);
+    const prevNav = prevNavRef.current;
+    const prevIndex = prevNav ? navIds.indexOf(prevNav) : -1;
+
+    // Saat pertama kali dimuat (initial mount) atau belum ada perpindahan
+    if (isInitialMount.current || prevIndex === -1 || prevIndex === targetIndex) {
+      gsap.set(pillEl, {
+        x: targetX,
+        y: targetY,
+        width: targetWidth,
+        height: targetHeight,
+        scaleX: 1,
+        scaleY: 1,
+        opacity: 1,
+        transformOrigin: "center center",
+      });
+      isInitialMount.current = false;
+      prevNavRef.current = activeNav;
+      return;
+    }
+
+    const distance = Math.abs(targetIndex - prevIndex);
+    const direction = targetIndex > prevIndex ? 1 : -1; // 1 = ke kanan, -1 = ke kiri
+
+    // Bersihkan animasi yang sedang berjalan agar transisi selalu responsif
+    gsap.killTweensOf(pillEl);
+
+    if (distance > 1) {
+      // KASUS 1: Melompati menu di antaranya (misal: Beranda <-> Panduan melewati Aplikasi)
+      // Meluncur lebih santai dan mengalir halus dengan efek samar-samar saat melintas
+      const tl = gsap.timeline();
+
+      // Pergerakan posisi x, y, width, height lembut ke tombol tujuan
+      tl.to(pillEl, {
+        x: targetX,
+        y: targetY,
+        width: targetWidth,
+        height: targetHeight,
+        duration: 0.68,
+        ease: "power2.inOut",
+      });
+
+      // Fase melintas di tengah: Memanjang & memudar samar-samar secara halus
+      tl.to(
+        pillEl,
+        {
+          opacity: 0.3,
+          scaleX: 1.25,
+          scaleY: 0.9,
+          duration: 0.28,
+          ease: "power2.in",
+          transformOrigin: "center center",
+        },
+        0
+      );
+
+      // Fase tiba di tujuan: Kembali solid dan kenyal lembut (spring lebih rileks dan mulus)
+      tl.to(
+        pillEl,
+        {
+          opacity: 1,
+          scaleX: 1,
+          scaleY: 1,
+          duration: 0.52,
+          ease: "elastic.out(1.08, 0.68)",
+          transformOrigin: "center center",
+        },
+        0.26
+      );
+    } else {
+      // KASUS 2: Bergeser ke menu tetangga (misal: Beranda <-> Aplikasi atau Aplikasi <-> Panduan)
+      const tl = gsap.timeline();
+
+      // Bergerak mulus dan halus ke posisi target
+      tl.to(pillEl, {
+        x: targetX,
+        y: targetY,
+        width: targetWidth,
+        height: targetHeight,
+        duration: 0.62,
+        ease: "power3.out",
+      });
+
+      // Efek melar kenyal yang lembut dan santai (spring lembut dan halus)
+      tl.fromTo(
+        pillEl,
+        {
+          scaleX: 1.14,
+          scaleY: 0.92,
+          transformOrigin: "center center",
+        },
+        {
+          scaleX: 1,
+          scaleY: 1,
+          opacity: 1,
+          duration: 0.68,
+          ease: "elastic.out(1.08, 0.65)",
+          transformOrigin: "center center",
+        },
+        0
+      );
+    }
+
+    prevNavRef.current = activeNav;
+  }, [activeNav]);
+
+  // Sinkronisasi posisi jika ukuran layar berubah atau font dimuat
+  useEffect(() => {
+    const handleResize = () => {
+      const pillEl = activePillRef.current;
+      const targetBtn = buttonRefs.current[activeNav];
+
+      if (!pillEl || !targetBtn) return;
+
+      gsap.set(pillEl, {
+        x: targetBtn.offsetLeft,
+        y: targetBtn.offsetTop,
+        width: targetBtn.offsetWidth,
+        height: targetBtn.offsetHeight,
+        scaleX: 1,
+        scaleY: 1,
+        opacity: 1,
+        transformOrigin: "center center",
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    if (typeof document !== "undefined" && document.fonts) {
+      document.fonts.ready.then(handleResize);
+    }
+    return () => window.removeEventListener("resize", handleResize);
+  }, [activeNav]);
+
   const handleItemClick = (id: string) => {
     if (pathname !== "/") {
       if (id === "beranda") {
@@ -84,20 +238,34 @@ export function Navbar({
           </span>
         </div>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-2">
+        {/* Desktop Navigation Links — Tanpa background luar terpisah, menyatu langsung dengan navbar */}
+        <nav
+          ref={navRef}
+          aria-label="Navigasi Menu Utama"
+          className="relative hidden md:flex items-center gap-1"
+        >
+          {/* Animated Sliding Jelly Indicator Pill — Diposisikan top-0 left-0 agar translate akurat 100% */}
+          <div
+            ref={activePillRef}
+            className="absolute top-0 left-0 pointer-events-none rounded-full bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.25)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2.5px_0_#1e3a8a] z-0 will-change-transform will-change-opacity"
+            style={{ opacity: 0 }}
+          />
+
           {navItems.map((item) => {
             const isActive = activeNav === item.id;
             return (
               <button
                 key={item.id}
+                ref={(el) => {
+                  buttonRefs.current[item.id] = el;
+                }}
                 type="button"
                 onClick={() => handleItemClick(item.id)}
                 className={cn(
-                  "relative px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 select-none",
+                  "relative z-10 flex h-9 items-center justify-center px-4 rounded-full text-xs sm:text-sm font-bold transition-colors duration-200 select-none",
                   isActive
-                    ? "bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2.5px_0_#1e3a8a]"
-                    : "text-slate-600 hover:text-foreground dark:text-slate-300 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+                    ? "text-white"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/60 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/50"
                 )}
               >
                 {item.label}
@@ -108,7 +276,7 @@ export function Navbar({
 
         {/* Right Controls: GitHub Link & Theme Toggle */}
         <div className="flex items-center gap-2.5 sm:gap-3">
-          {/* GitHub Profile Link (Fully Matches ThemeToggle Component) */}
+          {/* GitHub Profile Link */}
           <a
             href="https://github.com/Aldikurniawan19"
             target="_blank"

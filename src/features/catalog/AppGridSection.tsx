@@ -68,6 +68,11 @@ export function AppGridSection({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const tabContainerRef = useRef<HTMLDivElement>(null);
+  const tabPillRef = useRef<HTMLDivElement>(null);
+  const tabBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const prevTabRef = useRef<CatalogFilterTab | null>(null);
+  const isInitialTabMount = useRef<boolean>(true);
 
   // Cek apakah mode pembatasan aktif (misal di halaman Beranda: maks 3)
   const isAppsLimited = Boolean(limit && apps.length > limit);
@@ -82,6 +87,94 @@ export function AppGridSection({
   useEffect(() => {
     setCurrentPage(1);
   }, [activeTab, apps.length]);
+
+  // Animasi Background Pill Kenyal untuk Filter Switch (Aplikasi vs Web)
+  useEffect(() => {
+    const pill = tabPillRef.current;
+    const targetBtn = tabBtnRefs.current[activeTab];
+
+    if (!pill || !targetBtn) return;
+
+    // Gunakan offsetLeft/offsetTop dari container relative agar 100% tepat dan tidak tergeser padding
+    const targetX = targetBtn.offsetLeft;
+    const targetY = targetBtn.offsetTop;
+    const targetWidth = targetBtn.offsetWidth;
+    const targetHeight = targetBtn.offsetHeight;
+
+    const prevTab = prevTabRef.current;
+
+    if (isInitialTabMount.current || !prevTab || prevTab === activeTab) {
+      gsap.set(pill, {
+        x: targetX,
+        y: targetY,
+        width: targetWidth,
+        height: targetHeight,
+        opacity: 1,
+        scaleX: 1,
+        scaleY: 1,
+        transformOrigin: "center center",
+      });
+      isInitialTabMount.current = false;
+      prevTabRef.current = activeTab;
+      return;
+    }
+
+    gsap.killTweensOf(pill);
+
+    const tl = gsap.timeline();
+    // Bergerak mulus dan halus ke tab target
+    tl.to(pill, {
+      x: targetX,
+      y: targetY,
+      width: targetWidth,
+      height: targetHeight,
+      duration: 0.62,
+      ease: "power3.out",
+    });
+
+    // Efek kenyal lembut yang lebih luwes dan santai
+    tl.fromTo(
+      pill,
+      {
+        scaleX: 1.14,
+        scaleY: 0.92,
+        transformOrigin: "center center",
+      },
+      {
+        scaleX: 1,
+        scaleY: 1,
+        duration: 0.68,
+        ease: "elastic.out(1.08, 0.65)",
+        transformOrigin: "center center",
+      },
+      0
+    );
+
+    prevTabRef.current = activeTab;
+  }, [activeTab]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const pill = tabPillRef.current;
+      const targetBtn = tabBtnRefs.current[activeTab];
+
+      if (!pill || !targetBtn) return;
+
+      gsap.set(pill, {
+        x: targetBtn.offsetLeft,
+        y: targetBtn.offsetTop,
+        width: targetBtn.offsetWidth,
+        height: targetBtn.offsetHeight,
+        transformOrigin: "center center",
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    if (typeof document !== "undefined" && document.fonts) {
+      document.fonts.ready.then(handleResize);
+    }
+    return () => window.removeEventListener("resize", handleResize);
+  }, [activeTab]);
 
   // Data aplikasi yang ditampilkan (maksimal 3 jika ada limit, atau sesuai paginasi)
   const displayedApps = React.useMemo(() => {
@@ -336,14 +429,27 @@ export function AppGridSection({
           {/* Right: Segmented Filter Switch (Aplikasi & Web) + Total Count */}
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 self-start md:self-auto">
             {!hideFilterTabs && (
-              <div className="inline-flex items-center rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-1.5 shadow-inner">
+              <div
+                ref={tabContainerRef}
+                className="relative inline-flex items-center rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-900/80 p-1.5 shadow-inner"
+              >
+                {/* Elastic Sliding Pill Indicator */}
+                <div
+                  ref={tabPillRef}
+                  className="absolute top-0 left-0 pointer-events-none rounded-xl bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2px_0_#1e3a8a] z-0 will-change-transform"
+                  style={{ opacity: 0 }}
+                />
+
                 <button
                   type="button"
+                  ref={(el) => {
+                    tabBtnRefs.current["aplikasi"] = el;
+                  }}
                   onClick={() => handleTabChange("aplikasi")}
                   className={cn(
-                    "flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all select-none",
+                    "relative z-10 flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-colors select-none",
                     activeTab === "aplikasi"
-                      ? "bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2px_0_#1e3a8a]"
+                      ? "text-white"
                       : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                   )}
                 >
@@ -353,11 +459,14 @@ export function AppGridSection({
 
                 <button
                   type="button"
+                  ref={(el) => {
+                    tabBtnRefs.current["web"] = el;
+                  }}
                   onClick={() => handleTabChange("web")}
                   className={cn(
-                    "flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all select-none",
+                    "relative z-10 flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-colors select-none",
                     activeTab === "web"
-                      ? "bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2px_0_#1e3a8a]"
+                      ? "text-white"
                       : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                   )}
                 >

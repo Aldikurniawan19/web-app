@@ -4,7 +4,6 @@ import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { FloatingBottomBar } from "@/components/layout/FloatingBottomBar";
 import { WebProjectCard } from "@/features/catalog/WebProjectCard";
 import { WebProjectCardSkeleton } from "@/features/catalog/WebProjectCardSkeleton";
 import { WebProjectDetailView } from "@/features/detail/WebProjectDetailView";
@@ -204,8 +203,6 @@ export default function AllWebProjectsPage() {
       {/* 3. Footer */}
       <Footer />
 
-      {/* Mobile Floating Bar */}
-      <FloatingBottomBar activeNav="aplikasi" />
     </div>
   );
 }

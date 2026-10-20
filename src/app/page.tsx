@@ -279,11 +279,13 @@ export default function AppHubPage() {
       {/* 3. Footer */}
       <Footer />
 
-      {/* Floating Bottom Bar Navigation (khusus tampilan mobile, langsung terlihat tanpa scroll) */}
-      <FloatingBottomBar
-        activeNav={activeNav}
-        onNavClick={handleNavClick}
-      />
+      {/* Floating Bottom Bar Navigation (khusus tampilan mobile pada beranda katalog, disembunyikan pada tampilan detail) */}
+      {activeView === "catalog" && (
+        <FloatingBottomBar
+          activeNav={activeNav}
+          onNavClick={handleNavClick}
+        />
+      )}
 
       {/* 4. Download Multi-Platform Modal */}
       <DownloadModal
