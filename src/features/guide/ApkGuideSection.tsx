@@ -234,7 +234,6 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
           if (cards[idx]) {
             const cardEl = cards[idx];
             const stepNumber = cardEl.querySelector(".guide-step-number");
-            const stepSparkle = cardEl.querySelector(".guide-step-sparkle");
 
             if (stepNumber) {
               flowTimeline.fromTo(
@@ -246,32 +245,6 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
                   ease: "power2.inOut",
                 },
                 cardStartTime
-              );
-            }
-
-            if (stepSparkle) {
-              flowTimeline.fromTo(
-                stepSparkle,
-                { scale: 0, opacity: 0, rotation: 0 },
-                {
-                  scale: 1.25,
-                  opacity: 1,
-                  rotation: 50,
-                  duration: 0.32,
-                  ease: "back.out(2)",
-                },
-                cardStartTime + 0.32
-              );
-              flowTimeline.to(
-                stepSparkle,
-                {
-                  scale: 0,
-                  opacity: 0,
-                  rotation: 110,
-                  duration: 0.28,
-                  ease: "power2.in",
-                },
-                cardStartTime + 0.64
               );
             }
           }
@@ -409,20 +382,11 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
                     <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2.5px_0_#1e3a8a] transition-transform duration-200 group-hover:scale-105">
                       <Icon className="h-5 w-5" />
                     </div>
-                    {/* Step Number Berkilau di Kanan Atas */}
+                    {/* Step Number di Kanan Atas */}
                     <div className="relative inline-flex items-center select-none py-0.5">
                       <span className="guide-step-number font-display text-2xl sm:text-3xl font-black select-none">
                         {item.step}
                       </span>
-                      {/* Bintang Kilau (Sparkle Starburst) */}
-                      <svg
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="guide-step-sparkle pointer-events-none absolute -top-1 -right-2.5 h-3.5 w-3.5 text-sky-400 dark:text-sky-300 drop-shadow-[0_0_8px_rgba(56,189,248,0.9)] opacity-0 z-10"
-                        aria-hidden="true"
-                      >
-                        <path d="M12 0L14.3 8.7L23 11L14.3 13.3L12 22L9.7 13.3L1 11L9.7 8.7L12 0Z" />
-                      </svg>
                     </div>
                   </div>
 

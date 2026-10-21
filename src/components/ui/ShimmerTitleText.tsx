@@ -20,7 +20,7 @@ export function ShimmerTitleText({
   children,
   className,
   variant = "blue",
-  showSparkles = true,
+  showSparkles = false,
 }: ShimmerTitleTextProps) {
   const containerRef = useRef<HTMLSpanElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
@@ -104,7 +104,7 @@ export function ShimmerTitleText({
           );
       }
     },
-    { scope: containerRef, dependencies: [] }
+    { scope: containerRef, dependencies: [showSparkles] }
   );
 
   return (

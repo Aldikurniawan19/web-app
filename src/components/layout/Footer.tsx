@@ -54,7 +54,9 @@ export function Footer() {
                   <span className="inline-block font-script text-2xl sm:text-3xl font-bold text-3d-white pr-1">
                     All
                   </span>
-                  <ShimmerTitleText variant="sky">Projects</ShimmerTitleText>
+                  <ShimmerTitleText variant="sky" showSparkles={true}>
+                    Projects
+                  </ShimmerTitleText>
                 </span>
               </div>
               <p className="text-xs text-blue-100 leading-relaxed max-w-md">

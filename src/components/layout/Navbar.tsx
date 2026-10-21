@@ -315,7 +315,10 @@ export function Navbar({
             >
               All
             </span>
-            <ShimmerTitleText variant={isScrolled ? "sky" : "blue"}>
+            <ShimmerTitleText
+              variant={isScrolled ? "sky" : "blue"}
+              showSparkles={true}
+            >
               Projects
             </ShimmerTitleText>
           </span>
