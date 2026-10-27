@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { Star, HardDrive, ChevronRight } from "lucide-react";
+import { HardDrive, ChevronRight } from "lucide-react";
 import { AppItem } from "@/types/store";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { PlatformBadge } from "@/components/ui/PlatformBadge";
@@ -44,13 +43,8 @@ export function AppCard({ app, onOpenDetail }: AppCardProps) {
             {app.description}
           </p>
 
-          {/* Meta Info (Rating, Size, Version, Platforms) */}
+          {/* Meta Info (Size, Version, Platforms) */}
           <div className="flex flex-wrap items-center gap-3 pt-0.5 text-xs text-slate-500 dark:text-slate-400">
-            <div className="flex items-center gap-1 font-bold text-slate-800 dark:text-slate-200">
-              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-              <span>{app.rating.toFixed(1)}</span>
-            </div>
-            <span>•</span>
             <div className="flex items-center gap-1">
               <HardDrive className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
               <span>{app.fileSize}</span>

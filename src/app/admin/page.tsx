@@ -14,7 +14,6 @@ import {
   Trash2,
   ExternalLink,
   Search,
-  Star,
   CheckCircle2,
   AlertCircle,
   Globe,
@@ -355,20 +354,19 @@ export default function AdminDashboardPage() {
                   <th className="py-3.5 px-4">Versi</th>
                   <th className="py-3.5 px-4">Ukuran</th>
                   <th className="py-3.5 px-4">Developer</th>
-                  <th className="py-3.5 px-4">Rating</th>
                   <th className="py-3.5 px-6 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-slate-400">
+                    <td colSpan={6} className="py-12 text-center text-slate-400">
                       Memuat data aplikasi...
                     </td>
                   </tr>
                 ) : filteredApps.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-slate-400">
+                    <td colSpan={6} className="py-12 text-center text-slate-400">
                       Tidak ada aplikasi yang sesuai dengan pencarian.
                     </td>
                   </tr>
@@ -414,13 +412,6 @@ export default function AdminDashboardPage() {
 
                       <td className="py-4 px-4 text-slate-600 dark:text-slate-400">
                         {app.developer}
-                      </td>
-
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-1 font-bold text-slate-800 dark:text-slate-200">
-                          <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                          <span>{app.rating.toFixed(1)}</span>
-                        </div>
                       </td>
 
                       <td className="py-4 px-6 text-right">

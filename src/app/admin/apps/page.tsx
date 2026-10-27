@@ -10,7 +10,6 @@ import {
   Edit,
   Trash2,
   ExternalLink,
-  Star,
   HardDrive,
   Calendar,
   AlertCircle,
@@ -194,15 +193,12 @@ export default function AdminAppsListPage() {
 
               {/* Meta stats */}
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                <div className="flex items-center gap-1 font-bold text-slate-800 dark:text-slate-200">
-                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                  <span>{app.rating.toFixed(1)}</span>
-                </div>
                 <div className="flex items-center gap-1 font-mono">
                   <HardDrive className="h-3 w-3" />
                   <span>{app.fileSize}</span>
                 </div>
                 <span className="font-mono">v{app.version}</span>
+                <span>{app.downloadsCount}</span>
               </div>
 
               {/* Actions Footer */}

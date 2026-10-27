@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { Star, Download } from "lucide-react";
+import { Download } from "lucide-react";
 import { RELATED_APPS } from "@/constants/app-store-data";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { Button } from "@/components/ui/Button";
@@ -37,11 +36,6 @@ export function RelatedApps({ onDownloadItem }: RelatedAppsProps) {
                   {item.name}
                 </h4>
                 <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  <div className="flex items-center gap-0.5 text-slate-700 dark:text-slate-300 font-semibold">
-                    <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                    <span>{item.rating.toFixed(1)}</span>
-                  </div>
-                  <span>•</span>
                   <span>{item.fileSize}</span>
                 </div>
               </div>

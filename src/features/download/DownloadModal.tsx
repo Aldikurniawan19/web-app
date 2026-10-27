@@ -10,7 +10,6 @@ import {
   ArrowRight,
   X,
   Smartphone,
-  Star,
   HardDrive,
   History,
 } from "lucide-react";
@@ -279,11 +278,6 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
                   <span>{activeFileSize}</span>
                   <span>•</span>
                   <span>Versi {activeVersion}</span>
-                  <span>•</span>
-                  <div className="flex items-center gap-0.5 text-amber-500 font-medium">
-                    <Star className="h-3 w-3 fill-amber-500" />
-                    <span>{app.rating}</span>
-                  </div>
                 </div>
               )}
 

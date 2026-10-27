@@ -5,15 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Save,
-  Plus,
-  Trash2,
   ArrowLeft,
   CheckCircle2,
   AlertCircle,
   Smartphone,
   Layers,
   Image as ImageIcon,
-  Star,
   Download,
   Calendar,
   Settings2,
@@ -49,8 +46,6 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
   const [version, setVersion] = useState(initialData?.version || "1.0.0");
   const [fileSize, setFileSize] = useState(initialData?.fileSize || "15.0 MB");
   const [downloadsCount, setDownloadsCount] = useState(initialData?.downloadsCount || "10 rb+");
-  const [rating, setRating] = useState<number>(initialData?.rating ?? 5.0);
-  const [reviewsCount, setReviewsCount] = useState(initialData?.reviewsCount || "Baru");
   const [lastUpdated, setLastUpdated] = useState(
     initialData?.lastUpdated ||
       new Date().toLocaleDateString("id-ID", {
@@ -60,9 +55,8 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
       })
   );
 
-  // 2. Deskripsi Lengkap
+  // 2. Deskripsi
   const [description, setDescription] = useState(initialData?.description || "");
-  const [longDescription, setLongDescription] = useState(initialData?.longDescription || "");
 
   // 3. Ikon Aplikasi
   const [iconUrl, setIconUrl] = useState<string | null>(initialData?.iconUrl || null);
@@ -77,34 +71,6 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
   const [screenshots, setScreenshots] = useState<AppScreenshot[]>(
     initialData?.screenshots || []
   );
-
-  // 6. Poin Fitur Utama
-  const [features, setFeatures] = useState<string[]>(
-    initialData?.features || [
-      "Antarmuka cepat, intuitif, dan responsif",
-      "Dukungan mode gelap dan terang otomatis",
-      "Ringan dan hemat konsumsi memori baterai",
-      "Penyimpanan lokal terenkripsi dan aman",
-    ]
-  );
-  const [newFeatureText, setNewFeatureText] = useState("");
-
-  // 7. Persyaratan Sistem
-  const [osReq, setOsReq] = useState(initialData?.systemRequirements?.os || "Android 8.0 ke atas");
-  const [ramReq, setRamReq] = useState(initialData?.systemRequirements?.ram || "Minimum 2 GB RAM");
-  const [storageReq, setStorageReq] = useState(
-    initialData?.systemRequirements?.storage || "50 MB ruang bebas"
-  );
-
-  const handleAddFeature = () => {
-    if (!newFeatureText.trim()) return;
-    setFeatures([...features, newFeatureText.trim()]);
-    setNewFeatureText("");
-  };
-
-  const handleRemoveFeature = (index: number) => {
-    setFeatures(features.filter((_, i) => i !== index));
-  };
 
   const handleFileUploaded = (data: { fileName: string; fileSize: string; downloadUrl: string }) => {
     setFileSize(data.fileSize);
@@ -150,21 +116,21 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
         developer: developer.trim(),
         version: version.trim(),
         fileSize: fileSize.trim(),
-        rating: Number(rating) || 5.0,
-        reviewsCount: reviewsCount.trim() || "Baru",
+        rating: initialData?.rating ?? 5.0,
+        reviewsCount: initialData?.reviewsCount || "Baru",
         downloadsCount: downloadsCount.trim() || "10 rb+",
         lastUpdated: lastUpdated.trim(),
         description: description.trim(),
-        longDescription: longDescription.trim() || description.trim(),
+        longDescription: initialData?.longDescription || description.trim(),
         iconUrl,
         iconType: "document",
         iconColor: "bg-blue-500",
-        features,
+        features: initialData?.features || [],
         screenshots,
-        systemRequirements: {
-          os: osReq,
-          ram: ramReq,
-          storage: storageReq,
+        systemRequirements: initialData?.systemRequirements || {
+          os: "Android 8.0 ke atas",
+          ram: "Minimum 2 GB RAM",
+          storage: "50 MB ruang bebas",
         },
         apkUrl: apkUrl || initialData?.apkUrl || null,
         apkFileName: apkFileName || initialData?.apkFileName || null,
@@ -479,37 +445,6 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
             />
           </div>
 
-          {/* Rating */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Rating (1.0 - 5.0)
-            </label>
-            <input
-              type="number"
-              step="0.1"
-              min="1.0"
-              max="5.0"
-              value={rating}
-              onChange={(e) => setRating(parseFloat(e.target.value) || 5.0)}
-              placeholder="5.0"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-            />
-          </div>
-
-          {/* Reviews Count */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Jumlah Ulasan
-            </label>
-            <input
-              type="text"
-              value={reviewsCount}
-              onChange={(e) => setReviewsCount(e.target.value)}
-              placeholder="Contoh: 1.2k Ulasan, Baru"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-            />
-          </div>
-
           {/* Tanggal Pembaruan */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
@@ -526,171 +461,35 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
         </div>
       </div>
 
-      {/* 5. Deskripsi Singkat & Lengkap (Tentang Aplikasi) */}
+      {/* 5. Deskripsi Aplikasi */}
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white font-display">
-            5. Deskripsi & Konten Ulasan Aplikasi
+            5. Deskripsi Aplikasi
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Tuliskan ringkasan untuk kartu katalog dan ulasan lengkap untuk tab &ldquo;Tentang Aplikasi&rdquo; pada halaman detail.
+            Tuliskan ringkasan deskripsi aplikasi untuk kartu katalog dan halaman detail.
           </p>
         </div>
 
-        {/* Deskripsi Singkat */}
+        {/* Deskripsi */}
         <div className="space-y-1.5">
           <div className="flex justify-between items-center">
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Deskripsi Singkat (Kartu Katalog) <span className="text-rose-500">*</span>
+              Deskripsi Aplikasi <span className="text-rose-500">*</span>
             </label>
             <span className="text-[10px] text-slate-400 font-mono">
               {description.length} karakter
             </span>
           </div>
-          <input
-            type="text"
+          <textarea
+            rows={4}
             required
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Contoh: Aplikasi pencatat cepat dan mudah dengan fitur sinkronisasi cloud."
-            className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-          />
-        </div>
-
-        {/* Deskripsi Lengkap */}
-        <div className="space-y-1.5">
-          <div className="flex justify-between items-center">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Deskripsi Lengkap (Halaman Detail &ldquo;Tentang Aplikasi&rdquo;)
-            </label>
-            <span className="text-[10px] text-slate-400 font-mono">
-              {longDescription.length} karakter
-            </span>
-          </div>
-          <textarea
-            rows={6}
-            value={longDescription}
-            onChange={(e) => setLongDescription(e.target.value)}
-            placeholder="Jelaskan secara menyeluruh fungsi utama aplikasi, fitur kunci, manfaat untuk pengguna, keamanan penyimpanan, dan keunggulan desainnya..."
             className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 p-3.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all leading-relaxed"
           />
-        </div>
-      </div>
-
-      {/* 6. Poin Fitur Unggulan (Tab Fitur) */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
-        <div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white font-display">
-            6. Poin Fitur Utama & Keunggulan
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Daftar fitur kunci yang akan ditampilkan dengan ikon centang pada tab &ldquo;Fitur&rdquo; di halaman detail.
-          </p>
-        </div>
-
-        {/* List of features */}
-        <div className="space-y-2">
-          {features.map((feature, idx) => (
-            <div
-              key={idx}
-              className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 font-bold text-[10px]">
-                  ✓
-                </span>
-                <span className="truncate">{feature}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleRemoveFeature(idx)}
-                className="text-slate-400 hover:text-rose-500 transition-colors p-1"
-                title="Hapus fitur"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* Add new feature input */}
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={newFeatureText}
-            onChange={(e) => setNewFeatureText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleAddFeature();
-              }
-            }}
-            placeholder="Ketik fitur baru lalu tekan Enter..."
-            className="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-          />
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={handleAddFeature}
-            className="shrink-0"
-          >
-            <Plus className="h-4 w-4" />
-            <span>Tambah Fitur</span>
-          </Button>
-        </div>
-      </div>
-
-      {/* 7. Kebutuhan Sistem Minimum (Tab System Requirements) */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
-        <div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white font-display">
-            7. Persyaratan Sistem Perangkat
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Spesifikasi perangkat minimum yang ditampilkan pada tab &ldquo;System Requirements&rdquo; detail aplikasi.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Sistem Operasi Minimum
-            </label>
-            <input
-              type="text"
-              value={osReq}
-              onChange={(e) => setOsReq(e.target.value)}
-              placeholder="Android 8.0+"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Minimum Memori RAM
-            </label>
-            <input
-              type="text"
-              value={ramReq}
-              onChange={(e) => setRamReq(e.target.value)}
-              placeholder="2 GB RAM"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-              Ruang Penyimpanan Bebas
-            </label>
-            <input
-              type="text"
-              value={storageReq}
-              onChange={(e) => setStorageReq(e.target.value)}
-              placeholder="50 MB ruang bebas"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-            />
-          </div>
         </div>
       </div>
 

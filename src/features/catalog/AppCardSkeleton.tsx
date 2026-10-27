@@ -34,10 +34,8 @@ export function AppCardSkeleton({ delayMs = 0 }: AppCardSkeletonProps) {
             <div className="h-3.5 w-4/5 rounded bg-slate-100 dark:bg-slate-800/50 hidden sm:block" />
           </div>
 
-          {/* Meta Info (Rating, Size, Version) Skeleton */}
+          {/* Meta Info (Size, Version, Platforms) Skeleton */}
           <div className="flex items-center gap-2.5 pt-0.5">
-            <div className="h-3 w-12 rounded bg-slate-200/90 dark:bg-slate-800/90" />
-            <div className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700" />
             <div className="h-3 w-14 rounded bg-slate-200/90 dark:bg-slate-800/90" />
             <div className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700 hidden sm:block" />
             <div className="h-3 w-16 rounded bg-slate-200/90 dark:bg-slate-800/90 hidden sm:block" />
