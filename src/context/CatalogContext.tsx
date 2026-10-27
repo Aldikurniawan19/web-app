@@ -47,7 +47,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     let hasCachedApps = false;
     let hasCachedWeb = false;
 
-    // 1. Coba baca dari sessionStorage window jika tidak dipaksa refresh
+    // 1. Coba baca dari sessionStorage window HANYA untuk tampilan awal instan (tanpa flicker loading)
     if (!force && typeof window !== "undefined") {
       try {
         const cachedApps = sessionStorage.getItem(APPS_SESSION_CACHE_KEY);
@@ -55,7 +55,6 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
           const parsed = JSON.parse(cachedApps);
           if (Array.isArray(parsed) && parsed.length > 0) {
             setApps(parsed);
-            hasCachedApps = true;
           }
         }
 
@@ -64,7 +63,6 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
           const parsed = JSON.parse(cachedWeb);
           if (Array.isArray(parsed) && parsed.length > 0) {
             setWebProjects(parsed);
-            hasCachedWeb = true;
           }
         }
       } catch {
@@ -72,19 +70,12 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    // Jika kedua data sudah ada di sesi window saat ini, langsung gunakan tanpa fetch ulang
-    if (hasCachedApps && hasCachedWeb) {
-      setIsLoading(false);
-      return;
-    }
-
-    // 2. Fetch data dari server jika belum tersimpan di sesi window
+    // 2. SELALU fetch data terbaru dari server di latar belakang (Stale-While-Revalidate)
+    // agar versi terbaru dari database langsung tampil seketika tanpa tertahan cache sesi
     try {
-      setIsLoading(true);
-
       const [appsResult, webResult] = await Promise.allSettled([
-        !hasCachedApps ? fetch("/api/apps") : Promise.resolve(null),
-        !hasCachedWeb ? fetch("/api/web-projects") : Promise.resolve(null),
+        fetch("/api/apps", { cache: "no-store" }),
+        fetch("/api/web-projects", { cache: "no-store" }),
       ]);
 
       if (appsResult.status === "fulfilled" && appsResult.value && appsResult.value.ok) {
@@ -114,7 +105,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
         }
       }
     } catch (err) {
-      console.error("Gagal memuat katalog ke sesi window:", err);
+      console.error("Gagal memperbarui katalog:", err);
     } finally {
       setIsLoading(false);
     }

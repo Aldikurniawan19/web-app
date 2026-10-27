@@ -9,7 +9,7 @@ const MAX_VERSIONS_PER_APP = 4;
  */
 let cachedApps: AppItem[] | null = null;
 let lastCacheTimestamp = 0;
-const CACHE_TTL_MS = 60_000;
+const CACHE_TTL_MS = 5_000;
 let pendingFetchPromise: Promise<AppItem[]> | null = null;
 
 /**

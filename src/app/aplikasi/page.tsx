@@ -259,8 +259,25 @@ export default function AllAppsPage() {
     return filteredApps.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredApps, currentPage, shouldPaginate]);
 
+  // Sinkronkan selectedApp dengan data terbaru di apps
+  useEffect(() => {
+    if (selectedApp && apps.length > 0) {
+      const latest = apps.find((a) => a.id === selectedApp.id);
+      if (
+        latest &&
+        (latest.version !== selectedApp.version ||
+          latest.apkUrl !== selectedApp.apkUrl ||
+          latest.fileSize !== selectedApp.fileSize ||
+          latest.lastUpdated !== selectedApp.lastUpdated)
+      ) {
+        setSelectedApp(latest);
+      }
+    }
+  }, [apps, selectedApp]);
+
   const handleOpenDetail = (app: AppItem) => {
-    setSelectedApp(app);
+    const latest = apps.find((a) => a.id === app.id) || app;
+    setSelectedApp(latest);
     setActiveView("detail");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -271,8 +288,9 @@ export default function AllAppsPage() {
   };
 
   const handleDownload = (app: AppItem) => {
-    setDownloadModalApp(app);
-    setGuideModalApp(app);
+    const latestApp = apps.find((a) => a.id === app.id) || app;
+    setDownloadModalApp(latestApp);
+    setGuideModalApp(latestApp);
   };
 
   return (

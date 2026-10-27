@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { AppStorageService } from "@/services/app-storage.service";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export const runtime = "nodejs";
 
 /**
@@ -24,7 +25,9 @@ export async function GET(request: NextRequest) {
     { success: true, data: versions },
     {
       headers: {
-        "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300",
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
       },
     }
   );

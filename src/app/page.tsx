@@ -28,10 +28,23 @@ export default function AppHubPage() {
   const isManualScrollLockRef = useRef<boolean>(false);
   const scrollLockTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Set default selectedApp saat appsList tersedia
+  // Sinkronkan selectedApp dengan data terbaru di appsList
   useEffect(() => {
-    if (appsList.length > 0 && !selectedApp) {
-      setSelectedApp(appsList[0]);
+    if (appsList.length > 0) {
+      if (!selectedApp) {
+        setSelectedApp(appsList[0]);
+      } else {
+        const latest = appsList.find((a) => a.id === selectedApp.id);
+        if (
+          latest &&
+          (latest.version !== selectedApp.version ||
+            latest.apkUrl !== selectedApp.apkUrl ||
+            latest.fileSize !== selectedApp.fileSize ||
+            latest.lastUpdated !== selectedApp.lastUpdated)
+        ) {
+          setSelectedApp(latest);
+        }
+      }
     }
   }, [appsList, selectedApp]);
 
@@ -133,8 +146,10 @@ export default function AppHubPage() {
   };
 
   const handleDownload = (app: AppItem) => {
-    setDownloadModalApp(app);
-    setGuideModalApp(app);
+    // Ambil data versi terbaru dari appsList agar modal selalu memakai versi mutakhir
+    const latestApp = appsList.find((a) => a.id === app.id) || app;
+    setDownloadModalApp(latestApp);
+    setGuideModalApp(latestApp);
   };
 
   const handleNavClick = (navId: string) => {

@@ -30,7 +30,9 @@ export function VersionHistoryTab({ app, onDownload }: VersionHistoryTabProps) {
     setIsLoading(true);
     setHasError(false);
     try {
-      const res = await fetch(`/api/apps/versions?appId=${encodeURIComponent(app.id)}`);
+      const res = await fetch(`/api/apps/versions?appId=${encodeURIComponent(app.id)}`, {
+        cache: "no-store",
+      });
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
         setVersions(json.data);

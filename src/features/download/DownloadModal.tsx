@@ -47,7 +47,7 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
     }
 
     let isCancelled = false;
-    fetch(`/api/apps/versions?appId=${encodeURIComponent(app.id)}`)
+    fetch(`/api/apps/versions?appId=${encodeURIComponent(app.id)}`, { cache: "no-store" })
       .then((res) => res.json())
       .then((json) => {
         if (!isCancelled && json.success && Array.isArray(json.data)) {
