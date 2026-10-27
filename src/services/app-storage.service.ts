@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { AppItem, AppVersionItem, CreateAppInput } from "@/types/store";
+import { AppItem, AppVersionItem, CreateAppInput, ReleaseNewVersionInput } from "@/types/store";
 import { GithubReleaseService } from "./github-release.service";
 
 const MAX_VERSIONS_PER_APP = 4;
@@ -179,7 +179,7 @@ export class AppStorageService {
               if (stats.totalDownloads > 0) {
                 app.downloadsCount = stats.formattedTotal;
               }
-              if (stats.latestDownloadUrl) {
+              if (!app.apkUrl && stats.latestDownloadUrl) {
                 app.apkUrl = stats.latestDownloadUrl;
               }
             }
@@ -234,7 +234,7 @@ export class AppStorageService {
             if (stats.totalDownloads > 0) {
               item.downloadsCount = stats.formattedTotal;
             }
-            if (stats.latestDownloadUrl) {
+            if (!item.apkUrl && stats.latestDownloadUrl) {
               item.apkUrl = stats.latestDownloadUrl;
             }
           }
@@ -431,6 +431,112 @@ export class AppStorageService {
     lastCacheTimestamp = Date.now();
 
     return updatedItem;
+  }
+
+  /**
+   * Mengunggah / Menerbitkan versi baru aplikasi secara manual dengan tautan berkas dari GitHub Action.
+   * Versi lama otomatis diarsipkan ke tabel app_versions beserta riwayat changelog.
+   */
+  static async releaseNewVersion(params: ReleaseNewVersionInput): Promise<AppItem> {
+    const { appId, version, apkUrl } = params;
+
+    const existingApp = await withRetry(() =>
+      prisma.app.findUnique({
+        where: { id: appId },
+        select: {
+          id: true,
+          name: true,
+          version: true,
+          apkUrl: true,
+          apkFileName: true,
+          fileSize: true,
+        },
+      })
+    );
+
+    if (!existingApp) {
+      throw new Error(`Aplikasi dengan ID '${appId}' tidak ditemukan.`);
+    }
+
+    const cleanVersion = version.trim().replace(/^v/i, "");
+    const cleanUrl = apkUrl.trim();
+
+    // Tentukan nama berkas APK
+    let derivedFileName = params.apkFileName?.trim() || "";
+    if (!derivedFileName) {
+      try {
+        const urlObj = new URL(cleanUrl);
+        const lastPart = urlObj.pathname.split("/").pop();
+        if (lastPart && lastPart.toLowerCase().endsWith(".apk")) {
+          derivedFileName = decodeURIComponent(lastPart.split("?")[0]);
+        }
+      } catch {
+        // abaikan jika bukan URL standar
+      }
+    }
+    if (!derivedFileName) {
+      derivedFileName = `${existingApp.id}-v${cleanVersion}.apk`;
+    }
+
+    const cleanFileSize = params.fileSize?.trim() || existingApp.fileSize || "15.0 MB";
+    const lastUpdated =
+      params.lastUpdated?.trim() ||
+      new Date().toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+
+    // 1. Simpan versi aktif sebelumnya ke dalam riwayat app_versions
+    if (existingApp.apkUrl && existingApp.version) {
+      try {
+        await withRetry(() =>
+          prisma.appVersion.create({
+            data: {
+              appId,
+              version: existingApp.version,
+              fileSize: existingApp.fileSize,
+              apkUrl: existingApp.apkUrl!,
+              apkFileName: existingApp.apkFileName || `${appId}-v${existingApp.version}.apk`,
+              changelog: params.changelog?.trim() || "Pembaruan rilis versi stabil.",
+            },
+          })
+        );
+
+        // Batasi riwayat versi maksimal 4 versi tersimpan
+        const allVersions = await prisma.appVersion.findMany({
+          where: { appId },
+          orderBy: { createdAt: "desc" },
+          select: { id: true },
+        });
+
+        if (allVersions.length > MAX_VERSIONS_PER_APP) {
+          const idsToDelete = allVersions.slice(MAX_VERSIONS_PER_APP).map((v) => v.id);
+          await prisma.appVersion.deleteMany({
+            where: { id: { in: idsToDelete } },
+          });
+        }
+      } catch (archiveErr) {
+        console.warn("Peringatan: Gagal mengarsipkan versi lama:", archiveErr);
+      }
+    }
+
+    // 2. Perbarui data rilis aktif pada tabel utama app
+    const updatedRecord = await withRetry(() =>
+      prisma.app.update({
+        where: { id: appId },
+        data: {
+          version: cleanVersion,
+          apkUrl: cleanUrl,
+          apkFileName: derivedFileName,
+          fileSize: cleanFileSize,
+          lastUpdated,
+        },
+      })
+    );
+
+    this.invalidateCache();
+    return this.mapToAppItem(updatedRecord);
   }
 
   /**

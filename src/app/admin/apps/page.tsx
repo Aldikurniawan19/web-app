@@ -15,11 +15,14 @@ import {
   Calendar,
   AlertCircle,
   Smartphone,
+  History,
 } from "lucide-react";
 import { AppCategory, AppItem } from "@/types/store";
 import { CATEGORIES } from "@/constants/app-store-data";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
+import { NewVersionForm } from "@/features/admin/NewVersionForm";
 import { clearCatalogSessionCache } from "@/context/CatalogContext";
 
 export default function AdminAppsListPage() {
@@ -28,6 +31,7 @@ export default function AdminAppsListPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<AppCategory>("Semua");
   const [deleteTargetApp, setDeleteTargetApp] = useState<AppItem | null>(null);
+  const [versionTargetApp, setVersionTargetApp] = useState<AppItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchApps = async () => {
@@ -95,12 +99,20 @@ export default function AdminAppsListPage() {
           </p>
         </div>
 
-        <Link href="/admin/apps/new">
-          <Button variant="primary" size="sm" className="shadow-sm shadow-primary/20">
-            <Plus className="h-4 w-4" />
-            <span>Unggah APK Baru</span>
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2.5">
+          <Link href="/admin/apps/new?mode=version">
+            <Button variant="secondary" size="sm" className="shadow-sm">
+              <History className="h-4 w-4" />
+              <span>Upload Versi Baru</span>
+            </Button>
+          </Link>
+          <Link href="/admin/apps/new">
+            <Button variant="primary" size="sm" className="shadow-sm shadow-primary/20">
+              <Plus className="h-4 w-4" />
+              <span>Unggah APK Baru</span>
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* Filter & Search Bar */}
@@ -199,9 +211,19 @@ export default function AdminAppsListPage() {
                   {app.lastUpdated}
                 </span>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setVersionTargetApp(app)}
+                    className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-xl border border-primary/30 bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all text-xs font-semibold"
+                    title="Upload versi baru manual untuk aplikasi ini"
+                  >
+                    <History className="h-3.5 w-3.5" />
+                    <span>Rilis Versi</span>
+                  </button>
+
                   <Link href={`/admin/apps/${app.id}/edit`}>
-                    <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
+                    <Button variant="outline" size="sm" className="h-8 px-2.5 text-xs">
                       <Edit className="h-3.5 w-3.5" />
                       <span>Edit</span>
                     </Button>
@@ -259,6 +281,26 @@ export default function AdminAppsListPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modal Quick Release Versi Baru */}
+      {versionTargetApp && (
+        <Modal
+          isOpen={Boolean(versionTargetApp)}
+          onClose={() => setVersionTargetApp(null)}
+          title={`Upload Versi Baru: ${versionTargetApp.name}`}
+          description={`Rilis versi baru untuk aplikasi ${versionTargetApp.name} (versi saat ini: v${versionTargetApp.version}) menggunakan tautan GitHub Action.`}
+          className="max-w-2xl max-h-[90vh] overflow-y-auto"
+        >
+          <NewVersionForm
+            preselectedAppId={versionTargetApp.id}
+            onSuccess={() => {
+              setVersionTargetApp(null);
+              fetchApps();
+            }}
+            onCancel={() => setVersionTargetApp(null)}
+          />
+        </Modal>
       )}
     </div>
   );

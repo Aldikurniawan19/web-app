@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Save,
   Plus,
@@ -260,7 +261,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
 
       {/* 1. Upload APK Package File */}
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-4">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between flex-wrap gap-2">
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
               <Smartphone className="h-5 w-5 text-primary" />
@@ -270,9 +271,20 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
               Berkas APK akan diunggah otomatis ke GitHub Releases dan tautan unduhannya disimpan di Supabase.
             </p>
           </div>
-          <span className="rounded-full bg-blue-50 dark:bg-slate-800 px-2.5 py-0.5 text-[11px] font-bold text-primary">
-            GitHub Releases
-          </span>
+          <div className="flex items-center gap-2">
+            {isEditing && initialData?.id && (
+              <Link
+                href={`/admin/apps/new?mode=version&appId=${initialData.id}`}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary hover:text-white text-primary text-xs font-semibold transition-all shadow-sm"
+              >
+                <History className="h-3.5 w-3.5" />
+                <span>Upload Versi Baru Manual (GitHub Action)</span>
+              </Link>
+            )}
+            <span className="rounded-full bg-blue-50 dark:bg-slate-800 px-2.5 py-0.5 text-[11px] font-bold text-primary">
+              GitHub Releases
+            </span>
+          </div>
         </div>
 
         <ApkUploadDropzone

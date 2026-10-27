@@ -73,3 +73,13 @@ export type CreateAppInput = Omit<
   "rating" | "reviewsCount" | "downloadsCount" | "lastUpdated"
 > &
   Partial<Pick<AppItem, "rating" | "reviewsCount" | "downloadsCount" | "lastUpdated">>;
+
+export interface ReleaseNewVersionInput {
+  appId: string;
+  version: string;
+  apkUrl: string;
+  apkFileName?: string;
+  fileSize?: string;
+  changelog?: string;
+  lastUpdated?: string;
+}
