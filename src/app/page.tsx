@@ -90,21 +90,30 @@ export default function AppHubPage() {
       return;
     }
 
-    const handleScroll = () => {
+    let rafId: number | null = null;
+
+    const syncActiveNavFromScroll = () => {
       if (isManualScrollLockRef.current) return;
 
-      const scrollY = window.scrollY;
+      const scrollY =
+        window.scrollY ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        0;
       const windowHeight = window.innerHeight;
-      const docHeight = document.documentElement.scrollHeight;
+      const docHeight = Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight
+      );
 
       // Hanya paksa "panduan" jika pengguna sudah mencapai paling bawah halaman
       if (scrollY > 50 && scrollY + windowHeight >= docHeight - 16) {
-        setActiveNav("panduan");
+        setActiveNav((prev) => (prev === "panduan" ? prev : "panduan"));
         return;
       }
 
       // Garis acuan pembacaan di area atas viewport (di bawah navbar 64px)
-      const triggerY = Math.min(200, Math.round(windowHeight * 0.28));
+      const triggerY = Math.min(220, Math.round(windowHeight * 0.3));
       const orderedSections = [
         { id: "beranda", element: document.getElementById("beranda") },
         { id: "aplikasi", element: document.getElementById("katalog") },
@@ -121,16 +130,59 @@ export default function AppHubPage() {
         }
       }
 
-      setActiveNav(nextActive);
+      setActiveNav((prev) => (prev === nextActive ? prev : nextActive));
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll, { passive: true });
-    handleScroll();
+    const scheduleSync = () => {
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        syncActiveNavFromScroll();
+      });
+    };
+
+    // Jika pengguna langsung menggulir manual setelah klik menu, segera lepas kunci scroll
+    const releaseManualLock = () => {
+      if (isManualScrollLockRef.current) {
+        isManualScrollLockRef.current = false;
+        if (scrollLockTimerRef.current) {
+          clearTimeout(scrollLockTimerRef.current);
+          scrollLockTimerRef.current = null;
+        }
+      }
+      scheduleSync();
+    };
+
+    window.addEventListener("scroll", scheduleSync, { passive: true });
+    document.addEventListener("scroll", scheduleSync, {
+      passive: true,
+      capture: true,
+    });
+    window.addEventListener("resize", scheduleSync, { passive: true });
+    window.addEventListener("wheel", releaseManualLock, { passive: true });
+    window.addEventListener("touchstart", releaseManualLock, { passive: true });
+
+    let observer: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== "undefined") {
+      observer = new IntersectionObserver(scheduleSync, {
+        threshold: [0, 0.1, 0.25, 0.5],
+      });
+      ["beranda", "katalog", "keamanan", "panduan-apk"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) observer?.observe(el);
+      });
+    }
+
+    syncActiveNavFromScroll();
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", scheduleSync);
+      document.removeEventListener("scroll", scheduleSync, { capture: true });
+      window.removeEventListener("resize", scheduleSync);
+      window.removeEventListener("wheel", releaseManualLock);
+      window.removeEventListener("touchstart", releaseManualLock);
+      observer?.disconnect();
     };
   }, [activeView, isLoading, appsList.length]);
 

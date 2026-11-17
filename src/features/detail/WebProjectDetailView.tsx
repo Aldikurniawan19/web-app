@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import {
@@ -138,17 +138,15 @@ export function WebProjectDetailView({
                 </div>
 
                 {/* Meta Row: Technologies Count, Category, Status */}
-                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 font-medium">
                   <div className="flex items-center gap-1.5 font-bold text-emerald-600">
                     <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                     <span>Live Web</span>
                   </div>
-                  <span>â€¢</span>
                   <div className="flex items-center gap-1">
                     <Code2 className="h-3.5 w-3.5 text-slate-400" />
                     <span>{project.technologies.length} Teknologi Terintegrasi</span>
                   </div>
-                  <span>â€¢</span>
                   <span>Kategori {project.category}</span>
                 </div>
 

@@ -275,9 +275,8 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
             {/* Dynamic Status Line */}
             <div className="mt-1.5">
               {stage === "idle" && (
-                <div className="flex items-center gap-2 text-xs text-slate-500">
+                <div className="flex items-center gap-3 text-xs text-slate-500">
                   <span>{activeFileSize}</span>
-                  <span>â€¢</span>
                   <span>Versi {activeVersion}</span>
                 </div>
               )}
@@ -294,7 +293,7 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
                     {downloadedMb} MB / {totalMb} MB ({downloadProgress}%)
                   </div>
                   <div className="text-[11px] text-slate-400 font-mono">
-                    {downloadSpeed} â€¢ {timeLeft}
+                    {downloadSpeed} ({timeLeft})
                   </div>
                 </div>
               )}
@@ -309,7 +308,7 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
               {stage === "completed" && (
                 <div className="text-xs font-bold text-emerald-600 flex items-center gap-1">
                   <CheckCircle2 className="h-3.5 w-3.5" />
-                  <span>Download selesai â€¢ Siap dipasang</span>
+                  <span>Download selesai, siap dipasang</span>
                 </div>
               )}
             </div>
@@ -341,11 +340,11 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
               className="w-full text-xs font-semibold rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
             >
               <option value="latest">
-                v{app.version} (Terbaru) â€¢ {app.fileSize}
+                v{app.version} (Terbaru) - {app.fileSize}
               </option>
               {versions.map((v) => (
                 <option key={v.id} value={v.id}>
-                  v{v.version} â€¢ {v.fileSize}
+                  v{v.version} - {v.fileSize}
                 </option>
               ))}
             </select>

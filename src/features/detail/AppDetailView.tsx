@@ -145,14 +145,12 @@ export function AppDetailView({
                 </div>
 
                 {/* Size & Version */}
-                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 font-medium">
                   <div className="flex items-center gap-1">
                     <HardDrive className="h-3.5 w-3.5 text-slate-400" />
                     <span>{app.fileSize}</span>
                   </div>
-                  <span>â€¢</span>
                   <span>Versi {app.version}</span>
-                  <span>â€¢</span>
                   <span>{app.downloadsCount} Unduhan</span>
                 </div>
 

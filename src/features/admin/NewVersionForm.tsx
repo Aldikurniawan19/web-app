@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -391,7 +391,7 @@ export function NewVersionForm({
             >
               {apps.map((a) => (
                 <option key={a.id} value={a.id}>
-                  {a.name} â€” Versi Aktif: v{a.version} ({a.category})
+                  {a.name} — Versi Aktif: v{a.version} ({a.category})
                 </option>
               ))}
             </select>
@@ -582,7 +582,7 @@ export function NewVersionForm({
                             {asset.name}
                           </p>
                           <p className="text-[10px] text-slate-500">
-                            Ukuran: {asset.formattedSize} â€¢ Rilis: {asset.releaseTag} â€¢ {asset.downloadCount} unduhan
+                            Ukuran: {asset.formattedSize}, Rilis: {asset.releaseTag}, {asset.downloadCount} unduhan
                           </p>
                         </div>
                         <span className="shrink-0 text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">

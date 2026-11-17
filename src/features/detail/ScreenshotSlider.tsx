@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import {
@@ -165,8 +165,8 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
     <>
       <div className="relative rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-6 transition-colors duration-200">
         {/* Section Header */}
-        <div className="flex items-center justify-between mb-4">
-          <div>
+        <div className="flex items-start sm:items-center justify-between gap-3 mb-4">
+          <div className="min-w-0">
             <h3 className="text-base font-black text-slate-900 font-display select-none">
               Tangkapan Layar & Antarmuka
             </h3>
@@ -175,8 +175,8 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
             </p>
           </div>
           {hasRealScreenshots && (
-            <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-slate-500">
+            <div className="flex items-center gap-2.5 shrink-0">
+              <span className="whitespace-nowrap rounded-full border border-slate-200 bg-white px-2.5 py-0.5 text-[11px] font-semibold text-slate-500">
                 {realScreenshots.length} Gambar
               </span>
               {totalItems > 4 && (

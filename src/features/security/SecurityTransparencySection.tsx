@@ -176,7 +176,7 @@ export function SecurityTransparencySection({
         </div>
 
         {/* Konten 2 Kolom: Mobile (Atas: Aplikasi, Bawah: Bukti Cek) | Desktop (Kiri: Bukti Cek, Kanan: Aplikasi) */}
-        {isLoading ? (
+        {isLoading && apps.length === 0 ? (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             <div className="order-2 lg:order-1 lg:col-span-7 h-72 rounded-2xl border border-border bg-surface p-6 animate-pulse" />
             <div className="order-1 lg:order-2 lg:col-span-5 h-72 rounded-2xl border border-border bg-surface p-6 animate-pulse" />

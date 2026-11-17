@@ -415,7 +415,7 @@ export function ApkUploadDropzone({
                           {asset.name}
                         </p>
                         <p className="text-[10px] text-slate-500">
-                          Ukuran: {asset.formattedSize} â€¢ {asset.downloadCount} kali diunduh
+                          Ukuran: {asset.formattedSize} ({asset.downloadCount} kali diunduh)
                         </p>
                       </div>
                       <span className="shrink-0 text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">

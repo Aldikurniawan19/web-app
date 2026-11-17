@@ -120,21 +120,17 @@ export function VersionHistoryTab({ app, onDownload }: VersionHistoryTabProps) {
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-500 font-medium">
                 <div className="flex items-center gap-1">
                   <HardDrive className="h-3.5 w-3.5 text-slate-400" />
                   <span>{app.fileSize}</span>
                 </div>
-                <span>â€¢</span>
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3.5 w-3.5 text-slate-400" />
                   <span>Diperbarui {app.lastUpdated}</span>
                 </div>
                 {app.apkFileName && (
-                  <>
-                    <span>â€¢</span>
-                    <span className="font-mono text-slate-400 truncate max-w-xs">{app.apkFileName}</span>
-                  </>
+                  <span className="font-mono text-slate-400 truncate max-w-xs">{app.apkFileName}</span>
                 )}
               </div>
             </div>

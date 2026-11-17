@@ -55,14 +55,12 @@ export function AppCard({ app, onOpenDetail }: AppCardProps) {
           </p>
 
           {/* Meta Info (Size, Version, Platforms) */}
-          <div className="flex flex-wrap items-center gap-3 pt-0.5 text-xs text-slate-500">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-0.5 text-xs text-slate-500">
             <div className="flex items-center gap-1">
               <HardDrive className="h-3.5 w-3.5 text-slate-400" />
               <span>{app.fileSize}</span>
             </div>
-            <span>â€¢</span>
             <span className="hidden sm:inline">Versi {app.version}</span>
-            <span className="hidden sm:inline">â€¢</span>
             <PlatformBadge platforms={app.platforms} />
           </div>
         </div>
