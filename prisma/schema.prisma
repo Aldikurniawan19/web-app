@@ -82,13 +82,40 @@ model App {
   screenshots        Json?
   downloadsCount     String       @default("0+")
   systemRequirements Json?
-  apkUrl             String?      @db.Text
+  apkUrl             String?           @db.Text
   apkFileName        String?
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
   versions           AppVersion[]
+  securityScans      ApkSecurityScan[]
 
   @@map("apps")
+}
+
+model ApkSecurityScan {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  appId            String
+  version          String
+  apkFileName      String?
+  sha256           String
+  provider         String    @default("virustotal")
+  analysisId       String?
+  status           String    @default("pending")
+  maliciousCount   Int       @default(0)
+  suspiciousCount  Int       @default(0)
+  undetectedCount  Int       @default(0)
+  totalEngines     Int       @default(0)
+  permalink        String?   @db.Text
+  engineHighlights Json?
+  errorMessage     String?   @db.Text
+  scannedAt        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  App              App       @relation(fields: [appId], references: [id], onDelete: Cascade)
+
+  @@index([appId, version])
+  @@index([sha256])
+  @@map("apk_security_scans")
 }
 
 model AppVersion {

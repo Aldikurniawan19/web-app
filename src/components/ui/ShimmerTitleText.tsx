@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useRef } from "react";
 import gsap from "gsap";
@@ -133,8 +133,8 @@ export function ShimmerTitleText({
             className={cn(
               "pointer-events-none absolute -top-1 -left-2.5 h-3.5 w-3.5 opacity-0 z-10",
               variant === "sky"
-                ? "text-sky-100 dark:text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.95)]"
-                : "text-sky-400 dark:text-sky-300 drop-shadow-[0_0_8px_rgba(56,189,248,0.9)]"
+                ? "text-sky-100 drop-shadow-[0_0_8px_rgba(255,255,255,0.95)]"
+                : "text-sky-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.9)]"
             )}
             aria-hidden="true"
           >
@@ -149,8 +149,8 @@ export function ShimmerTitleText({
             className={cn(
               "pointer-events-none absolute -top-2.5 -right-3 h-[18px] w-[18px] opacity-0 z-10",
               variant === "sky"
-                ? "text-white dark:text-sky-200 drop-shadow-[0_0_10px_rgba(255,255,255,1)]"
-                : "text-blue-400 dark:text-sky-200 drop-shadow-[0_0_10px_rgba(96,165,250,1)]"
+                ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,1)]"
+                : "text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,1)]"
             )}
             aria-hidden="true"
           >

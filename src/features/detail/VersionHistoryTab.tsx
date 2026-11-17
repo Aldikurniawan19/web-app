@@ -80,18 +80,28 @@ export function VersionHistoryTab({ app, onDownload }: VersionHistoryTabProps) {
   return (
     <div className="space-y-6">
       {/* Header Info */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
-        <div className="space-y-1 border-b border-slate-100 dark:border-slate-800 pb-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="space-y-1 border-b border-slate-100 pb-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <h2 className="text-xl font-black text-slate-900 dark:text-white font-display select-none py-0.5">
+            <h2 className="text-xl font-black text-slate-900 font-display select-none py-0.5">
               Riwayat Versi Berkas APK
             </h2>
-            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-              <ShieldCheck className="h-4 w-4 text-emerald-500" />
-              <span>Semua paket terverifikasi dan aman dipasang</span>
+            <div className="flex items-center gap-1.5 text-xs text-slate-500">
+              <ShieldCheck
+                className={
+                  app.securityScan?.status === "clean"
+                    ? "h-4 w-4 text-emerald-600"
+                    : "h-4 w-4 text-slate-400"
+                }
+              />
+              <span>
+                {app.securityScan?.status === "clean"
+                  ? `v${app.version} terverifikasi bebas virus (${app.securityScan.maliciousCount}/${app.securityScan.totalEngines} deteksi)`
+                  : "Berkas diarsipkan langsung dari repositori rilis resmi"}
+              </span>
             </div>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
             Unduh versi aplikasi yang sesuai dengan kebutuhan sistem perangkat Anda. Versi sebelumnya tetap disimpan sehingga Anda dapat kembali ke rilis sebelumnya jika diperlukan.
           </p>
         </div>
@@ -101,7 +111,7 @@ export function VersionHistoryTab({ app, onDownload }: VersionHistoryTabProps) {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="space-y-1.5">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-mono">
+                <span className="text-base sm:text-lg font-bold text-slate-900 font-mono">
                   v{app.version}
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-[11px] font-bold text-primary">
@@ -110,19 +120,19 @@ export function VersionHistoryTab({ app, onDownload }: VersionHistoryTabProps) {
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium">
+              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium">
                 <div className="flex items-center gap-1">
                   <HardDrive className="h-3.5 w-3.5 text-slate-400" />
                   <span>{app.fileSize}</span>
                 </div>
-                <span>•</span>
+                <span>â€¢</span>
                 <div className="flex items-center gap-1">
                   <Calendar className="h-3.5 w-3.5 text-slate-400" />
                   <span>Diperbarui {app.lastUpdated}</span>
                 </div>
                 {app.apkFileName && (
                   <>
-                    <span>•</span>
+                    <span>â€¢</span>
                     <span className="font-mono text-slate-400 truncate max-w-xs">{app.apkFileName}</span>
                   </>
                 )}
@@ -143,12 +153,12 @@ export function VersionHistoryTab({ app, onDownload }: VersionHistoryTabProps) {
 
         {/* 2. Daftar Versi Sebelumnya */}
         <div className="space-y-4 pt-2">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 className="text-sm font-bold text-slate-800 flex items-center gap-2">
               <History className="h-4 w-4 text-primary" />
               <span>Versi Sebelumnya</span>
               {!isLoading && (
-                <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
+                <span className="text-xs font-normal text-slate-500">
                   ({versions.length} versi tersimpan)
                 </span>
               )}
@@ -172,10 +182,10 @@ export function VersionHistoryTab({ app, onDownload }: VersionHistoryTabProps) {
               {[1, 2].map((n) => (
                 <div
                   key={n}
-                  className="rounded-xl border border-slate-200 dark:border-slate-800 p-4 space-y-3 animate-pulse bg-slate-50/50 dark:bg-slate-800/20"
+                  className="rounded-xl border border-slate-200 p-4 space-y-3 animate-pulse bg-slate-50/50"
                 >
-                  <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/4" />
-                  <div className="h-3 bg-slate-100 dark:bg-slate-800 rounded w-1/2" />
+                  <div className="h-4 bg-slate-200 rounded w-1/4" />
+                  <div className="h-3 bg-slate-100 rounded w-1/2" />
                 </div>
               ))}
             </div>
@@ -183,7 +193,7 @@ export function VersionHistoryTab({ app, onDownload }: VersionHistoryTabProps) {
 
           {/* Error State */}
           {!isLoading && hasError && (
-            <div className="rounded-xl border border-red-200 dark:border-red-900/40 bg-red-50/40 dark:bg-red-950/20 p-4 flex items-center justify-between gap-3 text-xs text-red-700 dark:text-red-400">
+            <div className="rounded-xl border border-red-200 bg-red-50/40 p-4 flex items-center justify-between gap-3 text-xs text-red-700">
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 <span>Gagal memuat riwayat versi sebelumnya.</span>
@@ -200,14 +210,14 @@ export function VersionHistoryTab({ app, onDownload }: VersionHistoryTabProps) {
 
           {/* Empty State */}
           {!isLoading && !hasError && versions.length === 0 && (
-            <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/30 p-8 text-center space-y-2">
-              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">
+            <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-8 text-center space-y-2">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-400">
                 <PackageCheck className="h-5 w-5" />
               </div>
-              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">
+              <h4 className="text-sm font-bold text-slate-800">
                 Belum Ada Versi Sebelumnya
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+              <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
                 Aplikasi ini saat ini berjalan pada rilis pertama. Ketika pembaruan berkas APK diunggah oleh pengembang, versi lama akan secara otomatis diarsipkan dan dapat diunduh di sini.
               </p>
             </div>
@@ -219,25 +229,33 @@ export function VersionHistoryTab({ app, onDownload }: VersionHistoryTabProps) {
               {versions.map((v) => (
                 <div
                   key={v.id}
-                  className="group rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-4 sm:p-5 transition-all hover:border-primary/40 hover:shadow-sm"
+                  className="group rounded-xl border border-slate-200 bg-white p-4 sm:p-5 transition-all hover:border-primary/40 hover:shadow-sm"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div className="space-y-2 min-w-0 flex-1">
                       <div className="flex items-center gap-2.5 flex-wrap">
-                        <span className="text-sm sm:text-base font-bold text-slate-800 dark:text-slate-200 font-mono">
+                        <span className="text-sm sm:text-base font-bold text-slate-800 font-mono">
                           v{v.version}
                         </span>
-                        <span className="rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                        <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
                           {v.fileSize}
                         </span>
-                        <span className="text-xs text-slate-400 dark:text-slate-500">
+                        {v.securityScan?.status === "clean" && (
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-success-subtle px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
+                            <ShieldCheck className="h-3 w-3 text-emerald-700" aria-hidden="true" />
+                            <span>
+                              Bebas Virus ({v.securityScan.maliciousCount}/{v.securityScan.totalEngines})
+                            </span>
+                          </span>
+                        )}
+                        <span className="text-xs text-slate-400">
                           Dirilis {formatDate(v.createdAt)}
                         </span>
                       </div>
 
                       {v.changelog && (
-                        <div className="rounded-lg bg-slate-50 dark:bg-slate-800/50 p-3 border border-slate-100 dark:border-slate-800/80 text-xs text-slate-600 dark:text-slate-400 space-y-1">
-                          <div className="flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-300 text-[11px]">
+                        <div className="rounded-lg bg-slate-50 p-3 border border-slate-100 text-xs text-slate-600 space-y-1">
+                          <div className="flex items-center gap-1.5 font-semibold text-slate-700 text-[11px]">
                             <FileText className="h-3 w-3 text-primary" />
                             <span>Catatan Perubahan:</span>
                           </div>
@@ -249,7 +267,7 @@ export function VersionHistoryTab({ app, onDownload }: VersionHistoryTabProps) {
 
                       <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono truncate">
                         <span>Berkas:</span>
-                        <span className="text-slate-600 dark:text-slate-400 truncate">{v.apkFileName}</span>
+                        <span className="text-slate-600 truncate">{v.apkFileName}</span>
                       </div>
                     </div>
 
@@ -258,7 +276,7 @@ export function VersionHistoryTab({ app, onDownload }: VersionHistoryTabProps) {
                         size="sm"
                         variant="secondary"
                         onClick={() => handleDownloadOldVersion(v)}
-                        className="h-9 px-4 text-xs font-semibold rounded-lg flex items-center gap-1.5 border-slate-200 dark:border-slate-700"
+                        className="h-9 px-4 text-xs font-semibold rounded-lg flex items-center gap-1.5 border-slate-200"
                       >
                         <Download className="h-3.5 w-3.5 text-primary" />
                         <span>Unduh APK v{v.version}</span>

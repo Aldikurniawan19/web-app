@@ -7,8 +7,9 @@ import { FloatingBottomBar } from "@/components/layout/FloatingBottomBar";
 import { Home } from "lucide-react";
 import { StoreHero } from "@/features/hero/StoreHero";
 import { AppGridSection } from "@/features/catalog/AppGridSection";
+import { SecurityTransparencySection } from "@/features/security/SecurityTransparencySection";
 import { ApkGuideSection } from "@/features/guide/ApkGuideSection";
-import { AppDetailView } from "@/features/detail/AppDetailView";
+import { AppDetailView, AppDetailTab } from "@/features/detail/AppDetailView";
 import { WebProjectDetailView } from "@/features/detail/WebProjectDetailView";
 import { DownloadModal } from "@/features/download/DownloadModal";
 import { InstallGuideModal } from "@/features/guide/InstallGuideModal";
@@ -20,6 +21,7 @@ export default function AppHubPage() {
   const { apps: appsList, webProjects: webProjectsList, isLoading } = useCatalog();
   const [activeView, setActiveView] = useState<"catalog" | "detail" | "detail-web">("catalog");
   const [selectedApp, setSelectedApp] = useState<AppItem | null>(null);
+  const [detailInitialTab, setDetailInitialTab] = useState<AppDetailTab>("versi");
   const [selectedWebProject, setSelectedWebProject] = useState<WebProjectItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [downloadModalApp, setDownloadModalApp] = useState<AppItem | null>(null);
@@ -40,7 +42,9 @@ export default function AppHubPage() {
           (latest.version !== selectedApp.version ||
             latest.apkUrl !== selectedApp.apkUrl ||
             latest.fileSize !== selectedApp.fileSize ||
-            latest.lastUpdated !== selectedApp.lastUpdated)
+            latest.lastUpdated !== selectedApp.lastUpdated ||
+            latest.securityScan?.status !== selectedApp.securityScan?.status ||
+            latest.securityScan?.sha256 !== selectedApp.securityScan?.sha256)
         ) {
           setSelectedApp(latest);
         }
@@ -93,43 +97,46 @@ export default function AppHubPage() {
       const windowHeight = window.innerHeight;
       const docHeight = document.documentElement.scrollHeight;
 
-      if (scrollY + windowHeight >= docHeight - 120) {
+      // Hanya paksa "panduan" jika pengguna sudah mencapai paling bawah halaman
+      if (scrollY > 50 && scrollY + windowHeight >= docHeight - 16) {
         setActiveNav("panduan");
         return;
       }
 
-      const katalogEl = document.getElementById("katalog");
-      const panduanEl = document.getElementById("panduan-apk");
+      // Garis acuan pembacaan di area atas viewport (di bawah navbar 64px)
+      const triggerY = Math.min(200, Math.round(windowHeight * 0.28));
+      const orderedSections = [
+        { id: "beranda", element: document.getElementById("beranda") },
+        { id: "aplikasi", element: document.getElementById("katalog") },
+        { id: "keamanan", element: document.getElementById("keamanan") },
+        { id: "panduan", element: document.getElementById("panduan-apk") },
+      ];
 
-      if (panduanEl) {
-        const panduanTop = panduanEl.offsetTop - 200;
-        if (scrollY >= panduanTop) {
-          setActiveNav("panduan");
-          return;
+      let nextActive = "beranda";
+      for (const section of orderedSections) {
+        if (!section.element) continue;
+        const rect = section.element.getBoundingClientRect();
+        if (rect.top <= triggerY) {
+          nextActive = section.id;
         }
       }
 
-      if (katalogEl) {
-        const katalogTop = katalogEl.offsetTop - 200;
-        if (scrollY >= katalogTop) {
-          setActiveNav("aplikasi");
-          return;
-        }
-      }
-
-      setActiveNav("beranda");
+      setActiveNav(nextActive);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll, { passive: true });
     handleScroll();
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
     };
-  }, [activeView]);
+  }, [activeView, isLoading, appsList.length]);
 
-  const handleOpenDetail = (app: AppItem) => {
+  const handleOpenDetail = (app: AppItem, initialTab: AppDetailTab = "versi") => {
     setSelectedApp(app);
+    setDetailInitialTab(initialTab);
     setActiveView("detail");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -169,46 +176,36 @@ export default function AppHubPage() {
       } else {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
-    } else if (navId === "aplikasi") {
-      const scrollToKatalog = () => {
-        const element = document.getElementById("katalog");
-        if (element) {
-          const navbarHeight = 64;
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
-          window.scrollTo({
-            top: Math.max(0, offsetPosition),
-            behavior: "smooth",
-          });
-        }
-      };
+      return;
+    }
 
-      if (activeView !== "catalog") {
-        setActiveView("catalog");
-        setTimeout(scrollToKatalog, 50);
-      } else {
-        scrollToKatalog();
-      }
-    } else if (navId === "panduan") {
-      const scrollToPanduan = () => {
-        const element = document.getElementById("panduan-apk");
-        if (element) {
-          const navbarHeight = 64;
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
-          window.scrollTo({
-            top: Math.max(0, offsetPosition),
-            behavior: "smooth",
-          });
-        }
-      };
+    const sectionIdByNav: Record<string, string> = {
+      aplikasi: "katalog",
+      keamanan: "keamanan",
+      panduan: "panduan-apk",
+    };
 
-      if (activeView !== "catalog") {
-        setActiveView("catalog");
-        setTimeout(scrollToPanduan, 50);
-      } else {
-        scrollToPanduan();
+    const targetId = sectionIdByNav[navId];
+    if (!targetId) return;
+
+    const scrollToTargetSection = () => {
+      const element = document.getElementById(targetId);
+      if (element) {
+        const navbarHeight = 64;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
+        window.scrollTo({
+          top: Math.max(0, offsetPosition),
+          behavior: "smooth",
+        });
       }
+    };
+
+    if (activeView !== "catalog") {
+      setActiveView("catalog");
+      setTimeout(scrollToTargetSection, 50);
+    } else {
+      scrollToTargetSection();
     }
   };
 
@@ -226,14 +223,19 @@ export default function AppHubPage() {
       <main className="flex-1">
         {activeView === "catalog" ? (
           <>
-            {/* Store Hero Section with Search & Laptop Illustration */}
+            {/* Store Hero Section dengan Carousel Tampilan Handphone */}
             <StoreHero
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
-              onSearchSubmit={() => {
-                const element = document.getElementById("katalog");
-                if (element) element.scrollIntoView({ behavior: "smooth" });
-              }}
+              onSearchSubmit={() => handleNavClick("aplikasi")}
+              apps={filteredApps}
+              totalAppsCount={appsList.length}
+              totalWebProjectsCount={webProjectsList.length}
+              isLoading={isLoading}
+              onSelectApp={handleOpenDetail}
+              onDownloadApp={handleDownload}
+              onExploreCatalog={() => handleNavClick("aplikasi")}
+              onOpenGuide={() => handleNavClick("panduan")}
             />
 
             {/* Catalog List Section with Dual Filters (Aplikasi & Web) - Limit 3 di Beranda */}
@@ -241,11 +243,19 @@ export default function AppHubPage() {
               apps={filteredApps}
               webProjects={filteredWebProjects}
               isLoading={isLoading}
-              onOpenDetail={handleOpenDetail}
+              onOpenDetail={(app) => handleOpenDetail(app, "versi")}
               onOpenWebDetail={handleOpenWebDetail}
               onDownload={handleDownload}
               onResetSearch={() => setSearchQuery("")}
               limit={3}
+            />
+
+            {/* Transparansi Status Cek Virus Aplikasi di Halaman Utama */}
+            <SecurityTransparencySection
+              apps={appsList}
+              isLoading={isLoading}
+              onOpenSecurityDetail={(app) => handleOpenDetail(app, "keamanan")}
+              onOpenAppDetail={(app) => handleOpenDetail(app, "versi")}
             />
 
             {/* Panduan Pasang APK Section */}
@@ -259,6 +269,7 @@ export default function AppHubPage() {
             app={selectedApp}
             onBack={handleBackToCatalog}
             onDownload={handleDownload}
+            initialTab={detailInitialTab}
             breadcrumbs={[
               {
                 label: "Beranda",

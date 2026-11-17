@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import {
@@ -78,27 +78,27 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
     // Screen 1: Semua Catatan (Light)
     <div
       key="screen-1"
-      className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-xs text-xs space-y-2.5 h-full"
+      className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs text-xs space-y-2.5 h-full"
     >
-      <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-        <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px]">Semua Catatan</span>
-        <div className="flex items-center gap-1 text-slate-400 dark:text-slate-500">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+        <span className="font-bold text-slate-800 text-[11px]">Semua Catatan</span>
+        <div className="flex items-center gap-1 text-slate-400">
           <Search className="h-3 w-3" />
           <Plus className="h-3 w-3" />
         </div>
       </div>
       <div className="space-y-1.5">
-        <div className="rounded-lg bg-blue-50/70 dark:bg-blue-950/40 p-2 border border-blue-100 dark:border-blue-900/40">
-          <div className="font-semibold text-blue-900 dark:text-blue-300 text-[11px]">Tugas Kuliah</div>
-          <div className="text-[10px] text-blue-600 dark:text-blue-400 truncate">Penyelesaian bab 3 laporan...</div>
+        <div className="rounded-lg bg-blue-50/70 p-2 border border-blue-100">
+          <div className="font-semibold text-blue-900 text-[11px]">Tugas Kuliah</div>
+          <div className="text-[10px] text-blue-600 truncate">Penyelesaian bab 3 laporan...</div>
         </div>
-        <div className="rounded-lg bg-slate-50 dark:bg-slate-800/60 p-2 border border-slate-100 dark:border-slate-800">
-          <div className="font-semibold text-slate-800 dark:text-slate-200 text-[11px]">Ide Aplikasi</div>
-          <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">Fitur sinkronisasi P2P offline...</div>
+        <div className="rounded-lg bg-slate-50 p-2 border border-slate-100">
+          <div className="font-semibold text-slate-800 text-[11px]">Ide Aplikasi</div>
+          <div className="text-[10px] text-slate-500 truncate">Fitur sinkronisasi P2P offline...</div>
         </div>
-        <div className="rounded-lg bg-slate-50 dark:bg-slate-800/60 p-2 border border-slate-100 dark:border-slate-800">
-          <div className="font-semibold text-slate-800 dark:text-slate-200 text-[11px]">Rencana Liburan</div>
-          <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">Daftar perlengkapan & tiket...</div>
+        <div className="rounded-lg bg-slate-50 p-2 border border-slate-100">
+          <div className="font-semibold text-slate-800 text-[11px]">Rencana Liburan</div>
+          <div className="text-[10px] text-slate-500 truncate">Daftar perlengkapan & tiket...</div>
         </div>
       </div>
     </div>,
@@ -106,14 +106,14 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
     // Screen 2: Editor Catatan
     <div
       key="screen-2"
-      className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-xs text-xs space-y-2.5 h-full"
+      className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs text-xs space-y-2.5 h-full"
     >
-      <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-        <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px]">Tulis Catatan...</span>
-        <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-medium">Tersimpan</span>
+      <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+        <span className="font-bold text-slate-800 text-[11px]">Tulis Catatan...</span>
+        <span className="text-[9px] text-emerald-600 font-medium">Tersimpan</span>
       </div>
-      <div className="space-y-1 text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed">
-        <p className="font-semibold text-slate-800 dark:text-slate-200">Rapat Perencanaan Proyek</p>
+      <div className="space-y-1 text-[10px] text-slate-600 leading-relaxed">
+        <p className="font-semibold text-slate-800">Rapat Perencanaan Proyek</p>
         <p>1. Pembagian modul antarmuka</p>
         <p>2. Integrasi penyimpanan cloud</p>
       </div>
@@ -122,19 +122,19 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
     // Screen 3: Kalender & Jadwal
     <div
       key="screen-3"
-      className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-xs text-xs space-y-2 h-full"
+      className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-xs text-xs space-y-2 h-full"
     >
-      <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-        <span className="font-bold text-slate-800 dark:text-slate-200 text-[11px]">Kalender</span>
+      <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+        <span className="font-bold text-slate-800 text-[11px]">Kalender</span>
         <span className="text-[10px] font-semibold text-primary">Juni 2026</span>
       </div>
-      <div className="grid grid-cols-7 gap-1 text-center text-[9px] text-slate-500 dark:text-slate-400 pt-1">
+      <div className="grid grid-cols-7 gap-1 text-center text-[9px] text-slate-500 pt-1">
         {Array.from({ length: 14 }).map((_, i) => (
           <span
             key={i}
             className={cn(
               "py-0.5 rounded",
-              i === 6 ? "bg-primary text-white font-bold" : "hover:bg-slate-100 dark:hover:bg-slate-800"
+              i === 6 ? "bg-primary text-white font-bold" : "hover:bg-slate-100"
             )}
           >
             {i + 1}
@@ -163,20 +163,20 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
 
   return (
     <>
-      <div className="relative rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/50 p-4 sm:p-6 transition-colors duration-200">
+      <div className="relative rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-6 transition-colors duration-200">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-base font-black text-slate-900 dark:text-white font-display select-none">
+            <h3 className="text-base font-black text-slate-900 font-display select-none">
               Tangkapan Layar & Antarmuka
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-slate-500">
               Pratinjau tampilan aplikasi {appName} pada perangkat ponsel.
             </p>
           </div>
           {hasRealScreenshots && (
             <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+              <span className="text-xs font-bold text-slate-500">
                 {realScreenshots.length} Gambar
               </span>
               {totalItems > 4 && (
@@ -185,7 +185,7 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
                     type="button"
                     onClick={handleDesktopPrev}
                     disabled={desktopIndex === 0}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:pointer-events-none hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-2xs"
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 disabled:opacity-30 disabled:pointer-events-none hover:bg-slate-50 transition-colors shadow-2xs"
                     aria-label="Tangkapan layar sebelumnya"
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -194,7 +194,7 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
                     type="button"
                     onClick={handleDesktopNext}
                     disabled={desktopIndex >= maxDesktopIndex}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-30 disabled:pointer-events-none hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-2xs"
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 disabled:opacity-30 disabled:pointer-events-none hover:bg-slate-50 transition-colors shadow-2xs"
                     aria-label="Tangkapan layar berikutnya"
                   >
                     <ChevronRight className="h-4 w-4" />
@@ -223,21 +223,21 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
                     <div key={sc.id || idx} className="w-full min-w-full flex-shrink-0 px-1">
                       <div
                         onClick={() => setLightboxIndex(idx)}
-                        className="group relative cursor-pointer overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
+                        className="group relative cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
                       >
-                        <div className="aspect-[9/16] max-h-80 w-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                        <div className="aspect-[9/16] max-h-80 w-full overflow-hidden bg-slate-100 flex items-center justify-center">
                           <img
                             src={sc.imageUrl}
                             alt={sc.title || `${appName} screenshot ${idx + 1}`}
                             className="h-full w-full object-contain select-none"
                           />
                         </div>
-                        <div className="p-3 border-t border-slate-100 dark:border-slate-800">
-                          <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                        <div className="p-3 border-t border-slate-100">
+                          <h4 className="text-xs font-bold text-slate-900 truncate">
                             {sc.title}
                           </h4>
                           {sc.description && (
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                            <p className="text-[11px] text-slate-500 truncate mt-0.5">
                               {sc.description}
                             </p>
                           )}
@@ -258,7 +258,7 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
                 <button
                   type="button"
                   onClick={handlePrev}
-                  className="absolute left-1.5 top-1/2 -translate-y-1/2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-md backdrop-blur-sm active:scale-90 transition-transform"
+                  className="absolute left-1.5 top-1/2 -translate-y-1/2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-slate-700 border border-slate-200 shadow-md backdrop-blur-sm active:scale-90 transition-transform"
                   aria-label="Tangkapan layar sebelumnya"
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -267,7 +267,7 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-md backdrop-blur-sm active:scale-90 transition-transform"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-slate-700 border border-slate-200 shadow-md backdrop-blur-sm active:scale-90 transition-transform"
                   aria-label="Tangkapan layar berikutnya"
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -289,7 +289,7 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
                     "h-2 rounded-full transition-all duration-300",
                     currentIndex === idx
                       ? "w-6 bg-primary"
-                      : "w-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400"
+                      : "w-2 bg-slate-300 hover:bg-slate-400"
                   )}
                 />
               ))}
@@ -314,9 +314,9 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
                     >
                       <div
                         onClick={() => setLightboxIndex(idx)}
-                        className="group relative cursor-pointer flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm hover:border-primary/50 hover:shadow-md transition-all hover:-translate-y-0.5 h-full"
+                        className="group relative cursor-pointer flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:border-primary/50 hover:shadow-md transition-all hover:-translate-y-0.5 h-full"
                       >
-                        <div className="relative aspect-[9/16] max-h-72 w-full overflow-hidden bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center p-2">
+                        <div className="relative aspect-[9/16] max-h-72 w-full overflow-hidden bg-slate-100 flex items-center justify-center p-2">
                           <img
                             src={sc.imageUrl}
                             alt={sc.title || `${appName} screenshot ${idx + 1}`}
@@ -328,12 +328,12 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
                             </div>
                           </div>
                         </div>
-                        <div className="p-3.5 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
-                          <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                        <div className="p-3.5 border-t border-slate-100 bg-white">
+                          <h4 className="text-xs font-bold text-slate-900 truncate">
                             {sc.title}
                           </h4>
                           {sc.description && (
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                            <p className="text-[11px] text-slate-500 truncate mt-0.5">
                               {sc.description}
                             </p>
                           )}
@@ -356,7 +356,7 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
                 <button
                   type="button"
                   onClick={handleDesktopPrev}
-                  className="absolute -left-3.5 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-md hover:scale-110 hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-95 transition-all"
+                  className="absolute -left-3.5 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-700 border border-slate-200 shadow-md hover:scale-110 hover:bg-slate-50 active:scale-95 transition-all"
                   aria-label="Tangkapan layar sebelumnya"
                 >
                   <ChevronLeft className="h-5 w-5" />
@@ -367,7 +367,7 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
                 <button
                   type="button"
                   onClick={handleDesktopNext}
-                  className="absolute -right-3.5 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-md hover:scale-110 hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-95 transition-all"
+                  className="absolute -right-3.5 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-700 border border-slate-200 shadow-md hover:scale-110 hover:bg-slate-50 active:scale-95 transition-all"
                   aria-label="Tangkapan layar berikutnya"
                 >
                   <ChevronRight className="h-5 w-5" />
@@ -389,7 +389,7 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
                     "h-2 rounded-full transition-all duration-300",
                     desktopIndex === idx
                       ? "w-6 bg-primary"
-                      : "w-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400"
+                      : "w-2 bg-slate-300 hover:bg-slate-400"
                   )}
                 />
               ))}

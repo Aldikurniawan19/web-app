@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Outfit, DM_Sans } from "next/font/google";
-import { ThemeProvider } from "@/context/ThemeContext";
 import { CatalogProvider } from "@/context/CatalogContext";
 import "./globals.css";
 
@@ -89,7 +88,6 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      suppressHydrationWarning
       className={`${fontDisplay.variable} ${fontBody.variable} scroll-smooth`}
     >
       <head>
@@ -103,32 +101,12 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var saved = localStorage.getItem('apphub-theme');
-                  if (saved === 'dark') {
-                    document.documentElement.classList.add('dark');
-                    document.documentElement.style.colorScheme = 'dark';
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                    document.documentElement.style.colorScheme = 'light';
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
-        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
       <body className="min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-white transition-colors duration-200">
-        <ThemeProvider>
-          <CatalogProvider>{children}</CatalogProvider>
-        </ThemeProvider>
+        <CatalogProvider>{children}</CatalogProvider>
       </body>
     </html>
   );

@@ -15,6 +15,8 @@ import {
   AlertCircle,
   Smartphone,
   History,
+  ShieldCheck,
+  ScanSearch,
 } from "lucide-react";
 import { AppCategory, AppItem } from "@/types/store";
 import { CATEGORIES } from "@/constants/app-store-data";
@@ -22,6 +24,9 @@ import { AppIcon } from "@/components/ui/AppIcon";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { NewVersionForm } from "@/features/admin/NewVersionForm";
+import { ApkSecurityPanel } from "@/features/admin/ApkSecurityPanel";
+import { getSecurityStatusPresentation } from "@/lib/security-format";
+import { cn } from "@/lib/utils";
 import { clearCatalogSessionCache } from "@/context/CatalogContext";
 
 export default function AdminAppsListPage() {
@@ -31,6 +36,7 @@ export default function AdminAppsListPage() {
   const [selectedCategory, setSelectedCategory] = useState<AppCategory>("Semua");
   const [deleteTargetApp, setDeleteTargetApp] = useState<AppItem | null>(null);
   const [versionTargetApp, setVersionTargetApp] = useState<AppItem | null>(null);
+  const [scanTargetApp, setScanTargetApp] = useState<AppItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchApps = async () => {
@@ -90,10 +96,10 @@ export default function AdminAppsListPage() {
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white font-display">
+          <h2 className="text-xl font-bold text-slate-900 font-display">
             Kelola Seluruh Aplikasi APK
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Publikasikan, edit metadata deskripsi, atau hapus aplikasi dari ekosistem AllProjects.
           </p>
         </div>
@@ -115,7 +121,7 @@ export default function AdminAppsListPage() {
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+      <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
         {/* Search */}
         <div className="relative flex-1 max-w-md">
           <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -124,7 +130,7 @@ export default function AdminAppsListPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Cari berdasarkan nama, developer, atau deskripsi..."
-            className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 pl-9 pr-3.5 py-2 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3.5 py-2 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           />
         </div>
 
@@ -138,7 +144,7 @@ export default function AdminAppsListPage() {
               className={`rounded-xl px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-all select-none ${
                 selectedCategory === cat
                   ? "bg-primary text-white shadow-sm"
-                  : "border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  : "border border-slate-200 bg-slate-50 text-slate-600 hover:text-slate-900"
               }`}
             >
               {cat}
@@ -158,10 +164,12 @@ export default function AdminAppsListPage() {
             Tidak ada aplikasi ditemukan untuk filter ini.
           </div>
         ) : (
-          filteredApps.map((app) => (
+          filteredApps.map((app) => {
+            const scanUI = getSecurityStatusPresentation(app.securityScan, app.version);
+            return (
             <div
               key={app.id}
-              className="flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm hover:border-primary/40 hover:shadow-md transition-all space-y-4"
+              className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:border-primary/40 hover:shadow-md transition-all space-y-4"
             >
               {/* Top: Icon & Basic Info */}
               <div className="space-y-3">
@@ -173,26 +181,37 @@ export default function AdminAppsListPage() {
                     size="md"
                     className="h-12 w-12 rounded-2xl shrink-0"
                   />
-                  <span className="rounded-md bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 text-[10px] font-bold text-primary dark:text-blue-400 border border-blue-100 dark:border-blue-900/50">
-                    {app.category}
-                  </span>
+                  <div className="flex flex-wrap items-center justify-end gap-1.5">
+                    <span
+                      className={cn(
+                        "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-bold",
+                        scanUI.badgeClass
+                      )}
+                    >
+                      <ShieldCheck className="h-3 w-3 shrink-0" aria-hidden="true" />
+                      <span>{scanUI.label}</span>
+                    </span>
+                    <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-primary border border-blue-100">
+                      {app.category}
+                    </span>
+                  </div>
                 </div>
 
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white font-display truncate">
+                  <h3 className="text-base font-bold text-slate-900 font-display truncate">
                     {app.name}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  <p className="text-xs text-slate-500 font-medium">
                     {app.developer}
                   </p>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-slate-600 mt-2 line-clamp-2 leading-relaxed">
                     {app.description}
                   </p>
                 </div>
               </div>
 
               {/* Meta stats */}
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
                 <div className="flex items-center gap-1 font-mono">
                   <HardDrive className="h-3 w-3" />
                   <span>{app.fileSize}</span>
@@ -202,12 +221,22 @@ export default function AdminAppsListPage() {
               </div>
 
               {/* Actions Footer */}
-              <div className="flex items-center justify-between pt-2">
-                <span className="text-[10px] text-slate-400 truncate max-w-[120px]">
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
+                <span className="text-[10px] text-slate-400 truncate max-w-[110px]">
                   {app.lastUpdated}
                 </span>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setScanTargetApp(app)}
+                    className="inline-flex items-center gap-1 h-8 px-2.5 rounded-xl border border-emerald-200 bg-success-subtle text-emerald-800 hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all text-xs font-semibold"
+                    title="Pindai atau cek status virus berkas APK lewat VirusTotal"
+                  >
+                    <ScanSearch className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>Pindai</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => setVersionTargetApp(app)}
@@ -215,7 +244,7 @@ export default function AdminAppsListPage() {
                     title="Upload versi baru manual untuk aplikasi ini"
                   >
                     <History className="h-3.5 w-3.5" />
-                    <span>Rilis Versi</span>
+                    <span>Rilis</span>
                   </button>
 
                   <Link href={`/admin/apps/${app.id}/edit`}>
@@ -228,7 +257,7 @@ export default function AdminAppsListPage() {
                   <button
                     type="button"
                     onClick={() => setDeleteTargetApp(app)}
-                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 text-slate-400 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40 transition-colors"
+                    className="flex h-8 w-8 items-center justify-center rounded-xl border border-slate-200 text-slate-400 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600 transition-colors"
                     title="Hapus aplikasi"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -236,23 +265,24 @@ export default function AdminAppsListPage() {
                 </div>
               </div>
             </div>
-          ))
+            );
+          })
         )}
       </div>
 
       {/* Delete Modal */}
       {deleteTargetApp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-sm rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl space-y-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400">
+          <div className="w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
               <AlertCircle className="h-6 w-6" />
             </div>
 
             <div className="space-y-1">
-              <h4 className="text-base font-bold text-slate-900 dark:text-white font-display">
+              <h4 className="text-base font-bold text-slate-900 font-display">
                 Konfirmasi Hapus Aplikasi
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              <p className="text-xs text-slate-500 leading-relaxed">
                 Apakah Anda yakin ingin menghapus <strong>{deleteTargetApp.name}</strong>? Data aplikasi dan paket APK akan dihapus dari katalog publik.
               </p>
             </div>
@@ -295,6 +325,34 @@ export default function AdminAppsListPage() {
               fetchApps();
             }}
             onCancel={() => setVersionTargetApp(null)}
+          />
+        </Modal>
+      )}
+      {/* Modal Verifikasi Keamanan APK (VirusTotal) */}
+      {scanTargetApp && (
+        <Modal
+          isOpen={Boolean(scanTargetApp)}
+          onClose={() => setScanTargetApp(null)}
+          title={`Cek Keamanan APK: ${scanTargetApp.name}`}
+          description={`Pindai berkas ${scanTargetApp.apkFileName || scanTargetApp.name} (v${scanTargetApp.version}) melalui VirusTotal API v3 agar laporan bebas virus tampil di katalog publik.`}
+          className="max-w-2xl"
+        >
+          <ApkSecurityPanel
+            appId={scanTargetApp.id}
+            appName={scanTargetApp.name}
+            version={scanTargetApp.version}
+            apkUrl={scanTargetApp.apkUrl}
+            apkFileName={scanTargetApp.apkFileName}
+            initialSummary={scanTargetApp.securityScan}
+            onScanUpdated={(summary) => {
+              setApps((prev) =>
+                prev.map((item) =>
+                  item.id === scanTargetApp.id
+                    ? { ...item, securityScan: summary }
+                    : item
+                )
+              );
+            }}
           />
         </Modal>
       )}

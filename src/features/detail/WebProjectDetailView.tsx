@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import {
@@ -113,7 +113,7 @@ export function WebProjectDetailView({
         </div>
 
         {/* Main Project Hero Header Card */}
-        <div className="detail-anim rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm transition-colors duration-200">
+        <div className="detail-anim rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm transition-colors duration-200">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
             {/* Left Col: Web Icon & Info */}
             <div className="lg:col-span-8 flex flex-col sm:flex-row gap-5 items-start">
@@ -123,14 +123,14 @@ export function WebProjectDetailView({
 
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-display select-none py-0.5">
+                  <h1 className="text-2xl sm:text-3xl font-black text-slate-900 font-display select-none py-0.5">
                     {project.name}
                   </h1>
-                  <span className="rounded-md bg-blue-50 dark:bg-blue-950/60 px-2.5 py-0.5 text-xs font-semibold text-primary dark:text-blue-400 border border-blue-100 dark:border-blue-900/50">
+                  <span className="rounded-md bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-primary border border-blue-100">
                     {project.category || "Web App"}
                   </span>
                   {project.featured && (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 dark:bg-amber-950/60 px-2.5 py-0.5 text-xs font-bold text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-600 border border-amber-200">
                       <Sparkles className="h-3 w-3" />
                       <span>Unggulan</span>
                     </span>
@@ -138,35 +138,35 @@ export function WebProjectDetailView({
                 </div>
 
                 {/* Meta Row: Technologies Count, Category, Status */}
-                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-medium">
-                  <div className="flex items-center gap-1.5 font-bold text-emerald-600 dark:text-emerald-400">
+                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium">
+                  <div className="flex items-center gap-1.5 font-bold text-emerald-600">
                     <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                     <span>Live Web</span>
                   </div>
-                  <span>•</span>
+                  <span>â€¢</span>
                   <div className="flex items-center gap-1">
-                    <Code2 className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                    <Code2 className="h-3.5 w-3.5 text-slate-400" />
                     <span>{project.technologies.length} Teknologi Terintegrasi</span>
                   </div>
-                  <span>•</span>
+                  <span>â€¢</span>
                   <span>Kategori {project.category}</span>
                 </div>
 
                 {/* Short Description */}
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl">
                   {project.description}
                 </p>
               </div>
             </div>
 
             {/* Right Col: Action Buttons (Visit Website & GitHub) */}
-            <div className="lg:col-span-4 flex flex-col sm:items-end gap-3 lg:pl-6 lg:border-l border-slate-100 dark:border-slate-800">
+            <div className="lg:col-span-4 flex flex-col sm:items-end gap-3 lg:pl-6 lg:border-l border-slate-100">
               {project.liveUrl ? (
                 <a
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-8 font-bold shadow-md shadow-primary/25 rounded-2xl text-sm bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 text-white hover:-translate-y-0.5 active:translate-y-0.5 transition-all select-none"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-12 px-8 font-bold shadow-md shadow-primary/25 rounded-2xl text-sm bg-gradient-to-b from-blue-500 via-primary to-blue-700 text-white hover:-translate-y-0.5 active:translate-y-0.5 transition-all select-none"
                 >
                   <span>Kunjungi Website</span>
                   <ExternalLink className="h-4 w-4" />
@@ -178,7 +178,7 @@ export function WebProjectDetailView({
                   href={project.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-10 px-5 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 h-10 px-5 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 transition-colors"
                 >
                   <GitBranch className="h-3.5 w-3.5" />
                   <span>Lihat Repository</span>
@@ -193,16 +193,16 @@ export function WebProjectDetailView({
         </div>
 
         {/* Large Browser Showcase Card (Tampilan Sekilas Resolusi Tinggi) */}
-        <div className="detail-anim rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+        <div className="detail-anim rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
           {/* Mockup Browser Window Header */}
-          <div className="h-10 bg-slate-100 dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6">
+          <div className="h-10 bg-slate-100 border-b border-slate-200 flex items-center justify-between px-4 sm:px-6">
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full bg-rose-500/80" />
               <span className="h-3 w-3 rounded-full bg-amber-500/80" />
               <span className="h-3 w-3 rounded-full bg-emerald-500/80" />
             </div>
 
-            <div className="flex items-center gap-2 rounded-xl bg-white dark:bg-slate-900 px-4 py-1 text-xs font-mono text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700/80 max-w-sm sm:max-w-md truncate">
+            <div className="flex items-center gap-2 rounded-xl bg-white px-4 py-1 text-xs font-mono text-slate-600 border border-slate-200 max-w-sm sm:max-w-md truncate">
               <Globe className="h-3.5 w-3.5 text-primary shrink-0" />
               <span className="truncate">
                 {project.liveUrl || `https://${project.id}.allprojects.dev`}
@@ -224,7 +224,7 @@ export function WebProjectDetailView({
           </div>
 
           {/* Screenshot Image Container */}
-          <div className="relative aspect-[16/10] sm:aspect-[2/1] w-full bg-slate-100 dark:bg-slate-950 overflow-hidden">
+          <div className="relative aspect-[16/10] sm:aspect-[2/1] w-full bg-slate-100 overflow-hidden">
             {project.imageUrl ? (
               <img
                 src={project.imageUrl}
@@ -246,7 +246,7 @@ export function WebProjectDetailView({
         </div>
 
         {/* Detail Tabs Bar */}
-        <div className="detail-anim flex items-center gap-2.5 overflow-x-auto border-b border-slate-200 dark:border-slate-800 pt-2 pb-3.5 px-1.5 -mx-1.5 scrollbar-none">
+        <div className="detail-anim flex items-center gap-2.5 overflow-x-auto border-b border-slate-200 pt-2 pb-3.5 px-1.5 -mx-1.5 scrollbar-none">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -257,8 +257,8 @@ export function WebProjectDetailView({
                 className={cn(
                   "rounded-xl px-4 py-2 text-xs font-bold whitespace-nowrap transition-all duration-200 select-none",
                   isActive
-                    ? "bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2.5px_0_#1e3a8a] -translate-y-0.5"
-                    : "border border-slate-200 dark:border-slate-700 bg-gradient-to-b from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 text-slate-700 dark:text-slate-300 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_0_#cbd5e1] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_0_#0f172a] hover:-translate-y-0.5 active:translate-y-0.5"
+                    ? "bg-gradient-to-b from-blue-500 via-primary to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] -translate-y-0.5"
+                    : "border border-slate-200 bg-gradient-to-b from-white to-slate-100 text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_0_#cbd5e1] hover:-translate-y-0.5 active:translate-y-0.5"
                 )}
               >
                 {tab.label}
@@ -273,42 +273,42 @@ export function WebProjectDetailView({
           {activeTab === "tentang" && (
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 items-start">
               <div className="lg:col-span-7 space-y-6">
-                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-4">
-                  <h2 className="text-lg font-black text-slate-900 dark:text-white font-display select-none py-0.5">
+                <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-4">
+                  <h2 className="text-lg font-black text-slate-900 font-display select-none py-0.5">
                     Tentang Projek Web
                   </h2>
-                  <p className="text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-400 whitespace-pre-line">
+                  <p className="text-xs sm:text-sm leading-relaxed text-slate-600 whitespace-pre-line">
                     {project.description}
                   </p>
-                  <p className="text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                  <p className="text-xs sm:text-sm leading-relaxed text-slate-600">
                     Projek website <strong>{project.name}</strong> dibangun dengan standar rekayasa perangkat lunak modern untuk menghadirkan pengalaman pengguna yang cepat, responsif, dan mudah diakses di berbagai ukuran layar.
                   </p>
 
                   {/* Highlight Point Boxes */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3">
-                    <div className="flex items-start gap-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 p-4">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950/60 text-primary">
+                    <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-primary">
                         <Zap className="h-5 w-5" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                        <h4 className="text-xs font-bold text-slate-900">
                           Performa Tinggi
                         </h4>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                        <p className="text-[11px] text-slate-500 mt-0.5">
                           Waktu muat instan dengan arsitektur web modern.
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 p-4">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+                    <div className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/60 p-4">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
                         <Layout className="h-5 w-5" />
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                        <h4 className="text-xs font-bold text-slate-900">
                           Desain Responsif
                         </h4>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                        <p className="text-[11px] text-slate-500 mt-0.5">
                           Tampilan optimal di desktop, tablet, dan smartphone.
                         </p>
                       </div>
@@ -319,26 +319,26 @@ export function WebProjectDetailView({
 
               {/* Right Column: Ringkasan Cepat */}
               <div className="lg:col-span-5 space-y-6">
-                <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-sm space-y-4">
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white font-display">
+                <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-7 shadow-sm space-y-4">
+                  <h3 className="text-sm font-bold text-slate-900 font-display">
                     Ringkasan Spesifikasi Web
                   </h3>
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+                  <div className="divide-y divide-slate-100 text-xs">
                     <div className="flex justify-between py-2.5">
-                      <span className="text-slate-500 dark:text-slate-400">Nama Projek</span>
-                      <span className="font-semibold text-slate-800 dark:text-slate-200">{project.name}</span>
+                      <span className="text-slate-500">Nama Projek</span>
+                      <span className="font-semibold text-slate-800">{project.name}</span>
                     </div>
                     <div className="flex justify-between py-2.5">
-                      <span className="text-slate-500 dark:text-slate-400">Kategori</span>
+                      <span className="text-slate-500">Kategori</span>
                       <span className="font-semibold text-primary">{project.category}</span>
                     </div>
                     <div className="flex justify-between py-2.5">
-                      <span className="text-slate-500 dark:text-slate-400">Tipe Aplikasi</span>
-                      <span className="font-semibold text-slate-800 dark:text-slate-200">Web Interaktif</span>
+                      <span className="text-slate-500">Tipe Aplikasi</span>
+                      <span className="font-semibold text-slate-800">Web Interaktif</span>
                     </div>
                     <div className="flex justify-between py-2.5">
-                      <span className="text-slate-500 dark:text-slate-400">Status Rilis</span>
-                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">Dipublikasikan</span>
+                      <span className="text-slate-500">Status Rilis</span>
+                      <span className="font-semibold text-emerald-600">Dipublikasikan</span>
                     </div>
                   </div>
 
@@ -347,7 +347,7 @@ export function WebProjectDetailView({
                       href={project.liveUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-100 dark:bg-slate-800 px-4 py-2.5 text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-800 hover:bg-slate-200 transition-colors"
                     >
                       <span>Buka Halaman Web</span>
                       <ExternalLink className="h-3.5 w-3.5" />
@@ -360,12 +360,12 @@ export function WebProjectDetailView({
 
           {/* TAB 2: TEKNOLOGI */}
           {activeTab === "teknologi" && (
-            <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6">
               <div className="space-y-1">
-                <h2 className="text-lg font-black text-slate-900 dark:text-white font-display">
+                <h2 className="text-lg font-black text-slate-900 font-display">
                   Teknologi & Framework yang Digunakan
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500">
                   Kumpulan pustaka dan arsitektur yang mendukung stabilitas serta performa projek {project.name}.
                 </p>
               </div>
@@ -374,16 +374,16 @@ export function WebProjectDetailView({
                 {project.technologies.map((tech, idx) => (
                   <div
                     key={`tech-detail-${idx}`}
-                    className="flex items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 p-4 hover:border-primary/40 transition-colors"
+                    className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 hover:border-primary/40 transition-colors"
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-xs">
                       <Code2 className="h-5 w-5" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                      <h4 className="text-xs font-bold text-slate-900">
                         {tech}
                       </h4>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                      <p className="text-[10px] text-slate-500">
                         Komponen Inti Projek
                       </p>
                     </div>
@@ -395,12 +395,12 @@ export function WebProjectDetailView({
 
           {/* TAB 3: FITUR */}
           {activeTab === "fitur" && (
-            <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6">
               <div className="space-y-1">
-                <h2 className="text-lg font-black text-slate-900 dark:text-white font-display">
+                <h2 className="text-lg font-black text-slate-900 font-display">
                   Fitur Unggulan Projek
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500">
                   Kemampuan dan nilai tambah utama yang ditawarkan oleh aplikasi web ini.
                 </p>
               </div>
@@ -426,16 +426,16 @@ export function WebProjectDetailView({
                 ].map((feat, idx) => (
                   <div
                     key={`feat-${idx}`}
-                    className="flex items-start gap-3 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 p-4"
+                    className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-slate-50/60 p-4"
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 mt-0.5">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 mt-0.5">
                       <Check className="h-4 w-4" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                      <h4 className="text-xs font-bold text-slate-900">
                         {feat.title}
                       </h4>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                      <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                         {feat.desc}
                       </p>
                     </div>
@@ -447,18 +447,18 @@ export function WebProjectDetailView({
 
           {/* TAB 4: INFORMASI */}
           {activeTab === "informasi" && (
-            <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6">
               <div className="space-y-1">
-                <h2 className="text-lg font-black text-slate-900 dark:text-white font-display">
+                <h2 className="text-lg font-black text-slate-900 font-display">
                   Informasi & Tautan Terkait
                 </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500">
                   Detail tautan akses publik dan informasi metadata projek web.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div className="space-y-2 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
+                <div className="space-y-2 p-5 rounded-2xl border border-slate-200 bg-slate-50">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                     Tautan Live Web
                   </span>
@@ -477,7 +477,7 @@ export function WebProjectDetailView({
                   )}
                 </div>
 
-                <div className="space-y-2 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40">
+                <div className="space-y-2 p-5 rounded-2xl border border-slate-200 bg-slate-50">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                     Tautan Repository GitHub
                   </span>
@@ -486,7 +486,7 @@ export function WebProjectDetailView({
                       href={project.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-primary transition-colors break-all"
+                      className="flex items-center gap-2 text-xs font-bold text-slate-800 hover:text-primary transition-colors break-all"
                     >
                       <GitBranch className="h-3.5 w-3.5 shrink-0" />
                       <span>{project.githubUrl}</span>

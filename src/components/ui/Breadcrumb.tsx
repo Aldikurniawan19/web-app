@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React from "react";
 import Link from "next/link";
@@ -33,14 +33,14 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
             <li key={`breadcrumb-item-${index}`} className="flex items-center gap-2">
               {index > 0 && (
                 <ChevronRight
-                  className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500 shrink-0"
+                  className="h-3.5 w-3.5 text-slate-400 shrink-0"
                   aria-hidden="true"
                 />
               )}
 
               {isCurrent ? (
                 <span
-                  className="font-bold text-slate-900 dark:text-white truncate max-w-[200px] sm:max-w-md select-none"
+                  className="font-bold text-slate-900 truncate max-w-[200px] sm:max-w-md select-none"
                   aria-current="page"
                 >
                   {item.label}
@@ -48,10 +48,10 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
               ) : item.href ? (
                 <Link
                   href={item.href}
-                  className="group inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white font-medium transition-colors cursor-pointer select-none"
+                  className="group inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-900 font-medium transition-colors cursor-pointer select-none"
                 >
                   {Icon && (
-                    <Icon className="h-3.5 w-3.5 shrink-0 text-slate-400 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-white transition-colors" />
+                    <Icon className="h-3.5 w-3.5 shrink-0 text-slate-400 group-hover:text-slate-700 transition-colors" />
                   )}
                   <span>{item.label}</span>
                 </Link>
@@ -59,15 +59,15 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
                 <button
                   type="button"
                   onClick={item.onClick}
-                  className="group inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white font-medium transition-colors cursor-pointer select-none active:scale-95"
+                  className="group inline-flex items-center gap-1.5 text-slate-500 hover:text-slate-900 font-medium transition-colors cursor-pointer select-none active:scale-95"
                 >
                   {Icon && (
-                    <Icon className="h-3.5 w-3.5 shrink-0 text-slate-400 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-white transition-colors" />
+                    <Icon className="h-3.5 w-3.5 shrink-0 text-slate-400 group-hover:text-slate-700 transition-colors" />
                   )}
                   <span>{item.label}</span>
                 </button>
               ) : (
-                <span className="inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium select-none">
+                <span className="inline-flex items-center gap-1.5 text-slate-500 font-medium select-none">
                   {Icon && <Icon className="h-3.5 w-3.5 shrink-0" />}
                   <span>{item.label}</span>
                 </span>

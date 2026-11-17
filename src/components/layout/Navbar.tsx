@@ -3,7 +3,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
 import gsap from "gsap";
 
@@ -45,7 +44,7 @@ export function Navbar({
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 10);
     };
 
     handleScroll();
@@ -56,6 +55,7 @@ export function Navbar({
   const navItems = [
     { id: "beranda", label: "Beranda" },
     { id: "aplikasi", label: "Aplikasi" },
+    { id: "keamanan", label: "Keamanan" },
     { id: "panduan", label: "Panduan" },
   ];
 
@@ -78,7 +78,7 @@ export function Navbar({
     const targetWidth = targetBtn.offsetWidth;
     const targetHeight = targetBtn.offsetHeight;
 
-    const navIds = ["beranda", "aplikasi", "panduan"];
+    const navIds = ["beranda", "aplikasi", "keamanan", "panduan"];
     const targetIndex = navIds.indexOf(activeNav);
     const prevNav = prevNavRef.current;
     const prevIndex = prevNav ? navIds.indexOf(prevNav) : -1;
@@ -113,6 +113,7 @@ export function Navbar({
     const isMovingRight = targetX > startX;
 
     gsap.killTweensOf(pillEl);
+    gsap.set(pillEl, { opacity: 1, scaleY: 1 });
 
     // Animasi pergerakan fluida independen: ujung depan melesat lebih dulu, ujung ekor menyusul
     // sehingga pill benar-benar "molor" dan meluncur ke arah tujuan (bukan membesar di tempat)
@@ -240,6 +241,10 @@ export function Navbar({
     }
 
     prevNavRef.current = activeNav;
+
+    return () => {
+      tl.kill();
+    };
   }, [activeNav]);
 
   // Sinkronisasi posisi jika ukuran layar berubah atau font dimuat
@@ -275,6 +280,8 @@ export function Navbar({
         router.push("/");
       } else if (id === "aplikasi") {
         router.push("/aplikasi");
+      } else if (id === "keamanan") {
+        router.push("/#keamanan");
       } else if (id === "panduan") {
         router.push("/#panduan-apk");
       }
@@ -297,47 +304,49 @@ export function Navbar({
         "sticky top-0 z-40 w-full transition-all duration-300",
         isScrolled
           ? "bg-blue-600/95 backdrop-blur-md border-b border-blue-500/40 text-white shadow-lg shadow-blue-950/10"
-          : "bg-blue-50/70 dark:bg-slate-900/90 backdrop-blur-sm border-b border-transparent text-foreground"
+          : "bg-transparent border-b border-transparent text-foreground"
       )}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo / Brand Name — Menyesuaikan tampilan saat di atas (bubble 3D) dan saat di-scroll (3D putih + sky shimmer) */}
-        <div
-          onClick={handleLogoClick}
-          className="flex items-center cursor-pointer select-none group"
-        >
-          <span className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5 transition-transform group-hover:scale-105 flex items-baseline">
-            <span
-              className={cn(
-                "inline-block font-script text-2xl sm:text-3xl font-bold pr-1 transition-all duration-300",
-                isScrolled ? "text-3d-white" : "text-3d-bubble-main dark:text-3d-white"
-              )}
-            >
-              All
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        {/* Sisi Kiri: Slot Flex Seimbang untuk Logo */}
+        <div className="flex flex-1 items-center justify-start min-w-0">
+          <div
+            onClick={handleLogoClick}
+            className="flex items-center cursor-pointer select-none group"
+          >
+            <span className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5 transition-transform group-hover:scale-105 flex items-baseline">
+              <span
+                className={cn(
+                  "inline-block font-script text-2xl sm:text-3xl font-bold pr-1 transition-all duration-300",
+                  isScrolled ? "text-3d-white" : "text-3d-bubble-main"
+                )}
+              >
+                All
+              </span>
+              <ShimmerTitleText
+                variant={isScrolled ? "sky" : "blue"}
+                showSparkles={true}
+              >
+                Projects
+              </ShimmerTitleText>
             </span>
-            <ShimmerTitleText
-              variant={isScrolled ? "sky" : "blue"}
-              showSparkles={true}
-            >
-              Projects
-            </ShimmerTitleText>
-          </span>
+          </div>
         </div>
 
         {/* Desktop Navigation Links */}
         <nav
           ref={navRef}
           aria-label="Navigasi Menu Utama"
-          className="relative hidden md:flex items-center gap-1"
+          className="relative hidden md:flex shrink-0 items-center gap-1"
         >
-          {/* Animated Sliding Indicator Pill — Glass transparan saat scroll, solid blue saat di atas */}
+          {/* Animated Sliding Indicator Pill â€” Glass transparan saat scroll, solid blue saat di atas */}
           <div
             ref={activePillRef}
             className={cn(
               "absolute top-0 left-0 pointer-events-none rounded-full z-0 will-change-transform will-change-opacity transition-[background-color,border-color,box-shadow] duration-300",
               isScrolled
                 ? "bg-white/20 backdrop-blur-md border border-white/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_8px_rgba(0,0,0,0.15)]"
-                : "bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.25)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2.5px_0_#1e3a8a] border-0"
+                : "bg-gradient-to-b from-blue-500 via-primary to-blue-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.25)] border-0"
             )}
             style={{ opacity: 0 }}
           />
@@ -358,7 +367,7 @@ export function Navbar({
                     ? "text-white"
                     : isScrolled
                     ? "text-blue-100 hover:text-white hover:bg-white/10"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/60"
+                    : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/50"
                 )}
               >
                 {item.label}
@@ -367,8 +376,8 @@ export function Navbar({
           })}
         </nav>
 
-        {/* Right Controls: GitHub Link & Theme Toggle */}
-        <div className="flex items-center gap-2.5 sm:gap-3">
+        {/* Sisi Kanan: Slot Flex Seimbang untuk Ikon GitHub */}
+        <div className="flex flex-1 items-center justify-end gap-2.5 sm:gap-3 min-w-0">
           {/* GitHub Profile Link */}
           <a
             href="https://github.com/Aldikurniawan19"
@@ -380,19 +389,16 @@ export function Navbar({
               "group relative flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-300 select-none hover:-translate-y-0.5 active:translate-y-0.5",
               isScrolled
                 ? "border border-white/25 bg-white/15 hover:bg-white/25 active:bg-white/20 backdrop-blur-sm text-white shadow-sm"
-                : "border border-slate-200/90 dark:border-slate-700 bg-gradient-to-b from-white to-slate-100 dark:from-slate-800 dark:to-slate-900 text-slate-800 dark:text-slate-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_0_#cbd5e1] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_2px_0_#0f172a]"
+                : "border border-slate-200/90 bg-gradient-to-b from-white to-slate-100 text-slate-800 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_2px_0_#cbd5e1]"
             )}
           >
             <GithubBrandIcon
               className={cn(
                 "h-4.5 w-4.5 transition-transform duration-300 group-hover:scale-110",
-                isScrolled ? "text-white" : "text-slate-800 dark:text-white"
+                isScrolled ? "text-white" : "text-slate-800"
               )}
             />
           </a>
-
-          {/* Theme Toggle Button */}
-          <ThemeToggle variant={isScrolled ? "glass" : "default"} />
         </div>
       </div>
     </header>

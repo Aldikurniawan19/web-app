@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -329,7 +329,7 @@ export function NewVersionForm({
     <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto pb-12">
       {/* Alert Error */}
       {errorMsg && (
-        <div className="flex items-start gap-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 p-4 text-xs text-rose-700 dark:text-rose-300 animate-in fade-in">
+        <div className="flex items-start gap-3 rounded-2xl bg-rose-50 border border-rose-200 p-4 text-xs text-rose-700 animate-in fade-in">
           <AlertCircle className="h-5 w-5 shrink-0 text-rose-500" />
           <div className="space-y-1">
             <span className="font-bold">Gagal Menerbitkan Versi</span>
@@ -340,7 +340,7 @@ export function NewVersionForm({
 
       {/* Alert Success */}
       {successMsg && (
-        <div className="flex items-start gap-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 p-4 text-xs text-emerald-700 dark:text-emerald-300 animate-in fade-in">
+        <div className="flex items-start gap-3 rounded-2xl bg-emerald-50 border border-emerald-200 p-4 text-xs text-emerald-700 animate-in fade-in">
           <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
           <div className="space-y-1">
             <span className="font-bold">Berhasil!</span>
@@ -350,18 +350,18 @@ export function NewVersionForm({
       )}
 
       {/* 1. Pilih Aplikasi Target */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
+            <h2 className="text-base font-bold text-slate-900 font-display flex items-center gap-2">
               <Smartphone className="h-5 w-5 text-primary" />
               <span>1. Pilih Aplikasi yang Akan Diperbarui</span>
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Pilih aplikasi terdaftar untuk menambahkan versi APK baru. Versi lama akan otomatis tersimpan di riwayat unduhan.
             </p>
           </div>
-          <span className="rounded-full bg-blue-50 dark:bg-slate-800 px-2.5 py-0.5 text-[11px] font-bold text-primary">
+          <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold text-primary">
             Aplikasi Terdaftar
           </span>
         </div>
@@ -371,13 +371,13 @@ export function NewVersionForm({
             Memuat daftar aplikasi...
           </div>
         ) : apps.length === 0 ? (
-          <div className="rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-950/20 p-4 text-xs text-amber-700 dark:text-amber-400 flex items-center gap-2">
+          <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 text-xs text-amber-700 flex items-center gap-2">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>Belum ada aplikasi yang terdaftar. Daftarkan aplikasi baru terlebih dahulu.</span>
           </div>
         ) : (
           <div className="space-y-3">
-            <label htmlFor="app-select" className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+            <label htmlFor="app-select" className="block text-xs font-semibold text-slate-700">
               Pilih Aplikasi Target:
             </label>
             <select
@@ -387,18 +387,18 @@ export function NewVersionForm({
                 setSelectedAppId(e.target.value);
                 setVersion("");
               }}
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
             >
               {apps.map((a) => (
                 <option key={a.id} value={a.id}>
-                  {a.name} — Versi Aktif: v{a.version} ({a.category})
+                  {a.name} â€” Versi Aktif: v{a.version} ({a.category})
                 </option>
               ))}
             </select>
 
             {/* Banner Info Aplikasi Aktif */}
             {currentApp && (
-              <div className="flex items-center gap-3.5 rounded-xl border border-slate-100 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-800/30 p-3.5 transition-all">
+              <div className="flex items-center gap-3.5 rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 transition-all">
                 <AppIcon
                   type={currentApp.iconType}
                   iconUrl={currentApp.iconUrl}
@@ -408,18 +408,18 @@ export function NewVersionForm({
                 />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    <span className="text-xs font-bold text-slate-900 truncate">
                       {currentApp.name}
                     </span>
                     <span className="rounded bg-primary/10 text-primary px-1.5 py-0.5 text-[10px] font-bold">
                       v{currentApp.version} Aktif
                     </span>
-                    <span className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
+                    <span className="text-[11px] text-slate-400 font-mono">
                       {currentApp.fileSize}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
-                    Berkas saat ini: <code className="font-mono text-slate-600 dark:text-slate-300">{currentApp.apkFileName || `${currentApp.id}.apk`}</code>
+                  <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                    Berkas saat ini: <code className="font-mono text-slate-600">{currentApp.apkFileName || `${currentApp.id}.apk`}</code>
                   </p>
                 </div>
               </div>
@@ -429,13 +429,13 @@ export function NewVersionForm({
       </div>
 
       {/* 2. Nomor Versi Baru */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
         <div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
+          <h2 className="text-base font-bold text-slate-900 font-display flex items-center gap-2">
             <History className="h-5 w-5 text-primary" />
             <span>2. Nomor Versi Baru (Manual)</span>
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Tentukan nomor versi rilis baru sesuai standar semantik (contoh: 1.0.1 atau 1.1.0).
           </p>
         </div>
@@ -448,7 +448,7 @@ export function NewVersionForm({
               value={version}
               onChange={(e) => setVersion(e.target.value)}
               placeholder="Contoh: 1.0.1"
-              className="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono font-bold"
+              className="flex-1 rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-mono font-bold"
             />
 
             {/* Quick Suggestion Chips */}
@@ -457,7 +457,7 @@ export function NewVersionForm({
                 <button
                   type="button"
                   onClick={() => setVersion(getSuggestedVersion("patch"))}
-                  className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:border-primary hover:text-primary transition-colors"
+                  className="rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:border-primary hover:text-primary transition-colors"
                   title="Naikkan versi patch (+0.0.1)"
                 >
                   +Patch (v{getSuggestedVersion("patch")})
@@ -465,7 +465,7 @@ export function NewVersionForm({
                 <button
                   type="button"
                   onClick={() => setVersion(getSuggestedVersion("minor"))}
-                  className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:border-primary hover:text-primary transition-colors"
+                  className="rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-1.5 text-[11px] font-semibold text-slate-700 hover:border-primary hover:text-primary transition-colors"
                   title="Naikkan versi minor (+0.1.0)"
                 >
                   +Minor (v{getSuggestedVersion("minor")})
@@ -475,9 +475,9 @@ export function NewVersionForm({
           </div>
 
           {currentApp?.version && version.trim() && (
-            <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-2 text-[11px] text-slate-500">
               <span>Transisi rilis:</span>
-              <span className="font-mono font-semibold text-slate-700 dark:text-slate-300">
+              <span className="font-mono font-semibold text-slate-700">
                 v{currentApp.version}
               </span>
               <ArrowRight className="h-3 w-3 text-slate-400" />
@@ -488,28 +488,28 @@ export function NewVersionForm({
       </div>
 
       {/* 3. Tautan Berkas APK dari GitHub Action */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
         <div className="flex items-start justify-between flex-wrap gap-2">
           <div>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
+            <h2 className="text-base font-bold text-slate-900 font-display flex items-center gap-2">
               <LinkIcon className="h-5 w-5 text-primary" />
               <span>3. Tautan Berkas APK dari GitHub Action</span>
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Tetap menggunakan tautan rilis GitHub Action agar unduhan stabil, cepat, dan terhubung dengan repositori.
             </p>
           </div>
 
           {/* Mode Switcher Tabs */}
-          <div className="flex items-center gap-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
+          <div className="flex items-center gap-1.5 rounded-xl bg-slate-100 p-1">
             <button
               type="button"
               onClick={() => setSourceMode("github-link")}
               className={cn(
                 "flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all",
                 sourceMode === "github-link"
-                  ? "bg-white dark:bg-slate-900 text-primary shadow-sm"
-                  : "text-slate-600 dark:text-slate-400 hover:text-foreground"
+                  ? "bg-white text-primary shadow-sm"
+                  : "text-slate-600 hover:text-foreground"
               )}
             >
               <LinkIcon className="h-3.5 w-3.5" />
@@ -521,8 +521,8 @@ export function NewVersionForm({
               className={cn(
                 "flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all",
                 sourceMode === "direct-upload"
-                  ? "bg-white dark:bg-slate-900 text-primary shadow-sm"
-                  : "text-slate-600 dark:text-slate-400 hover:text-foreground"
+                  ? "bg-white text-primary shadow-sm"
+                  : "text-slate-600 hover:text-foreground"
               )}
             >
               <UploadCloud className="h-3.5 w-3.5" />
@@ -532,9 +532,9 @@ export function NewVersionForm({
         </div>
 
         {sourceMode === "github-link" ? (
-          <div className="space-y-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 p-4">
+          <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/50 p-4">
             <div className="flex items-center justify-between">
-              <label htmlFor="apk-github-url" className="block text-xs font-bold text-slate-800 dark:text-slate-200">
+              <label htmlFor="apk-github-url" className="block text-xs font-bold text-slate-800">
                 Tautan Unduh APK GitHub Action / Release:
               </label>
               <button
@@ -550,23 +550,23 @@ export function NewVersionForm({
 
             {/* Picker Aset GitHub Action Modal/Dropdown */}
             {showAssetsPicker && (
-              <div className="space-y-2 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/60 dark:bg-blue-950/30 p-3 animate-in fade-in">
+              <div className="space-y-2 rounded-xl border border-blue-200 bg-blue-50/60 p-3 animate-in fade-in">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <FolderArchive className="h-4 w-4 text-primary" />
                     <span>Aset APK di Repositori GitHub Action:</span>
                   </span>
                   <button
                     type="button"
                     onClick={() => setShowAssetsPicker(false)}
-                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    className="text-slate-400 hover:text-slate-600"
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
                 </div>
 
                 {githubAssets.length === 0 ? (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 py-1">
+                  <p className="text-xs text-slate-500 py-1">
                     Tidak ditemukan aset APK pada repositori GitHub Action saat ini.
                   </p>
                 ) : (
@@ -575,14 +575,14 @@ export function NewVersionForm({
                       <div
                         key={asset.id}
                         onClick={() => handleSelectGithubAsset(asset)}
-                        className="flex items-center justify-between gap-3 p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-primary cursor-pointer transition-all hover:shadow-sm"
+                        className="flex items-center justify-between gap-3 p-2 rounded-lg bg-white border border-slate-200 hover:border-primary cursor-pointer transition-all hover:shadow-sm"
                       >
                         <div className="min-w-0">
-                          <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+                          <p className="text-xs font-bold text-slate-800 truncate">
                             {asset.name}
                           </p>
-                          <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                            Ukuran: {asset.formattedSize} • Rilis: {asset.releaseTag} • {asset.downloadCount} unduhan
+                          <p className="text-[10px] text-slate-500">
+                            Ukuran: {asset.formattedSize} â€¢ Rilis: {asset.releaseTag} â€¢ {asset.downloadCount} unduhan
                           </p>
                         </div>
                         <span className="shrink-0 text-[11px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">
@@ -617,12 +617,12 @@ export function NewVersionForm({
                   } catch {}
                 }}
                 placeholder="https://github.com/Aldikurniawan19/app-release/releases/download/.../app-release.apk"
-                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-mono"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-mono"
               />
 
               {/* Status URL Preview */}
               {apkUrl.trim() && (
-                <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 text-[11px] text-emerald-700 dark:text-emerald-300">
+                <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-700">
                   <div className="flex items-center gap-1.5 truncate">
                     <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">Tautan GitHub Action siap digunakan</span>
@@ -673,16 +673,16 @@ export function NewVersionForm({
                 "group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all cursor-pointer select-none",
                 isDragging
                   ? "border-primary bg-primary/5 scale-[1.01]"
-                  : "border-slate-300 dark:border-slate-700 hover:border-primary/60 dark:hover:border-primary/60 hover:bg-slate-50/50 dark:hover:bg-slate-800/40"
+                  : "border-slate-300 hover:border-primary/60 hover:bg-slate-50/50"
               )}
             >
               {uploadProgress !== null ? (
                 <div className="w-full max-w-xs space-y-3 py-4">
-                  <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-700">
                     <span>Mengunggah APK ke penyimpanan GitHub...</span>
                     <span>{uploadProgress}%</span>
                   </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
                     <div
                       className="h-full bg-primary transition-all duration-150"
                       style={{ width: `${uploadProgress}%` }}
@@ -691,14 +691,14 @@ export function NewVersionForm({
                 </div>
               ) : (
                 <>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 dark:bg-slate-800 text-primary group-hover:scale-110 transition-transform shadow-inner">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-primary group-hover:scale-110 transition-transform shadow-inner">
                     <UploadCloud className="h-6 w-6" />
                   </div>
                   <div className="mt-3 space-y-1">
-                    <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    <p className="text-xs font-bold text-slate-800">
                       Tarik & letakkan berkas <span className="text-primary font-mono">.apk</span> baru di sini
                     </p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <p className="text-[11px] text-slate-500">
                       atau klik untuk memilih berkas dari komputer (akan disimpan ke GitHub Releases)
                     </p>
                   </div>
@@ -707,7 +707,7 @@ export function NewVersionForm({
             </div>
 
             {apkUrl && (
-              <div className="p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/20 text-xs text-emerald-700 dark:text-emerald-300 flex items-center justify-between gap-2">
+              <div className="p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/40 text-xs text-emerald-700 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5 truncate">
                   <CheckCircle2 className="h-4 w-4 shrink-0" />
                   <span className="truncate">Berkas berhasil diunggah: <strong>{apkFileName}</strong></span>
@@ -721,7 +721,7 @@ export function NewVersionForm({
         {/* Metadata Berkas (Nama Berkas & Ukuran) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
           <div>
-            <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+            <label className="block text-[11px] font-semibold text-slate-600 mb-1">
               Nama Berkas APK:
             </label>
             <input
@@ -729,11 +729,11 @@ export function NewVersionForm({
               value={apkFileName}
               onChange={(e) => setApkFileName(e.target.value)}
               placeholder="Contoh: cashflow-v1.0.1.apk"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-mono"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-mono"
             />
           </div>
           <div>
-            <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+            <label className="block text-[11px] font-semibold text-slate-600 mb-1">
               Ukuran Berkas:
             </label>
             <input
@@ -741,20 +741,20 @@ export function NewVersionForm({
               value={fileSize}
               onChange={(e) => setFileSize(e.target.value)}
               placeholder="Contoh: 82.5 MB"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
             />
           </div>
         </div>
       </div>
 
       {/* 4. Catatan Perubahan (Changelog) */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-3">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
-          <label htmlFor="changelog-textarea" className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+          <label htmlFor="changelog-textarea" className="block text-xs font-bold text-slate-800 flex items-center gap-2">
             <FileText className="h-4 w-4 text-primary" />
             <span>4. Catatan Perubahan Versi Baru (Changelog)</span>
           </label>
-          <span className="text-[11px] text-slate-400 dark:text-slate-500">
+          <span className="text-[11px] text-slate-400">
             Ditampilkan di tab Riwayat Versi
           </span>
         </div>
@@ -765,10 +765,10 @@ export function NewVersionForm({
           onChange={(e) => setChangelog(e.target.value)}
           rows={3}
           placeholder="Contoh: Perbaikan bug pada perhitungan saldo, peningkatan performa sinkronisasi, dukungan Android 14..."
-          className="block w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 px-4 py-3 text-xs text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary focus:bg-white dark:focus:bg-slate-900 transition-all resize-none"
+          className="block w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-xs text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary focus:bg-white transition-all resize-none"
         />
 
-        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+        <p className="text-[11px] text-slate-500 leading-relaxed">
           Catatan ini akan tersimpan permanen bersama rilis ini dan dapat dibaca oleh pengguna saat melihat riwayat pembaruan di halaman katalog aplikasi.
         </p>
       </div>

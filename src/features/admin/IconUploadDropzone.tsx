@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useRef } from "react";
 import {
@@ -96,9 +96,9 @@ export function IconUploadDropzone({
 
       {previewUrl ? (
         /* Preview Card */
-        <div className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-surface-card p-4 transition-all">
+        <div className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-surface-card p-4 transition-all">
           <div className="flex items-center gap-4">
-            <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shadow-md shadow-slate-200/50 dark:shadow-none shrink-0">
+            <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 shadow-md shadow-slate-200/50 shrink-0">
               <img
                 src={previewUrl}
                 alt="Preview Ikon Aplikasi"
@@ -107,15 +107,15 @@ export function IconUploadDropzone({
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-900 dark:text-white">
+                <span className="text-xs font-bold text-slate-900">
                   Gambar Ikon Aktif
                 </span>
-                <span className="flex items-center gap-1 rounded bg-emerald-100 dark:bg-emerald-900/60 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                <span className="flex items-center gap-1 rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">
                   <CheckCircle2 className="h-3 w-3" />
                   <span>Siap Disimpan</span>
                 </span>
               </div>
-              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              <p className="text-[11px] text-slate-500">
                 Gambar akan disimpan langsung ke database Supabase.
               </p>
             </div>
@@ -125,7 +125,7 @@ export function IconUploadDropzone({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-surface px-3 py-2 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-surface px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors"
               title="Ganti gambar"
             >
               <RefreshCw className="h-3.5 w-3.5" />
@@ -134,7 +134,7 @@ export function IconUploadDropzone({
             <button
               type="button"
               onClick={handleRemove}
-              className="rounded-xl p-2 text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:text-rose-600 transition-colors"
+              className="rounded-xl p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
               title="Hapus gambar"
             >
               <X className="h-4 w-4" />
@@ -152,17 +152,17 @@ export function IconUploadDropzone({
             "group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-all cursor-pointer select-none",
             isDragging
               ? "border-primary bg-primary/5 scale-[1.01]"
-              : "border-slate-300 dark:border-slate-700 hover:border-primary/60 dark:hover:border-primary/60 hover:bg-slate-50/50 dark:hover:bg-slate-800/40"
+              : "border-slate-300 hover:border-primary/60 hover:bg-slate-50/50"
           )}
         >
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 dark:bg-slate-800 text-primary group-hover:scale-110 transition-transform shadow-inner">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-primary group-hover:scale-110 transition-transform shadow-inner">
             <ImageIcon className="h-6 w-6" />
           </div>
           <div className="mt-3 space-y-1">
-            <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+            <p className="text-sm font-bold text-slate-800">
               Pilih atau seret gambar ikon di sini
             </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-slate-500">
               Format: PNG, JPG, WebP, atau SVG (Rekomendasi rasio 1:1, maks. 4 MB)
             </p>
           </div>
@@ -170,7 +170,7 @@ export function IconUploadDropzone({
       )}
 
       {errorMsg && (
-        <div className="flex items-center gap-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 p-3 text-xs text-rose-600 dark:text-rose-400 animate-in fade-in">
+        <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-600 animate-in fade-in">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{errorMsg}</span>
         </div>

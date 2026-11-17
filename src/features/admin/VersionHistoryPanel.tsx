@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useCallback } from "react";
 import { History, Trash2, Download, FileText, AlertCircle } from "lucide-react";
@@ -71,7 +71,7 @@ export function VersionHistoryPanel({ appId }: VersionHistoryPanelProps) {
 
   if (loading) {
     return (
-      <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+      <div className="mt-6 pt-6 border-t border-slate-200">
         <div className="flex items-center gap-2 text-xs text-slate-400">
           <History className="h-3.5 w-3.5 animate-spin" />
           <span>Memuat riwayat versi...</span>
@@ -82,7 +82,7 @@ export function VersionHistoryPanel({ appId }: VersionHistoryPanelProps) {
 
   if (versions.length === 0) {
     return (
-      <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+      <div className="mt-6 pt-6 border-t border-slate-200">
         <div className="flex items-center gap-2 text-xs text-slate-400">
           <History className="h-3.5 w-3.5" />
           <span>Belum ada riwayat versi sebelumnya.</span>
@@ -92,8 +92,8 @@ export function VersionHistoryPanel({ appId }: VersionHistoryPanelProps) {
   }
 
   return (
-    <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 space-y-3">
-      <h3 className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+    <div className="mt-6 pt-6 border-t border-slate-200 space-y-3">
+      <h3 className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
         <History className="h-3.5 w-3.5 text-primary" />
         Riwayat Versi Sebelumnya ({versions.length})
       </h3>
@@ -102,7 +102,7 @@ export function VersionHistoryPanel({ appId }: VersionHistoryPanelProps) {
         {versions.map((v) => (
           <div
             key={v.id}
-            className="group relative rounded-xl border border-slate-200 dark:border-slate-700/50 bg-slate-50 dark:bg-slate-800/30 p-3.5 transition-all hover:border-primary/30 hover:bg-primary/[0.02]"
+            className="group relative rounded-xl border border-slate-200 bg-slate-50 p-3.5 transition-all hover:border-primary/30 hover:bg-primary/[0.02]"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
@@ -110,10 +110,10 @@ export function VersionHistoryPanel({ appId }: VersionHistoryPanelProps) {
                   <span className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
                     v{v.version}
                   </span>
-                  <span className="text-[11px] text-slate-400 dark:text-slate-500">
+                  <span className="text-[11px] text-slate-400">
                     {v.fileSize}
                   </span>
-                  <span className="text-[11px] text-slate-400 dark:text-slate-500">
+                  <span className="text-[11px] text-slate-400">
                     {formatDate(v.createdAt)}
                   </span>
                 </div>
@@ -121,13 +121,13 @@ export function VersionHistoryPanel({ appId }: VersionHistoryPanelProps) {
                 {v.changelog && (
                   <div className="mt-1.5 flex items-start gap-1.5">
                     <FileText className="h-3 w-3 text-slate-400 mt-0.5 shrink-0" />
-                    <p className="text-[12px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2">
+                    <p className="text-[12px] text-slate-500 leading-relaxed line-clamp-2">
                       {v.changelog}
                     </p>
                   </div>
                 )}
 
-                <p className="mt-1 text-[11px] text-slate-400 dark:text-slate-500 truncate">
+                <p className="mt-1 text-[11px] text-slate-400 truncate">
                   {v.apkFileName}
                 </p>
               </div>
@@ -145,7 +145,7 @@ export function VersionHistoryPanel({ appId }: VersionHistoryPanelProps) {
                   type="button"
                   onClick={() => handleDelete(v.id)}
                   disabled={deletingId === v.id}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all disabled:opacity-40"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-40"
                   title="Hapus versi ini"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
@@ -156,7 +156,7 @@ export function VersionHistoryPanel({ appId }: VersionHistoryPanelProps) {
         ))}
       </div>
 
-      <div className="flex items-start gap-1.5 text-[11px] text-slate-400 dark:text-slate-500">
+      <div className="flex items-start gap-1.5 text-[11px] text-slate-400">
         <AlertCircle className="h-3 w-3 mt-0.5 shrink-0" />
         <span>Maksimal 4 versi tersimpan. Versi terlama otomatis dihapus saat versi baru diunggah.</span>
       </div>

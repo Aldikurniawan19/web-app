@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { Check } from "lucide-react";
@@ -146,17 +146,17 @@ export function InstallGuideModal({
       {/* Clean Canvas Modal Dialog Box */}
       <div
         ref={dialogRef}
-        className="relative z-10 w-full max-w-xl rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl p-6 sm:p-8 space-y-6 select-none my-auto"
+        className="relative z-10 w-full max-w-xl rounded-2xl sm:rounded-3xl border border-slate-200 bg-white shadow-2xl p-6 sm:p-8 space-y-6 select-none my-auto"
       >
         {/* Simple Header */}
-        <div className="space-y-1.5 border-b border-slate-100 dark:border-slate-800/80 pb-4">
+        <div className="space-y-1.5 border-b border-slate-100 pb-4">
           <h2
             id="guide-canvas-title"
-            className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-display tracking-tight"
+            className="text-xl sm:text-2xl font-black text-slate-900 font-display tracking-tight"
           >
             Panduan Instalasi APK
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-xs sm:text-sm text-slate-500">
             {app
               ? `Langkah memasang ${app.name} di perangkat Android Anda:`
               : "Ikuti langkah praktis berikut untuk memasang aplikasi:"}
@@ -168,16 +168,16 @@ export function InstallGuideModal({
           {INSTALL_STEPS.map((step, idx) => (
             <div key={step.number} className="flex items-start gap-3.5 sm:gap-4">
               {/* Step Number Circle */}
-              <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950/70 border border-blue-200 dark:border-blue-900/60 text-primary dark:text-blue-400 font-bold text-xs sm:text-sm font-mono mt-0.5">
+              <div className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 border border-blue-200 text-primary font-bold text-xs sm:text-sm font-mono mt-0.5">
                 {step.number}
               </div>
 
               {/* Step Content */}
               <div className="flex-1 min-w-0 space-y-0.5">
-                <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white font-display">
+                <h3 className="text-xs sm:text-sm font-bold text-slate-900 font-display">
                   {step.title}
                 </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                <p className="text-xs text-slate-600 leading-relaxed">
                   {step.description}
                 </p>
               </div>
@@ -186,24 +186,24 @@ export function InstallGuideModal({
         </div>
 
         {/* Footer: Interactive Checkbox & Action Button */}
-        <div className="pt-4 border-t border-slate-100 dark:border-slate-800/80 space-y-4">
+        <div className="pt-4 border-t border-slate-100 space-y-4">
           {/* Interactive Checkbox */}
           <div
             ref={checkboxContainerRef}
             onClick={() => setIsUnderstood(!isUnderstood)}
-            className="flex items-center gap-3 cursor-pointer rounded-xl p-2.5 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
+            className="flex items-center gap-3 cursor-pointer rounded-xl p-2.5 hover:bg-slate-50 transition-colors"
           >
             <div
               className={cn(
                 "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-all duration-150",
                 isUnderstood
                   ? "bg-primary border-primary text-white shadow-xs"
-                  : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
+                  : "border-slate-300 bg-white"
               )}
             >
               {isUnderstood && <Check className="h-3.5 w-3.5 stroke-[3]" />}
             </div>
-            <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">
+            <span className="text-xs sm:text-sm font-medium text-slate-700">
               Saya sudah paham panduan ini
             </span>
           </div>
@@ -216,7 +216,7 @@ export function InstallGuideModal({
               "w-full h-11 rounded-xl text-xs sm:text-sm font-bold transition-all duration-150 flex items-center justify-center gap-2 select-none",
               isUnderstood
                 ? "cursor-pointer bg-gradient-to-b from-blue-500 via-primary to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_3px_0_#1d4ed8,0_4px_8px_rgba(37,99,235,0.25)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_4px_0_#1d4ed8,0_6px_12px_rgba(37,99,235,0.3)] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_0_#1d4ed8]"
-                : "cursor-not-allowed opacity-50 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700 shadow-none hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-400 dark:hover:text-slate-500"
+                : "cursor-not-allowed opacity-50 bg-slate-100 text-slate-400 border border-slate-200 shadow-none hover:bg-slate-100 hover:text-slate-400"
             )}
             title={
               isUnderstood

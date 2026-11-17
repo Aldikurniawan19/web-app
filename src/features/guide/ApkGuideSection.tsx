@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useRef } from "react";
 import {
@@ -329,7 +329,7 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
     <section
       ref={containerRef}
       id="panduan-apk"
-      className="relative py-14 sm:py-20 bg-slate-50/60 dark:bg-slate-900/40 border-t border-slate-200/80 dark:border-slate-800 transition-colors duration-200"
+      className="relative py-14 sm:py-20 bg-slate-50/60 border-t border-slate-200/80 transition-colors duration-200"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
@@ -339,7 +339,7 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
             <ShimmerTitleText>Pasang APK</ShimmerTitleText>
           </h2>
 
-          <p className="guide-header-anim text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-2xl mx-auto">
+          <p className="guide-header-anim text-xs sm:text-sm text-slate-500 leading-relaxed max-w-2xl mx-auto">
             Ikuti 4 langkah sederhana berikut untuk memasang aplikasi format APK langsung di smartphone atau tablet Android Anda dengan aman dan cepat.
           </p>
 
@@ -369,7 +369,7 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
             return (
               <div
                 key={item.step}
-                className="guide-step-card group relative flex flex-col justify-between rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/90 p-5 sm:p-6 shadow-xs hover:shadow-lg hover:shadow-primary/5 hover:border-primary/40 dark:hover:border-primary/40 transition-[border-color,box-shadow,background-color] duration-200 hover:-translate-y-1 will-change-transform"
+                className="guide-step-card group relative flex flex-col justify-between rounded-2xl border border-slate-200/90 bg-white p-5 sm:p-6 shadow-xs hover:shadow-lg hover:shadow-primary/5 hover:border-primary/40 transition-[border-color,box-shadow,background-color] duration-200 hover:-translate-y-1 will-change-transform"
               >
                 {/* Animasi Berkas Cahaya Mengalir di Border (Hanya pada Border) */}
                 <div className="guide-card-border-beam" aria-hidden="true">
@@ -379,7 +379,7 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
                 <div>
                   {/* Top Row: 3D Icon Badge & Step Number */}
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_2.5px_0_#1e3a8a] transition-transform duration-200 group-hover:scale-105">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-b from-blue-500 via-primary to-blue-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] transition-transform duration-200 group-hover:scale-105">
                       <Icon className="h-5 w-5" />
                     </div>
                     {/* Step Number di Kanan Atas */}
@@ -394,14 +394,14 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
                   <h3 className="mt-4 text-base font-bold text-foreground tracking-tight">
                     {item.title}
                   </h3>
-                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  <p className="mt-2 text-xs text-slate-500 leading-relaxed">
                     {item.description}
                   </p>
                 </div>
 
                 {/* Bottom Micro Tip */}
-                <div className="mt-5 pt-3.5 border-t border-slate-100 dark:border-slate-800/80 flex items-start gap-1.5 text-[11px] text-slate-400 dark:text-slate-500">
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500 dark:text-emerald-400 mt-0.5" />
+                <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-start gap-1.5 text-[11px] text-slate-400">
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500 mt-0.5" />
                   <span className="leading-snug">{item.tip}</span>
                 </div>
 
@@ -414,13 +414,13 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
                       aria-hidden="true"
                     >
                       {/* Track Garis Penghubung */}
-                      <div className="w-6 h-[2px] bg-slate-200 dark:bg-slate-800 absolute top-1/2 -translate-y-1/2" />
+                      <div className="w-6 h-[2px] bg-slate-200 absolute top-1/2 -translate-y-1/2" />
                       {/* Cahaya Berkas Mengalir di Garis Track */}
                       <div className="guide-connector-track-beam w-6 h-[2px] bg-gradient-to-r from-blue-500 via-sky-400 to-blue-600 absolute top-1/2 -translate-y-1/2 opacity-0" />
 
                       {/* Node Titik Penghubung Tengah */}
-                      <div className="guide-connector-node relative flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                        <ChevronRight className="guide-connector-icon h-4 w-4 text-slate-400 dark:text-slate-500 transition-colors" />
+                      <div className="guide-connector-node relative flex h-7 w-7 items-center justify-center rounded-full bg-white border border-slate-200 shadow-sm">
+                        <ChevronRight className="guide-connector-icon h-4 w-4 text-slate-400 transition-colors" />
                       </div>
                     </div>
 
@@ -431,10 +431,10 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
                         className="guide-connector-tablet hidden md:flex lg:hidden absolute left-[calc(100%+12px)] top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 items-center justify-center pointer-events-none"
                         aria-hidden="true"
                       >
-                        <div className="w-6 h-[2px] bg-slate-200 dark:bg-slate-800 absolute top-1/2 -translate-y-1/2" />
+                        <div className="w-6 h-[2px] bg-slate-200 absolute top-1/2 -translate-y-1/2" />
                         <div className="guide-connector-track-beam w-6 h-[2px] bg-gradient-to-r from-blue-500 via-sky-400 to-blue-600 absolute top-1/2 -translate-y-1/2 opacity-0" />
-                        <div className="guide-connector-node relative flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                          <ChevronRight className="guide-connector-icon h-4 w-4 text-slate-400 dark:text-slate-500 transition-colors" />
+                        <div className="guide-connector-node relative flex h-7 w-7 items-center justify-center rounded-full bg-white border border-slate-200 shadow-sm">
+                          <ChevronRight className="guide-connector-icon h-4 w-4 text-slate-400 transition-colors" />
                         </div>
                       </div>
                     )}
@@ -444,10 +444,10 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
                         className="guide-connector-tablet hidden md:flex lg:hidden absolute left-1/2 top-[calc(100%+12px)] -translate-x-1/2 -translate-y-1/2 z-20 items-center justify-center pointer-events-none"
                         aria-hidden="true"
                       >
-                        <div className="h-6 w-[2px] bg-slate-200 dark:bg-slate-800 absolute left-1/2 -translate-x-1/2" />
+                        <div className="h-6 w-[2px] bg-slate-200 absolute left-1/2 -translate-x-1/2" />
                         <div className="guide-connector-track-beam h-6 w-[2px] bg-gradient-to-b from-blue-500 via-sky-400 to-blue-600 absolute left-1/2 -translate-x-1/2 opacity-0" />
-                        <div className="guide-connector-node relative flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
-                          <ChevronDown className="guide-connector-icon h-4 w-4 text-slate-400 dark:text-slate-500 transition-colors" />
+                        <div className="guide-connector-node relative flex h-7 w-7 items-center justify-center rounded-full bg-white border border-slate-200 shadow-sm">
+                          <ChevronDown className="guide-connector-icon h-4 w-4 text-slate-400 transition-colors" />
                         </div>
                       </div>
                     )}
@@ -457,10 +457,10 @@ export function ApkGuideSection({ onOpenGuideModal }: ApkGuideSectionProps) {
                       className="guide-connector-mobile flex md:hidden absolute left-1/2 top-[calc(100%+8px)] sm:top-[calc(100%+12px)] -translate-x-1/2 -translate-y-1/2 z-20 items-center justify-center pointer-events-none"
                       aria-hidden="true"
                     >
-                      <div className="h-4 sm:h-6 w-[2px] bg-slate-200 dark:bg-slate-800 absolute left-1/2 -translate-x-1/2" />
+                      <div className="h-4 sm:h-6 w-[2px] bg-slate-200 absolute left-1/2 -translate-x-1/2" />
                       <div className="guide-connector-track-beam h-4 sm:h-6 w-[2px] bg-gradient-to-b from-blue-500 via-sky-400 to-blue-600 absolute left-1/2 -translate-x-1/2 opacity-0" />
-                      <div className="guide-connector-node relative flex h-6 w-6 items-center justify-center rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-xs">
-                        <ChevronDown className="guide-connector-icon h-3.5 w-3.5 text-slate-400 dark:text-slate-500 transition-colors" />
+                      <div className="guide-connector-node relative flex h-6 w-6 items-center justify-center rounded-full bg-white border border-slate-200 shadow-xs">
+                        <ChevronDown className="guide-connector-icon h-3.5 w-3.5 text-slate-400 transition-colors" />
                       </div>
                     </div>
                   </>

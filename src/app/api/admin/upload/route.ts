@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AUTH_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
 import { GithubReleaseService } from "@/services/github-release.service";
+import { ApkSecurityService } from "@/services/apk-security.service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -257,6 +258,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
+      const sha256 = ApkSecurityService.computeSha256(buffer);
       // Unggah biner APK ke GitHub Release (dengan fallback otomatis ke penyimpanan lokal)
       const uploadResult = await GithubReleaseService.uploadApkAsset(buffer, fileName);
 
@@ -268,6 +270,7 @@ export async function POST(request: NextRequest) {
           fileSize: uploadResult.fileSize,
           fileSizeBytes: uploadResult.fileSizeBytes,
           downloadUrl: uploadResult.downloadUrl,
+          sha256,
         },
       });
     } catch (githubErr: unknown) {

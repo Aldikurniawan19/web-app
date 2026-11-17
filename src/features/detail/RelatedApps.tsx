@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Download } from "lucide-react";
 import { RELATED_APPS } from "@/constants/app-store-data";
@@ -13,7 +13,7 @@ interface RelatedAppsProps {
 export function RelatedApps({ onDownloadItem }: RelatedAppsProps) {
   return (
     <div className="space-y-3">
-      <h3 className="text-base font-black text-slate-900 dark:text-white font-display select-none py-0.5">
+      <h3 className="text-base font-black text-slate-900 font-display select-none py-0.5">
         Aplikasi Terkait
       </h3>
 
@@ -21,7 +21,7 @@ export function RelatedApps({ onDownloadItem }: RelatedAppsProps) {
         {RELATED_APPS.map((item) => (
           <div
             key={item.id}
-            className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+            className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 shadow-sm hover:border-slate-300 transition-colors"
           >
             <div className="flex items-center gap-3">
               <AppIcon
@@ -35,7 +35,7 @@ export function RelatedApps({ onDownloadItem }: RelatedAppsProps) {
                 <h4 className="text-xs font-bold text-foreground">
                   {item.name}
                 </h4>
-                <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
                   <span>{item.fileSize}</span>
                 </div>
               </div>

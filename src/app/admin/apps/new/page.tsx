@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
@@ -21,12 +21,12 @@ function NewAppPageContent() {
       <div className="max-w-5xl mx-auto space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white font-display">
+            <h2 className="text-xl font-bold text-slate-900 font-display">
               {mode === "new"
                 ? "Daftarkan Aplikasi Baru"
                 : "Upload Versi Baru Manual (GitHub Action)"}
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               {mode === "new"
                 ? "Lengkapi informasi aplikasi baru, gambar ikon, screenshot, dan paket APK rilis pertama."
                 : "Perbarui berkas APK untuk aplikasi yang sudah ada menggunakan tautan unduhan dari GitHub Action."}
@@ -43,7 +43,7 @@ function NewAppPageContent() {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+        <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
           <button
             type="button"
             onClick={() => setMode("new")}
@@ -51,7 +51,7 @@ function NewAppPageContent() {
               "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all select-none",
               mode === "new"
                 ? "bg-primary text-white shadow-sm shadow-primary/20"
-                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-foreground"
+                : "bg-slate-100 text-slate-600 hover:text-foreground"
             )}
           >
             <Plus className="h-4 w-4" />
@@ -65,7 +65,7 @@ function NewAppPageContent() {
               "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all select-none",
               mode === "version"
                 ? "bg-primary text-white shadow-sm shadow-primary/20"
-                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-foreground"
+                : "bg-slate-100 text-slate-600 hover:text-foreground"
             )}
           >
             <History className="h-4 w-4" />

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -135,7 +135,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
       {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 p-6 sm:p-8 text-white shadow-xl shadow-blue-600/10">
+      <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 p-6 sm:p-8 text-white shadow-xl shadow-blue-600/10">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-bold backdrop-blur-sm">
@@ -190,81 +190,81 @@ export default function AdminDashboardPage() {
       {/* Metrics Cards Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Metric 1: Total Apps */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-3">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold text-slate-500">
               Total Aplikasi APK
             </span>
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950/60 text-primary">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-primary">
               <Layers className="h-5 w-5" />
             </div>
           </div>
           <div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white font-display">
+            <div className="text-2xl font-black text-slate-900 font-display">
               {stats.totalApps} Aplikasi
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-[11px] text-slate-500 mt-0.5">
               Dalam {stats.categoriesCount} kategori aktif
             </p>
           </div>
         </div>
 
         {/* Metric 2: Total Projek Web */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-3">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold text-slate-500">
               Total Projek Web
             </span>
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
               <Globe className="h-5 w-5" />
             </div>
           </div>
           <div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white font-display">
+            <div className="text-2xl font-black text-slate-900 font-display">
               {webProjects.length} Projek
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-[11px] text-slate-500 mt-0.5">
               Ditampilkan di filter web publik
             </p>
           </div>
         </div>
 
         {/* Metric 3: Total Storage */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-3">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold text-slate-500">
               Penyimpanan APK
             </span>
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
               <HardDrive className="h-5 w-5" />
             </div>
           </div>
           <div>
-            <div className="text-2xl font-black text-slate-900 dark:text-white font-display">
+            <div className="text-2xl font-black text-slate-900 font-display">
               {stats.totalStorageFormatted}
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-[11px] text-slate-500 mt-0.5">
               Akumulasi ukuran berkas paket
             </p>
           </div>
         </div>
 
         {/* Metric 4: System Status */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-3">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold text-slate-500">
               Status Sistem
             </span>
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 text-purple-600">
               <ShieldCheck className="h-5 w-5" />
             </div>
           </div>
           <div>
-            <div className="flex items-center gap-1.5 text-lg font-black text-emerald-600 dark:text-emerald-400 font-display">
+            <div className="flex items-center gap-1.5 text-lg font-black text-emerald-600 font-display">
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>Optimal</span>
             </div>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-[11px] text-slate-500 mt-0.5">
               Database Supabase aktif
             </p>
           </div>
@@ -272,19 +272,19 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Main Catalog Management Table Section with Tabs */}
-      <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+      <div className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
         {/* Table Header & Search Filter */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 border-b border-slate-100">
           <div className="space-y-3">
             {/* Tab Switcher: Aplikasi APK vs Projek Web */}
-            <div className="inline-flex items-center rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-800/80 p-1 shadow-inner">
+            <div className="inline-flex items-center rounded-2xl border border-slate-200 bg-slate-100/80 p-1 shadow-inner">
               <button
                 type="button"
                 onClick={() => setActiveTab("apps")}
                 className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all select-none ${
                   activeTab === "apps"
                     ? "bg-primary text-white shadow-sm"
-                    : "text-slate-600 dark:text-slate-400 hover:text-foreground"
+                    : "text-slate-600 hover:text-foreground"
                 }`}
               >
                 <Layers className="h-3.5 w-3.5" />
@@ -297,7 +297,7 @@ export default function AdminDashboardPage() {
                 className={`flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-all select-none ${
                   activeTab === "web"
                     ? "bg-primary text-white shadow-sm"
-                    : "text-slate-600 dark:text-slate-400 hover:text-foreground"
+                    : "text-slate-600 hover:text-foreground"
                 }`}
               >
                 <Globe className="h-3.5 w-3.5" />
@@ -305,7 +305,7 @@ export default function AdminDashboardPage() {
               </button>
             </div>
 
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-slate-500">
               {activeTab === "apps"
                 ? "Daftar seluruh berkas APK yang tersedia dan dipublikasikan di katalog."
                 : "Daftar karya projek web lengkap dengan foto tampilan sekilas dan teknologi."}
@@ -321,7 +321,7 @@ export default function AdminDashboardPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={activeTab === "apps" ? "Cari aplikasi..." : "Cari projek web..."}
-                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 pl-9 pr-3.5 py-2 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3.5 py-2 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
               />
             </div>
 
@@ -347,7 +347,7 @@ export default function AdminDashboardPage() {
         {activeTab === "apps" && (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+              <thead className="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100">
                 <tr>
                   <th className="py-3.5 px-6">Aplikasi</th>
                   <th className="py-3.5 px-4">Kategori</th>
@@ -357,7 +357,7 @@ export default function AdminDashboardPage() {
                   <th className="py-3.5 px-6 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+              <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
                     <td colSpan={6} className="py-12 text-center text-slate-400">
@@ -374,7 +374,7 @@ export default function AdminDashboardPage() {
                   filteredApps.map((app) => (
                     <tr
                       key={app.id}
-                      className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors"
+                      className="hover:bg-slate-50/70 transition-colors"
                     >
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
@@ -386,10 +386,10 @@ export default function AdminDashboardPage() {
                             className="h-9 w-9 rounded-xl shrink-0"
                           />
                           <div className="min-w-0 max-w-xs">
-                            <p className="font-bold text-slate-900 dark:text-white truncate">
+                            <p className="font-bold text-slate-900 truncate">
                               {app.name}
                             </p>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                            <p className="text-[11px] text-slate-500 truncate">
                               {app.description}
                             </p>
                           </div>
@@ -397,20 +397,20 @@ export default function AdminDashboardPage() {
                       </td>
 
                       <td className="py-4 px-4">
-                        <span className="rounded-md bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 text-[11px] font-semibold text-primary dark:text-blue-400 border border-blue-100 dark:border-blue-900/50">
+                        <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-primary border border-blue-100">
                           {app.category}
                         </span>
                       </td>
 
-                      <td className="py-4 px-4 font-mono text-slate-700 dark:text-slate-300">
+                      <td className="py-4 px-4 font-mono text-slate-700">
                         v{app.version}
                       </td>
 
-                      <td className="py-4 px-4 font-mono text-slate-500 dark:text-slate-400">
+                      <td className="py-4 px-4 font-mono text-slate-500">
                         {app.fileSize}
                       </td>
 
-                      <td className="py-4 px-4 text-slate-600 dark:text-slate-400">
+                      <td className="py-4 px-4 text-slate-600">
                         {app.developer}
                       </td>
 
@@ -419,7 +419,7 @@ export default function AdminDashboardPage() {
                           <Link href={`/admin/apps/${app.id}/edit`}>
                             <button
                               type="button"
-                              className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary transition-colors"
+                              className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-primary transition-colors"
                               title="Edit aplikasi"
                             >
                               <Edit className="h-4 w-4" />
@@ -429,7 +429,7 @@ export default function AdminDashboardPage() {
                           <button
                             type="button"
                             onClick={() => setDeleteTargetApp(app)}
-                            className="rounded-lg p-1.5 text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 transition-colors"
+                            className="rounded-lg p-1.5 text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-colors"
                             title="Hapus aplikasi"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -448,7 +448,7 @@ export default function AdminDashboardPage() {
         {activeTab === "web" && (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100 dark:border-slate-800">
+              <thead className="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-100">
                 <tr>
                   <th className="py-3.5 px-6">Projek Web</th>
                   <th className="py-3.5 px-4">Kategori</th>
@@ -457,7 +457,7 @@ export default function AdminDashboardPage() {
                   <th className="py-3.5 px-6 text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+              <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
                     <td colSpan={5} className="py-12 text-center text-slate-400">
@@ -474,7 +474,7 @@ export default function AdminDashboardPage() {
                   filteredWebProjects.map((project) => (
                     <tr
                       key={project.id}
-                      className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors"
+                      className="hover:bg-slate-50/70 transition-colors"
                     >
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
@@ -482,18 +482,18 @@ export default function AdminDashboardPage() {
                             <img
                               src={project.imageUrl}
                               alt={project.name}
-                              className="h-10 w-14 rounded-lg object-cover object-top border border-slate-200 dark:border-slate-700 shrink-0"
+                              className="h-10 w-14 rounded-lg object-cover object-top border border-slate-200 shrink-0"
                             />
                           ) : (
-                            <div className="flex h-10 w-14 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 shrink-0">
+                            <div className="flex h-10 w-14 items-center justify-center rounded-lg bg-slate-100 text-slate-400 shrink-0">
                               <Globe className="h-5 w-5" />
                             </div>
                           )}
                           <div className="min-w-0 max-w-xs">
-                            <p className="font-bold text-slate-900 dark:text-white truncate">
+                            <p className="font-bold text-slate-900 truncate">
                               {project.name}
                             </p>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                            <p className="text-[11px] text-slate-500 truncate">
                               {project.description}
                             </p>
                           </div>
@@ -501,7 +501,7 @@ export default function AdminDashboardPage() {
                       </td>
 
                       <td className="py-4 px-4">
-                        <span className="rounded-md bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/50">
+                        <span className="rounded-md bg-indigo-50 px-2 py-0.5 text-[11px] font-semibold text-indigo-600 border border-indigo-100">
                           {project.category}
                         </span>
                       </td>
@@ -511,7 +511,7 @@ export default function AdminDashboardPage() {
                           {project.technologies.slice(0, 3).map((t, idx) => (
                             <span
                               key={`${project.id}-t-${idx}`}
-                              className="rounded border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-700 dark:text-slate-300"
+                              className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-700"
                             >
                               {t}
                             </span>
@@ -545,7 +545,7 @@ export default function AdminDashboardPage() {
                           <Link href={`/admin/web-projects/${project.id}/edit`}>
                             <button
                               type="button"
-                              className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary transition-colors"
+                              className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-primary transition-colors"
                               title="Edit projek web"
                             >
                               <Edit className="h-4 w-4" />
@@ -555,7 +555,7 @@ export default function AdminDashboardPage() {
                           <button
                             type="button"
                             onClick={() => setDeleteTargetWeb(project)}
-                            className="rounded-lg p-1.5 text-slate-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 transition-colors"
+                            className="rounded-lg p-1.5 text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-colors"
                             title="Hapus projek web"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -574,16 +574,16 @@ export default function AdminDashboardPage() {
       {/* Delete App Confirmation Modal */}
       {deleteTargetApp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-sm rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl space-y-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400">
+          <div className="w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
               <AlertCircle className="h-6 w-6" />
             </div>
 
             <div className="space-y-1">
-              <h4 className="text-base font-bold text-slate-900 dark:text-white font-display">
+              <h4 className="text-base font-bold text-slate-900 font-display">
                 Konfirmasi Hapus Aplikasi
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              <p className="text-xs text-slate-500 leading-relaxed">
                 Apakah Anda yakin ingin menghapus <strong>{deleteTargetApp.name}</strong> dari katalog? Tindakan ini tidak dapat dibatalkan.
               </p>
             </div>
@@ -613,16 +613,16 @@ export default function AdminDashboardPage() {
       {/* Delete Web Project Confirmation Modal */}
       {deleteTargetWeb && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-sm rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl space-y-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400">
+          <div className="w-full max-w-sm rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
               <AlertCircle className="h-6 w-6" />
             </div>
 
             <div className="space-y-1">
-              <h4 className="text-base font-bold text-slate-900 dark:text-white font-display">
+              <h4 className="text-base font-bold text-slate-900 font-display">
                 Konfirmasi Hapus Projek Web
               </h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              <p className="text-xs text-slate-500 leading-relaxed">
                 Apakah Anda yakin ingin menghapus <strong>{deleteTargetWeb.name}</strong> dari katalog? Tindakan ini tidak dapat dibatalkan.
               </p>
             </div>

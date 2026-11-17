@@ -53,10 +53,10 @@ export default function EditAppPage({ params }: EditAppPageProps) {
   if (errorMsg || !app) {
     return (
       <div className="max-w-md mx-auto py-16 text-center space-y-3">
-        <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-2xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400">
+        <div className="flex h-12 w-12 mx-auto items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
           <AlertCircle className="h-6 w-6" />
         </div>
-        <h3 className="text-base font-bold text-slate-900 dark:text-white">
+        <h3 className="text-base font-bold text-slate-900">
           Aplikasi Tidak Ditemukan
         </h3>
         <p className="text-xs text-slate-500">
@@ -69,10 +69,10 @@ export default function EditAppPage({ params }: EditAppPageProps) {
   return (
     <div className="space-y-6">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white font-display">
+        <h2 className="text-xl font-bold text-slate-900 font-display">
           Edit Informasi & Deskripsi: {app.name}
         </h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+        <p className="text-xs text-slate-500 mt-0.5">
           Perbarui berkas APK, deskripsi, rilis versi baru, atau sesuaikan fitur unggulan.
         </p>
       </div>

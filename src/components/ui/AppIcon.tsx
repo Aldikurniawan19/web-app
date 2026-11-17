@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import {
   FileText,
   GraduationCap,
@@ -58,7 +58,7 @@ export function AppIcon({
     return (
       <div
         className={cn(
-          "relative overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 shadow-md shadow-slate-200/50 dark:shadow-none transition-transform duration-200 shrink-0",
+          "relative overflow-hidden bg-slate-100 border border-slate-200/80 shadow-md shadow-slate-200/50 transition-transform duration-200 shrink-0",
           imageContainerSizeStyles[size],
           className
         )}

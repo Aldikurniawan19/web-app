@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { AppItem, AppVersionItem, CreateAppInput, ReleaseNewVersionInput } from "@/types/store";
 import { GithubReleaseService } from "./github-release.service";
+import { ApkSecurityService } from "./apk-security.service";
 
 const MAX_VERSIONS_PER_APP = 4;
 
@@ -163,6 +164,16 @@ export class AppStorageService {
 
         const mapped = records.map(this.mapToAppItem);
 
+        // Lampirkan ringkasan scan keamanan APK dalam 1 query batch (menghindari N+1)
+        const scanMap = await ApkSecurityService.getLatestScansMapForApps(
+          mapped.map((a) => ({ id: a.id, version: a.version }))
+        );
+        for (const app of mapped) {
+          if (scanMap[app.id]) {
+            app.securityScan = scanMap[app.id];
+          }
+        }
+
         // Sinkronkan downloadsCount & URL GitHub Releases secara real-time dari akumulasi unduhan aset GitHub Releases
         try {
           const statsMap = await GithubReleaseService.getAllAppsDownloadStats(
@@ -221,6 +232,13 @@ export class AppStorageService {
       );
       if (record) {
         const item = this.mapToAppItem(record);
+
+        const scanMap = await ApkSecurityService.getLatestScansMapForApps([
+          { id: item.id, version: item.version },
+        ]);
+        if (scanMap[item.id]) {
+          item.securityScan = scanMap[item.id];
+        }
 
         // Sinkronkan downloadsCount aktual & URL GitHub Releases dari akumulasi unduhan seluruh rilis GitHub
         try {
@@ -374,6 +392,7 @@ export class AppStorageService {
     delete dataToUpdate.id;
     delete dataToUpdate.versions;
     delete dataToUpdate.changelog;
+    delete dataToUpdate.securityScan;
 
     // 1. Jika perlu mengarsipkan versi lama, simpan ke tabel app_versions
     if (shouldArchive && existingApp.apkUrl && existingApp.apkFileName) {
@@ -604,11 +623,14 @@ export class AppStorageService {
         })
       );
 
+      const versionScansMap = await ApkSecurityService.getVersionScansMap(appId);
+
       return records.map((r) => {
         const apkFile = r.apkFileName || `${appId}-${r.version}.apk`;
         const defaultGithubUrl = `https://github.com/Aldikurniawan19/app-release/releases/download/apk-releases/${apkFile}`;
         const resolvedApkUrl =
           r.apkUrl && !r.apkUrl.startsWith("/downloads/") ? r.apkUrl : defaultGithubUrl;
+        const cleanVer = r.version.trim().replace(/^v/i, "");
 
         return {
           id: r.id,
@@ -618,6 +640,7 @@ export class AppStorageService {
           apkFileName: apkFile,
           changelog: r.changelog,
           createdAt: r.createdAt.toISOString(),
+          securityScan: versionScansMap[cleanVer],
         };
       });
     } catch (err) {

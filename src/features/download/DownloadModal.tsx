@@ -12,6 +12,7 @@ import {
   Smartphone,
   HardDrive,
   History,
+  ExternalLink,
 } from "lucide-react";
 import { AppItem, AppVersionItem } from "@/types/store";
 import { AppIcon } from "@/components/ui/AppIcon";
@@ -181,7 +182,7 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
       isOpen={isOpen}
       onClose={onClose}
       title="Unduh Aplikasi"
-      className="max-w-md bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-foreground"
+      className="max-w-md bg-white border-slate-200 text-foreground"
     >
       <div className="space-y-6">
         {/* Play Store Header with Circular Progress Ring around App Icon */}
@@ -202,7 +203,7 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
                 cy="40"
                 r={circleRadius}
                 fill="transparent"
-                className="stroke-slate-200 dark:stroke-slate-800"
+                className="stroke-slate-200"
                 strokeWidth="3.5"
               />
 
@@ -217,7 +218,7 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
                     "transition-all duration-200 ease-out",
                     stage === "completed"
                       ? "stroke-emerald-500"
-                      : "stroke-emerald-600 dark:stroke-emerald-400"
+                      : "stroke-emerald-600"
                   )}
                   strokeWidth="3.5"
                   strokeLinecap="round"
@@ -234,7 +235,7 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
                   cy="40"
                   r={circleRadius}
                   fill="transparent"
-                  className="stroke-emerald-600 dark:stroke-emerald-400"
+                  className="stroke-emerald-600"
                   strokeWidth="3.5"
                   strokeLinecap="round"
                   strokeDasharray="60 166.19"
@@ -264,51 +265,51 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
 
           {/* App Title & Dynamic Play Store Status */}
           <div className="min-w-0 flex-1 pt-0.5">
-            <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-display truncate leading-tight">
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 font-display truncate leading-tight">
               {app.name}
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
+            <p className="text-xs text-slate-500 mt-0.5 truncate">
               {app.developer}
             </p>
 
             {/* Dynamic Status Line */}
             <div className="mt-1.5">
               {stage === "idle" && (
-                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <div className="flex items-center gap-2 text-xs text-slate-500">
                   <span>{activeFileSize}</span>
-                  <span>•</span>
+                  <span>â€¢</span>
                   <span>Versi {activeVersion}</span>
                 </div>
               )}
 
               {stage === "preparing" && (
-                <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 animate-pulse">
+                <div className="text-xs font-semibold text-emerald-600 animate-pulse">
                   Menunggu download...
                 </div>
               )}
 
               {stage === "downloading" && (
                 <div className="space-y-0.5">
-                  <div className="text-xs font-bold text-slate-800 dark:text-slate-200 font-mono">
+                  <div className="text-xs font-bold text-slate-800 font-mono">
                     {downloadedMb} MB / {totalMb} MB ({downloadProgress}%)
                   </div>
-                  <div className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
-                    {downloadSpeed} • {timeLeft}
+                  <div className="text-[11px] text-slate-400 font-mono">
+                    {downloadSpeed} â€¢ {timeLeft}
                   </div>
                 </div>
               )}
 
               {stage === "verifying" && (
-                <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 animate-pulse flex items-center gap-1.5">
+                <div className="text-xs font-semibold text-emerald-600 animate-pulse flex items-center gap-1.5">
                   <Smartphone className="h-3.5 w-3.5 animate-bounce" />
                   <span>Memverifikasi paket APK...</span>
                 </div>
               )}
 
               {stage === "completed" && (
-                <div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <div className="text-xs font-bold text-emerald-600 flex items-center gap-1">
                   <CheckCircle2 className="h-3.5 w-3.5" />
-                  <span>Download selesai • Siap dipasang</span>
+                  <span>Download selesai â€¢ Siap dipasang</span>
                 </div>
               )}
             </div>
@@ -317,13 +318,13 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
 
         {/* Opsi Pemilihan Versi APK jika terdapat riwayat versi */}
         {versions.length > 0 && (
-          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 p-3 space-y-1.5">
+          <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <label htmlFor="version-select" className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+              <label htmlFor="version-select" className="font-bold text-slate-700 flex items-center gap-1.5">
                 <History className="h-3.5 w-3.5 text-primary" />
                 <span>Pilih Versi APK:</span>
               </label>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+              <span className="text-[11px] text-slate-500">
                 {selectedVersionId === "latest" ? "Rilis Terkini" : "Rilis Terdahulu"}
               </span>
             </div>
@@ -337,25 +338,62 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
                 setDownloadProgress(0);
               }}
               disabled={stage === "downloading" || stage === "verifying"}
-              className="w-full text-xs font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-slate-800 dark:text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
+              className="w-full text-xs font-semibold rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors"
             >
               <option value="latest">
-                v{app.version} (Terbaru) • {app.fileSize}
+                v{app.version} (Terbaru) â€¢ {app.fileSize}
               </option>
               {versions.map((v) => (
                 <option key={v.id} value={v.id}>
-                  v{v.version} • {v.fileSize}
+                  v{v.version} â€¢ {v.fileSize}
                 </option>
               ))}
             </select>
 
             {selectedArchived?.changelog && (
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight pt-0.5">
+              <p className="text-[11px] text-slate-500 leading-tight pt-0.5">
                 Catatan: {selectedArchived.changelog}
               </p>
             )}
           </div>
         )}
+
+        {/* Ringkasan Keamanan Versi APK yang Dipilih */}
+        {(() => {
+          const activeSecurityScan = selectedArchived
+            ? selectedArchived.securityScan
+            : app.securityScan;
+          if (activeSecurityScan?.status === "clean") {
+            return (
+              <div className="flex items-center justify-between gap-2 rounded-xl border border-emerald-200 bg-success-subtle px-3.5 py-2.5 text-xs">
+                <div className="flex items-center gap-2 min-w-0 text-emerald-800 font-semibold">
+                  <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
+                  <span className="truncate">
+                    Bebas virus ({activeSecurityScan.maliciousCount}/{activeSecurityScan.totalEngines} mesin antivirus)
+                  </span>
+                </div>
+                {activeSecurityScan.permalink && (
+                  <a
+                    href={activeSecurityScan.permalink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex shrink-0 items-center gap-1 text-[11px] font-bold text-emerald-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                  >
+                    <span>Bukti</span>
+                    <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                  </a>
+                )}
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex items-center gap-2 rounded-xl border border-border bg-background-soft px-3.5 py-2 text-[11px] text-foreground-muted">
+              <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-foreground-subtle" aria-hidden="true" />
+              <span>Berkas diambil langsung dari repositori rilis resmi pengembang.</span>
+            </div>
+          );
+        })()}
 
         {/* Play Store Interactive Action Controls */}
         <div>
@@ -364,7 +402,7 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
             <button
               type="button"
               onClick={handleStartDownload}
-              className="w-full h-11 rounded-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 select-none"
+              className="w-full h-11 rounded-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 select-none"
             >
               <Download className="h-4 w-4" />
               <span>Download ({activeFileSize})</span>
@@ -377,7 +415,7 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
               <button
                 type="button"
                 onClick={handleCancel}
-                className="w-full h-10 rounded-full border border-slate-300 dark:border-slate-700 text-emerald-700 dark:text-emerald-400 hover:bg-slate-50 dark:hover:bg-slate-800/80 font-bold text-xs transition-colors flex items-center justify-center gap-1.5"
+                className="w-full h-10 rounded-full border border-slate-300 text-emerald-700 hover:bg-slate-50 font-bold text-xs transition-colors flex items-center justify-center gap-1.5"
               >
                 <X className="h-4 w-4" />
                 <span>Batalkan</span>
@@ -391,7 +429,7 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
               <button
                 type="button"
                 onClick={handleGoToGuide}
-                className="w-full h-11 rounded-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 select-none"
+                className="w-full h-11 rounded-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 select-none"
               >
                 <BookOpen className="h-4 w-4" />
                 <span>Buka Panduan Pasang APK</span>
@@ -402,7 +440,7 @@ export function DownloadModal({ app, isOpen, onClose, onOpenGuide }: DownloadMod
         </div>
 
         {/* Footer info */}
-        <p className="text-center text-[10px] text-slate-400 dark:text-slate-500 font-mono">
+        <p className="text-center text-[10px] text-slate-400 font-mono">
           Paket: {getInstallerName()}
         </p>
       </div>

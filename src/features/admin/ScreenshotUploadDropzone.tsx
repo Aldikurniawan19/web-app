@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useRef } from "react";
 import {
@@ -152,10 +152,10 @@ export function ScreenshotUploadDropzone({
       {/* Header Info & Limit Indicator */}
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
-          <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+          <span className="text-xs font-bold text-slate-700">
             Daftar Screenshot Tampilan Aplikasi
           </span>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+          <p className="text-[11px] text-slate-500">
             Format PNG, JPG, atau WebP (Rekomendasi rasio vertikal HP atau horizontal, maks. 5 MB).
           </p>
         </div>
@@ -163,8 +163,8 @@ export function ScreenshotUploadDropzone({
           className={cn(
             "rounded-full px-2.5 py-0.5 text-[11px] font-bold border",
             screenshots.length >= maxScreenshots
-              ? "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/50 dark:text-amber-400 dark:border-amber-900"
-              : "bg-blue-50 text-primary border-blue-200 dark:bg-blue-950/50 dark:text-blue-400 dark:border-blue-900"
+              ? "bg-amber-50 text-amber-600 border-amber-200"
+              : "bg-blue-50 text-primary border-blue-200"
           )}
         >
           {screenshots.length} / {maxScreenshots} Screenshot
@@ -186,10 +186,10 @@ export function ScreenshotUploadDropzone({
           {screenshots.map((sc, idx) => (
             <div
               key={sc.id || idx}
-              className="group relative flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 p-3 shadow-xs space-y-3 transition-all hover:border-primary/40 hover:shadow-sm"
+              className="group relative flex flex-col justify-between rounded-2xl border border-slate-200 bg-slate-50/50 p-3 shadow-xs space-y-3 transition-all hover:border-primary/40 hover:shadow-sm"
             >
               {/* Image Preview & Order Badge */}
-              <div className="relative aspect-[9/16] max-h-56 w-full overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
+              <div className="relative aspect-[9/16] max-h-56 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100 flex items-center justify-center">
                 {sc.imageUrl ? (
                   <img
                     src={sc.imageUrl}
@@ -244,7 +244,7 @@ export function ScreenshotUploadDropzone({
               {/* Title & Description Form per Screenshot */}
               <div className="space-y-2">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                  <label className="text-[10px] font-bold text-slate-600">
                     Judul Tampilan
                   </label>
                   <input
@@ -252,11 +252,11 @@ export function ScreenshotUploadDropzone({
                     value={sc.title}
                     onChange={(e) => handleUpdateScreenshot(idx, "title", e.target.value)}
                     placeholder="Contoh: Halaman Beranda"
-                    className="mt-0.5 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:outline-none"
+                    className="mt-0.5 w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                  <label className="text-[10px] font-bold text-slate-600">
                     Keterangan Singkat
                   </label>
                   <input
@@ -264,7 +264,7 @@ export function ScreenshotUploadDropzone({
                     value={sc.description}
                     onChange={(e) => handleUpdateScreenshot(idx, "description", e.target.value)}
                     placeholder="Contoh: Mode gelap adaptif"
-                    className="mt-0.5 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-2.5 py-1 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:outline-none"
+                    className="mt-0.5 w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:outline-none"
                   />
                 </div>
               </div>
@@ -284,19 +284,19 @@ export function ScreenshotUploadDropzone({
             "group relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-all cursor-pointer select-none",
             isDragging
               ? "border-primary bg-primary/5 scale-[1.005]"
-              : "border-slate-300 dark:border-slate-700 hover:border-primary/60 dark:hover:border-primary/60 hover:bg-slate-50/50 dark:hover:bg-slate-800/40"
+              : "border-slate-300 hover:border-primary/60 hover:bg-slate-50/50"
           )}
         >
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 dark:bg-slate-800 text-primary group-hover:scale-110 transition-transform shadow-inner">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-primary group-hover:scale-110 transition-transform shadow-inner">
             <Upload className="h-5 w-5" />
           </div>
           <div className="mt-2.5 space-y-1">
-            <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
+            <p className="text-xs font-bold text-slate-800">
               {screenshots.length === 0
                 ? "Pilih atau seret hingga 8 gambar screenshot aplikasi ke sini"
                 : `Tambah gambar screenshot lainnya (tersisa ${maxScreenshots - screenshots.length} slot)`}
             </p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            <p className="text-[11px] text-slate-500">
               Dapat memilih beberapa gambar sekaligus (Format: PNG, JPG, WebP)
             </p>
           </div>
@@ -305,7 +305,7 @@ export function ScreenshotUploadDropzone({
 
       {/* Error alert */}
       {errorMsg && (
-        <div className="flex items-center gap-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 p-3 text-xs text-rose-600 dark:text-rose-400 animate-in fade-in">
+        <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3 text-xs text-rose-600 animate-in fade-in">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{errorMsg}</span>
         </div>

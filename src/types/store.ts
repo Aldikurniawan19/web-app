@@ -1,3 +1,5 @@
+import type { ApkSecuritySummary } from "./security";
+
 export type AppPlatform = "android";
 
 export type AppCategory =
@@ -25,6 +27,7 @@ export interface AppVersionItem {
   apkFileName: string;
   changelog: string;
   createdAt: string;
+  securityScan?: ApkSecuritySummary;
 }
 
 export interface AppItem {
@@ -55,6 +58,7 @@ export interface AppItem {
   apkUrl?: string;
   apkFileName?: string;
   versions?: AppVersionItem[];
+  securityScan?: ApkSecuritySummary;
 }
 
 export interface RelatedAppItem {

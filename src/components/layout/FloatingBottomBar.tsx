@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, LayoutGrid, BookOpen } from "lucide-react";
+import { Home, LayoutGrid, ShieldCheck, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import gsap from "gsap";
 
@@ -25,6 +25,7 @@ export function FloatingBottomBar({
   const navItems = [
     { id: "beranda", label: "Beranda", icon: Home },
     { id: "aplikasi", label: "Aplikasi", icon: LayoutGrid },
+    { id: "keamanan", label: "Keamanan", icon: ShieldCheck },
     { id: "panduan", label: "Panduan", icon: BookOpen },
   ];
 
@@ -47,7 +48,7 @@ export function FloatingBottomBar({
     const targetWidth = targetBtn.offsetWidth;
     const targetHeight = targetBtn.offsetHeight;
 
-    const navIds = ["beranda", "aplikasi", "panduan"];
+    const navIds = ["beranda", "aplikasi", "keamanan", "panduan"];
     const targetIndex = navIds.indexOf(activeNav);
     const prevNav = prevNavRef.current;
     const prevIndex = prevNav ? navIds.indexOf(prevNav) : -1;
@@ -81,6 +82,7 @@ export function FloatingBottomBar({
     const isMovingRight = targetX > startX;
 
     gsap.killTweensOf(pillEl);
+    gsap.set(pillEl, { opacity: 1, scaleY: 1 });
 
     // Animasi pergerakan fluida independen: ujung depan melesat lebih dulu, ujung ekor menyusul
     // sehingga pill benar-benar "molor" dan meluncur ke arah tujuan (bukan membesar di tempat)
@@ -208,6 +210,10 @@ export function FloatingBottomBar({
     }
 
     prevNavRef.current = activeNav;
+
+    return () => {
+      tl.kill();
+    };
   }, [activeNav]);
 
   useEffect(() => {
@@ -239,6 +245,8 @@ export function FloatingBottomBar({
         router.push("/");
       } else if (id === "aplikasi") {
         router.push("/aplikasi");
+      } else if (id === "keamanan") {
+        router.push("/#keamanan");
       } else if (id === "panduan") {
         router.push("/#panduan-apk");
       }
@@ -250,16 +258,16 @@ export function FloatingBottomBar({
   return (
     <aside
       aria-label="Navigasi Menu Mobile"
-      className="md:hidden fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 select-none w-[calc(100vw-32px)] max-w-sm sm:max-w-md sm:w-auto pointer-events-auto"
+      className="md:hidden fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 select-none w-[calc(100vw-24px)] max-w-md sm:w-auto pointer-events-auto"
     >
       <nav
         ref={navRef}
-        className="relative flex items-center justify-between sm:justify-center gap-1.5 sm:gap-2 p-2 sm:p-2.5 rounded-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200/90 dark:border-slate-700/80 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.2),0_0_0_1px_rgba(0,0,0,0.04)] dark:shadow-[0_16px_40px_-8px_rgba(0,0,0,0.8),0_0_0_1px_rgba(255,255,255,0.06)] w-full"
+        className="relative flex items-center justify-between sm:justify-center gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-full bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_16px_40px_-8px_rgba(15,23,42,0.2),0_0_0_1px_rgba(0,0,0,0.04)] w-full"
       >
-        {/* Animated Sliding Jelly Indicator Pill — Diposisikan top-0 left-0 agar translate akurat 100% */}
+        {/* Animated Sliding Jelly Indicator Pill â€” Diposisikan top-0 left-0 agar translate akurat 100% */}
         <div
           ref={activePillRef}
-          className="absolute top-0 left-0 pointer-events-none rounded-full bg-gradient-to-b from-blue-500 via-primary to-blue-700 dark:from-blue-400 dark:via-blue-600 dark:to-blue-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_6px_rgba(37,99,235,0.35)] z-0 will-change-transform will-change-opacity"
+          className="absolute top-0 left-0 pointer-events-none rounded-full bg-gradient-to-b from-blue-500 via-primary to-blue-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2.5px_6px_rgba(37,99,235,0.35)] z-0 will-change-transform will-change-opacity"
           style={{ opacity: 0 }}
         />
 
@@ -277,14 +285,14 @@ export function FloatingBottomBar({
               onClick={() => handleClick(item.id)}
               aria-label={item.label}
               className={cn(
-                "relative z-10 flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4.5 sm:px-6 py-3.5 sm:py-4 rounded-full text-xs sm:text-sm font-bold transition-colors duration-200 select-none active:scale-95",
+                "relative z-10 flex-1 sm:flex-initial flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-2 px-2 sm:px-5 py-2 sm:py-3.5 rounded-full text-[10px] sm:text-sm font-bold transition-colors duration-200 select-none active:scale-95",
                 isActive
                   ? "text-white"
-                  : "text-slate-600 dark:text-slate-400 hover:text-foreground dark:hover:text-white"
+                  : "text-slate-600 hover:text-foreground"
               )}
             >
-              <Icon className="h-4.5 w-4.5 sm:h-5 sm:w-5 shrink-0" />
-              <span>{item.label}</span>
+              <Icon className="h-4 w-4 sm:h-4.5 sm:w-4.5 shrink-0" />
+              <span className="truncate">{item.label}</span>
             </button>
           );
         })}

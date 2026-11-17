@@ -6,6 +6,7 @@
   --color-background: #f8fafc;
   --color-background-soft: #f1f5f9;
   --color-surface: #ffffff;
+  --color-surface-card: #ffffff;
   --color-surface-hover: #f8fafc;
   --color-border: #e2e8f0;
   --color-border-subtle: #cbd5e1;
@@ -44,36 +45,5 @@
   --radius-xl: 20px;
   --radius-2xl: 24px;
   --radius-full: 9999px;
-}
-
-.dark {
-  /* Warna Dasar Dark Mode (Sleek Modern Slate / Charcoal) */
-  --color-background: #0f172a;
-  --color-background-soft: #1e293b;
-  --color-surface: #1e293b;
-  --color-surface-hover: #334155;
-  --color-border: #334155;
-  --color-border-subtle: #475569;
-  --color-border-focus: #3b82f6;
-
-  /* Tipografi Warna Dark Mode */
-  --color-foreground: #f8fafc;
-  --color-foreground-muted: #94a3b8;
-  --color-foreground-subtle: #64748b;
-
-  /* Aksen & Brand AppHub */
-  --color-primary: #3b82f6;
-  --color-primary-hover: #60a5fa;
-  --color-primary-subtle: #1e3a8a;
-  --color-accent: #60a5fa;
-  --color-accent-subtle: #1e293b;
-
-  /* Status & Rating */
-  --color-warning: #fbbf24;
-  --color-warning-subtle: #451a03;
-  --color-success: #34d399;
-  --color-success-subtle: #064e3b;
-  --color-danger: #f87171;
-  --color-danger-subtle: #450a0a;
 }
 

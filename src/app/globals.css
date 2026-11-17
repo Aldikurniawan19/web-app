@@ -15,10 +15,6 @@
     color-scheme: light;
   }
 
-  html.dark {
-    color-scheme: dark;
-  }
-
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -50,25 +46,13 @@
   background: #f8fafc;
 }
 
-.dark ::-webkit-scrollbar-track {
-  background: #0f172a;
-}
-
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
 }
 
-.dark ::-webkit-scrollbar-thumb {
-  background: #334155;
-}
-
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
 }
 
 /* -------------------------------------------------------------
@@ -83,15 +67,6 @@
   text-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
-.dark .text-3d-bubble-main,
-.dark .text-3d-main {
-  color: #ffffff;
-  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 70%, #e2e8f0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
 .text-3d-bubble-blue,
 .text-3d-blue {
   color: #2563eb;
@@ -99,15 +74,6 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
-}
-
-.dark .text-3d-bubble-blue,
-.dark .text-3d-blue {
-  color: #60a5fa;
-  background: linear-gradient(180deg, #93c5fd 0%, #60a5fa 70%, #3b82f6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 1px 3px rgba(37, 99, 235, 0.3);
 }
 
 /* Animasi Berkilau (Shimmer Light Sweep) untuk Judul Biru */
@@ -131,26 +97,6 @@
   filter: drop-shadow(0 1px 2px rgba(37, 99, 235, 0.25));
 }
 
-.dark .text-shimmer-blue {
-  background-image: linear-gradient(
-    115deg,
-    #2563eb 0%,
-    #60a5fa 18%,
-    #93c5fd 36%,
-    #ffffff 48%,
-    #dbeafe 58%,
-    #60a5fa 74%,
-    #2563eb 100%
-  );
-  background-size: 260% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-position: 200% 0;
-  display: inline-block;
-  will-change: background-position;
-  filter: drop-shadow(0 1px 3px rgba(59, 130, 246, 0.4));
-}
-
 /* Animasi Berkilau Sky Blue (Shimmer Light Sweep untuk Footer di Permukaan Biru) */
 .text-shimmer-sky {
   background-image: linear-gradient(
@@ -172,49 +118,12 @@
   filter: drop-shadow(0 1px 2px rgba(2, 132, 199, 0.45));
 }
 
-.dark .text-shimmer-sky {
-  background-image: linear-gradient(
-    115deg,
-    #38bdf8 0%,
-    #60a5fa 18%,
-    #93c5fd 36%,
-    #ffffff 48%,
-    #bae6fd 58%,
-    #38bdf8 74%,
-    #0284c7 100%
-  );
-  background-size: 260% 100%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-position: 200% 0;
-  display: inline-block;
-  will-change: background-position;
-  filter: drop-shadow(0 1px 3px rgba(3, 105, 161, 0.55));
-}
-
-/* White 3D Text (for App on Footer & Blue/Dark Surfaces) */
+/* White 3D Text (for App on Footer & Blue Surfaces) */
 .text-3d-white {
   color: #ffffff;
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 60%, #e2e8f0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
-
-.dark .text-3d-white {
-  color: #ffffff;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 60%, #e2e8f0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.dark .text-3d-white {
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 40%, #e2e8f0 75%, #cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: 
-    drop-shadow(0 1px 0 #60a5fa)
-    drop-shadow(0 1px 0 #1d4ed8)
-    drop-shadow(0 1px 0 #0f172a);
 }
 
 /* Sky-300 3D Text (for Hub on Footer) */
@@ -226,16 +135,6 @@
     drop-shadow(0 1px 0 #0284c7)
     drop-shadow(0 1px 0 #0369a1)
     drop-shadow(0 1px 0 #075985);
-}
-
-.dark .text-3d-sky {
-  background: linear-gradient(180deg, #f0f9ff 0%, #bae6fd 35%, #7dd3fc 75%, #38bdf8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: 
-    drop-shadow(0 1px 0 #0284c7)
-    drop-shadow(0 1px 0 #1e3a8a)
-    drop-shadow(0 1px 0 #0f172a);
 }
 
 /* Animated High-Speed Diagonal Stripes for Progress Bar */
@@ -306,17 +205,6 @@
   pointer-events: none;
 }
 
-.dark .skeleton-shimmer::after {
-  background: linear-gradient(
-    105deg,
-    transparent 0%,
-    transparent 30%,
-    rgba(255, 255, 255, 0.14) 50%,
-    transparent 70%,
-    transparent 100%
-  );
-}
-
 @keyframes skeleton-shine {
   0% {
     transform: translateX(-100%);
@@ -346,10 +234,6 @@
   filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.75)) drop-shadow(0 0 10px rgba(37, 99, 235, 0.4));
 }
 
-.dark .guide-card-border-beam {
-  filter: drop-shadow(0 0 6px rgba(96, 165, 250, 0.85)) drop-shadow(0 0 12px rgba(59, 130, 246, 0.5));
-}
-
 .guide-card-border-spinner {
   position: absolute;
   width: 500%;
@@ -369,20 +253,6 @@
     rgba(56, 189, 248, 0.95) 338deg,
     #ffffff 350deg,
     rgba(147, 197, 253, 0.95) 356deg,
-    transparent 360deg
-  );
-}
-
-.dark .guide-card-border-spinner {
-  background: conic-gradient(
-    from 0deg at 50% 50%,
-    transparent 0deg,
-    transparent 255deg,
-    rgba(30, 64, 175, 0.3) 280deg,
-    rgba(59, 130, 246, 0.85) 310deg,
-    rgba(96, 165, 250, 1) 335deg,
-    #ffffff 350deg,
-    rgba(191, 219, 254, 0.95) 356deg,
     transparent 360deg
   );
 }
@@ -427,22 +297,21 @@
   transition: filter 0.3s ease;
 }
 
-.dark .guide-step-number {
-  background-image: linear-gradient(
-    115deg,
-    #334155 0%,
-    #475569 20%,
-    #60a5fa 38%,
-    #ffffff 48%,
-    #93c5fd 58%,
-    #3b82f6 75%,
-    #334155 100%
-  );
-  background-size: 260% 100%;
-  background-position: 200% 0;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+/* Latar atmosferik lembut di bagian atas hero (memudar mulus ke warna background) */
+.hero-sky-atmosphere {
+  background-image:
+    radial-gradient(
+      ellipse 52% 48% at 6% 0%,
+      rgba(96, 165, 250, 0.42) 0%,
+      rgba(147, 197, 253, 0.16) 45%,
+      transparent 78%
+    ),
+    radial-gradient(
+      ellipse 52% 48% at 94% 0%,
+      rgba(56, 189, 248, 0.38) 0%,
+      rgba(147, 197, 253, 0.14) 45%,
+      transparent 78%
+    );
 }
 
 

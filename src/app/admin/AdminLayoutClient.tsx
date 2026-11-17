@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
@@ -25,7 +25,7 @@ export function AdminLayoutClient({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-foreground flex">
+    <div className="min-h-screen bg-slate-50 text-foreground flex">
       {/* Sidebar Navigasi Admin */}
       <AdminSidebar
         isOpen={sidebarOpen}

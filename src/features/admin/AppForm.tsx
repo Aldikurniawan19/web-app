@@ -19,6 +19,7 @@ import {
 import { AppCategory, AppItem, AppScreenshot } from "@/types/store";
 import { CATEGORIES } from "@/constants/app-store-data";
 import { ApkUploadDropzone } from "@/features/admin/ApkUploadDropzone";
+import { ApkSecurityPanel } from "@/features/admin/ApkSecurityPanel";
 import { IconUploadDropzone } from "@/features/admin/IconUploadDropzone";
 import { ScreenshotUploadDropzone } from "@/features/admin/ScreenshotUploadDropzone";
 import { Button } from "@/components/ui/Button";
@@ -64,6 +65,9 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
   // 4. Berkas APK
   const [apkUrl, setApkUrl] = useState<string | null>(initialData?.apkUrl || null);
   const [apkFileName, setApkFileName] = useState<string | null>(initialData?.apkFileName || null);
+  const [uploadedSha256, setUploadedSha256] = useState<string | null>(
+    initialData?.securityScan?.sha256 || null
+  );
   const [changelog, setChangelog] = useState("");
   const [apkChanged, setApkChanged] = useState(false);
 
@@ -72,10 +76,20 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
     initialData?.screenshots || []
   );
 
-  const handleFileUploaded = (data: { fileName: string; fileSize: string; downloadUrl: string }) => {
+  const handleFileUploaded = (data: {
+    fileName: string;
+    fileSize: string;
+    downloadUrl: string;
+    sha256?: string;
+  }) => {
     setFileSize(data.fileSize);
     setApkUrl(data.downloadUrl);
     setApkFileName(data.fileName);
+    if (data.sha256) {
+      setUploadedSha256(data.sha256);
+    } else {
+      setUploadedSha256(null);
+    }
     setApkChanged(true);
     if (!name) {
       const cleanName = data.fileName
@@ -206,7 +220,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
 
       {/* Status Alerts */}
       {errorMsg && (
-        <div className="flex items-start gap-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 p-4 text-xs text-rose-700 dark:text-rose-300 animate-in fade-in">
+        <div className="flex items-start gap-3 rounded-2xl bg-rose-50 border border-rose-200 p-4 text-xs text-rose-700 animate-in fade-in">
           <AlertCircle className="h-5 w-5 shrink-0 text-rose-500" />
           <div className="space-y-1">
             <span className="font-bold">Gagal Menyimpan Data</span>
@@ -216,7 +230,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
       )}
 
       {successMsg && (
-        <div className="flex items-start gap-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 p-4 text-xs text-emerald-700 dark:text-emerald-300 animate-in fade-in">
+        <div className="flex items-start gap-3 rounded-2xl bg-emerald-50 border border-emerald-200 p-4 text-xs text-emerald-700 animate-in fade-in">
           <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
           <div className="space-y-1">
             <span className="font-bold">Berhasil!</span>
@@ -226,14 +240,14 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
       )}
 
       {/* 1. Upload APK Package File */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-4">
         <div className="flex items-start justify-between flex-wrap gap-2">
           <div>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
+            <h2 className="text-base font-bold text-slate-900 font-display flex items-center gap-2">
               <Smartphone className="h-5 w-5 text-primary" />
               <span>1. Berkas Android Package (.APK)</span>
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Berkas APK akan diunggah otomatis ke GitHub Releases dan tautan unduhannya disimpan di Supabase.
             </p>
           </div>
@@ -247,7 +261,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
                 <span>Upload Versi Baru Manual (GitHub Action)</span>
               </Link>
             )}
-            <span className="rounded-full bg-blue-50 dark:bg-slate-800 px-2.5 py-0.5 text-[11px] font-bold text-primary">
+            <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold text-primary">
               GitHub Releases
             </span>
           </div>
@@ -261,9 +275,9 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
         />
 
         {isEditing && (apkChanged || (initialData?.version && version.trim() !== initialData.version.trim())) && (
-          <div className="mt-4 space-y-2 p-3.5 rounded-xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/40 dark:bg-blue-950/20">
+          <div className="mt-4 space-y-2 p-3.5 rounded-xl border border-blue-100 bg-blue-50/40">
             <div className="flex items-center justify-between flex-wrap gap-1">
-              <label htmlFor="changelog-input" className="block text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+              <label htmlFor="changelog-input" className="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
                 <History className="h-3.5 w-3.5 text-primary" />
                 <span>Catatan Perubahan (Changelog)</span>
               </label>
@@ -277,13 +291,32 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
               onChange={(e) => setChangelog(e.target.value)}
               rows={3}
               placeholder="Contoh: Perbaikan bug crash saat buka aplikasi, peningkatan performa 2x lebih cepat..."
-              className="block w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"
+              className="block w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"
             />
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+            <p className="text-[11px] text-slate-500 leading-relaxed">
               {apkChanged
                 ? "Berkas APK baru terdeteksi. Berkas versi lama akan otomatis diarsipkan ke riwayat versi."
                 : `Nomor versi diubah dari v${initialData?.version} ke v${version}. Berkas versi sebelumnya akan otomatis diarsipkan.`}
             </p>
+          </div>
+        )}
+
+        {isEditing && initialData?.id && (
+          <ApkSecurityPanel
+            appId={initialData.id}
+            appName={name || initialData.name}
+            version={version}
+            apkUrl={apkUrl || initialData.apkUrl}
+            apkFileName={apkFileName || initialData.apkFileName}
+            knownSha256={uploadedSha256}
+            initialSummary={initialData.securityScan}
+          />
+        )}
+
+        {!isEditing && (apkUrl || uploadedSha256) && (
+          <div className="rounded-xl border border-border bg-background-soft px-4 py-3 text-xs text-foreground-muted">
+            Setelah aplikasi diterbitkan, Anda dapat menjalankan pemindaian keamanan VirusTotal API v3 melalui tombol{" "}
+            <strong className="text-foreground">Pindai</strong> di daftar aplikasi atau halaman Edit Aplikasi.
           </div>
         )}
 
@@ -293,13 +326,13 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
       </div>
 
       {/* 2. Upload Gambar Ikon Aplikasi */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-4">
         <div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
+          <h2 className="text-base font-bold text-slate-900 font-display flex items-center gap-2">
             <ImageIcon className="h-5 w-5 text-primary" />
             <span>2. Gambar Ikon Aplikasi</span>
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Unggah logo/ikon aplikasi dalam format gambar (PNG, JPG, WebP, SVG). Gambar akan disimpan di Supabase.
           </p>
         </div>
@@ -311,13 +344,13 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
       </div>
 
       {/* 3. Upload Screenshot Tampilan Aplikasi (Maksimal 8 Gambar) */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-4">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-4">
         <div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
+          <h2 className="text-base font-bold text-slate-900 font-display flex items-center gap-2">
             <ImageIcon className="h-5 w-5 text-primary" />
             <span>3. Tangkapan Layar Aplikasi (Screenshot)</span>
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Unggah hingga <strong>maksimal 8 gambar</strong> screenshot antarmuka aplikasi. Gambar akan ditampilkan di galeri slider pada halaman detail aplikasi.
           </p>
         </div>
@@ -330,13 +363,13 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
       </div>
 
       {/* 4. Informasi Utama & Metadata Aplikasi */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6">
         <div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white font-display flex items-center gap-2">
+          <h2 className="text-base font-bold text-slate-900 font-display flex items-center gap-2">
             <Layers className="h-5 w-5 text-primary" />
             <span>4. Informasi & Metadata Aplikasi</span>
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Informasi ini akan muncul di kartu katalog dan header halaman detail aplikasi.
           </p>
         </div>
@@ -344,7 +377,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {/* Nama Aplikasi */}
           <div className="space-y-1.5 sm:col-span-2">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+            <label className="text-xs font-bold text-slate-700">
               Nama Aplikasi <span className="text-rose-500">*</span>
             </label>
             <input
@@ -353,19 +386,19 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Contoh: Notely, AeroSync"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
 
           {/* Kategori */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+            <label className="text-xs font-bold text-slate-700">
               Kategori <span className="text-rose-500">*</span>
             </label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as Exclude<AppCategory, "Semua">)}
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             >
               {CATEGORIES.filter((c) => c !== "Semua").map((cat) => (
                 <option key={cat} value={cat}>
@@ -377,7 +410,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
 
           {/* Tagline */}
           <div className="space-y-1.5 sm:col-span-2">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+            <label className="text-xs font-bold text-slate-700">
               Tagline Ringkas
             </label>
             <input
@@ -385,13 +418,13 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
               value={tagline}
               onChange={(e) => setTagline(e.target.value)}
               placeholder="Contoh: Aplikasi Pencatat Modern, Cepat & Terenkripsi"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
 
           {/* Developer */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+            <label className="text-xs font-bold text-slate-700">
               Developer / Studio
             </label>
             <input
@@ -399,13 +432,13 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
               value={developer}
               onChange={(e) => setDeveloper(e.target.value)}
               placeholder="Contoh: AppHub Studio"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
 
           {/* Versi */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+            <label className="text-xs font-bold text-slate-700">
               Versi Rilis
             </label>
             <input
@@ -413,13 +446,13 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
               value={version}
               onChange={(e) => setVersion(e.target.value)}
               placeholder="1.0.0"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground font-mono focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-foreground font-mono focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
 
           {/* Ukuran Berkas */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+            <label className="text-xs font-bold text-slate-700">
               Ukuran Berkas
             </label>
             <input
@@ -427,13 +460,13 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
               value={fileSize}
               onChange={(e) => setFileSize(e.target.value)}
               placeholder="15.0 MB"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground font-mono focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-foreground font-mono focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
 
           {/* Total Unduhan */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+            <label className="text-xs font-bold text-slate-700">
               Jumlah Unduhan
             </label>
             <input
@@ -441,13 +474,13 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
               value={downloadsCount}
               onChange={(e) => setDownloadsCount(e.target.value)}
               placeholder="Contoh: 10 rb+, 50k+"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
 
           {/* Tanggal Pembaruan */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+            <label className="text-xs font-bold text-slate-700">
               Tanggal Pembaruan
             </label>
             <input
@@ -455,19 +488,19 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
               value={lastUpdated}
               onChange={(e) => setLastUpdated(e.target.value)}
               placeholder="Contoh: 15 September 2026"
-              className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
             />
           </div>
         </div>
       </div>
 
       {/* 5. Deskripsi Aplikasi */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-sm space-y-6">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm space-y-6">
         <div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white font-display">
+          <h2 className="text-base font-bold text-slate-900 font-display">
             5. Deskripsi Aplikasi
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Tuliskan ringkasan deskripsi aplikasi untuk kartu katalog dan halaman detail.
           </p>
         </div>
@@ -475,7 +508,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
         {/* Deskripsi */}
         <div className="space-y-1.5">
           <div className="flex justify-between items-center">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+            <label className="text-xs font-bold text-slate-700">
               Deskripsi Aplikasi <span className="text-rose-500">*</span>
             </label>
             <span className="text-[10px] text-slate-400 font-mono">
@@ -488,13 +521,13 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Contoh: Aplikasi pencatat cepat dan mudah dengan fitur sinkronisasi cloud."
-            className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 p-3.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all leading-relaxed"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all leading-relaxed"
           />
         </div>
       </div>
 
       {/* Bottom Action Submit Buttons */}
-      <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+      <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
         <Button
           type="button"
           variant="outline"
