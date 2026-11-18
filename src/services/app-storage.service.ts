@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { withDbRetry as withRetry } from "@/lib/db-retry";
 import { AppItem, AppVersionItem, CreateAppInput, ReleaseNewVersionInput } from "@/types/store";
 import { GithubReleaseService } from "./github-release.service";
 import { ApkSecurityService } from "./apk-security.service";
@@ -6,54 +7,37 @@ import { decodeDataImageUri, DecodedImageData } from "@/lib/media-decode";
 
 const MAX_VERSIONS_PER_APP = 4;
 const GITHUB_STATS_TIMEOUT_MS = 2_000;
+const CACHE_TTL_MS = 60_000;
+
+interface AppCacheStore {
+  cachedApps: AppItem[] | null;
+  lastCacheTimestamp: number;
+  pendingFetchPromise: Promise<AppItem[]> | null;
+  mediaVersionMap: Map<string, string>;
+}
+
+const globalForAppCache = globalThis as unknown as {
+  __allprojectsAppCache?: AppCacheStore;
+};
 
 /**
- * In-memory cache untuk mengurangi frekuensi query ke database Supabase.
+ * In-memory cache berbasis globalThis agar terbagi antara RSC dan API Route Handlers
+ * di Next.js dev maupun produksi, mengurangi frekuensi query ke database Supabase.
  */
-let cachedApps: AppItem[] | null = null;
-let lastCacheTimestamp = 0;
-const CACHE_TTL_MS = 60_000;
-let pendingFetchPromise: Promise<AppItem[]> | null = null;
-const mediaVersionMap = new Map<string, string>();
+const appCache: AppCacheStore =
+  globalForAppCache.__allprojectsAppCache ??
+  (globalForAppCache.__allprojectsAppCache = {
+    cachedApps: null,
+    lastCacheTimestamp: 0,
+    pendingFetchPromise: null,
+    mediaVersionMap: new Map<string, string>(),
+  });
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T | null> {
   return Promise.race([
     promise,
     new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs)),
   ]);
-}
-
-/**
- * Helper auto-retry query jika ada gangguan koneksi transien ke Supabase.
- * Delay eksponensial: 300ms, 600ms, dst.
- */
-async function withRetry<T>(fn: () => Promise<T>, maxRetries = 2): Promise<T> {
-  let attempt = 0;
-  while (true) {
-    try {
-      return await fn();
-    } catch (err: unknown) {
-      attempt++;
-      const msg = err instanceof Error ? err.message : String(err);
-      const isTransient =
-        msg.includes("Connection terminated") ||
-        msg.includes("closed") ||
-        msg.includes("timeout") ||
-        msg.includes("57014") ||
-        msg.includes("ECONNRESET") ||
-        msg.includes("ENOTFOUND") ||
-        msg.includes("connection pool");
-
-      if (isTransient && attempt < maxRetries) {
-        console.warn(
-          `[Prisma Retry] Percobaan ke-${attempt + 1} setelah error: ${msg.slice(0, 80)}`
-        );
-        await new Promise((r) => setTimeout(r, 300 * attempt));
-        continue;
-      }
-      throw err;
-    }
-  }
 }
 
 /**
@@ -106,7 +90,7 @@ export class AppStorageService {
     const versionStamp = stampSource
       ? new Date(stampSource).getTime().toString(36)
       : "1";
-    mediaVersionMap.set(record.id, versionStamp);
+    appCache.mediaVersionMap.set(record.id, versionStamp);
 
     const apkFile = record.apkFileName || `${record.id}-v${record.version || "1.0.0"}.apk`;
     // Prioritaskan URL GitHub Releases resmi
@@ -150,9 +134,9 @@ export class AppStorageService {
    * Membersihkan cache agar query berikutnya mengambil data segar dari database.
    */
   static invalidateCache(): void {
-    cachedApps = null;
-    lastCacheTimestamp = 0;
-    pendingFetchPromise = null;
+    appCache.cachedApps = null;
+    appCache.lastCacheTimestamp = 0;
+    appCache.pendingFetchPromise = null;
   }
 
   /**
@@ -162,15 +146,18 @@ export class AppStorageService {
   static async getAllApps(): Promise<AppItem[]> {
     const now = Date.now();
 
-    if (cachedApps !== null && now - lastCacheTimestamp < CACHE_TTL_MS) {
-      return cachedApps;
+    if (
+      appCache.cachedApps !== null &&
+      now - appCache.lastCacheTimestamp < CACHE_TTL_MS
+    ) {
+      return appCache.cachedApps;
     }
 
-    if (pendingFetchPromise) {
-      return pendingFetchPromise;
+    if (appCache.pendingFetchPromise) {
+      return appCache.pendingFetchPromise;
     }
 
-    pendingFetchPromise = (async () => {
+    appCache.pendingFetchPromise = (async () => {
       try {
         const records = await withRetry(() =>
           prisma.app.findMany({
@@ -221,27 +208,27 @@ export class AppStorageService {
           // Tetap gunakan fallback downloadsCount dari database jika API GitHub lambat atau gagal
         }
 
-        cachedApps = mapped;
-        lastCacheTimestamp = Date.now();
+        appCache.cachedApps = mapped;
+        appCache.lastCacheTimestamp = Date.now();
         return mapped;
       } catch (err) {
         console.error("Gagal membaca daftar aplikasi dari Supabase:", err);
-        if (cachedApps !== null) return cachedApps;
+        if (appCache.cachedApps !== null) return appCache.cachedApps;
         return [];
       } finally {
-        pendingFetchPromise = null;
+        appCache.pendingFetchPromise = null;
       }
     })();
 
-    return pendingFetchPromise;
+    return appCache.pendingFetchPromise;
   }
 
   /**
    * Mengambil satu aplikasi berdasarkan ID.
    */
   static async getAppById(id: string): Promise<AppItem | null> {
-    if (cachedApps !== null) {
-      const found = cachedApps.find((a) => a.id === id);
+    if (appCache.cachedApps !== null) {
+      const found = appCache.cachedApps.find((a) => a.id === id);
       if (found) return found;
     }
 
@@ -283,8 +270,11 @@ export class AppStorageService {
           }
         } catch {}
 
-        if (cachedApps !== null) {
-          cachedApps = [item, ...cachedApps.filter((a) => a.id !== id)];
+        if (appCache.cachedApps !== null) {
+          appCache.cachedApps = [
+            item,
+            ...appCache.cachedApps.filter((a) => a.id !== id),
+          ];
         }
         return item;
       }
@@ -346,12 +336,15 @@ export class AppStorageService {
 
     const newItem = this.mapToAppItem(record);
 
-    if (cachedApps !== null) {
-      cachedApps = [newItem, ...cachedApps.filter((a) => a.id !== newItem.id)];
+    if (appCache.cachedApps !== null) {
+      appCache.cachedApps = [
+        newItem,
+        ...appCache.cachedApps.filter((a) => a.id !== newItem.id),
+      ];
     } else {
-      cachedApps = [newItem];
+      appCache.cachedApps = [newItem];
     }
-    lastCacheTimestamp = Date.now();
+    appCache.lastCacheTimestamp = Date.now();
 
     return newItem;
   }
@@ -464,15 +457,15 @@ export class AppStorageService {
 
     const updatedItem = this.mapToAppItem(record);
 
-    if (cachedApps !== null) {
-      const idx = cachedApps.findIndex((a) => a.id === id);
+    if (appCache.cachedApps !== null) {
+      const idx = appCache.cachedApps.findIndex((a) => a.id === id);
       if (idx >= 0) {
-        cachedApps[idx] = updatedItem;
+        appCache.cachedApps[idx] = updatedItem;
       } else {
-        cachedApps = [updatedItem, ...cachedApps];
+        appCache.cachedApps = [updatedItem, ...appCache.cachedApps];
       }
     }
-    lastCacheTimestamp = Date.now();
+    appCache.lastCacheTimestamp = Date.now();
 
     return updatedItem;
   }
@@ -587,10 +580,10 @@ export class AppStorageService {
    * Menghapus aplikasi berdasarkan ID dari Supabase dan menghapusnya dari cache.
    */
   static async deleteApp(id: string): Promise<boolean> {
-    if (cachedApps !== null) {
-      cachedApps = cachedApps.filter((a) => a.id !== id);
+    if (appCache.cachedApps !== null) {
+      appCache.cachedApps = appCache.cachedApps.filter((a) => a.id !== id);
     }
-    lastCacheTimestamp = Date.now();
+    appCache.lastCacheTimestamp = Date.now();
 
     try {
       await withRetry(() =>
@@ -698,7 +691,7 @@ export class AppStorageService {
   static async getPublicCatalogApps(): Promise<AppItem[]> {
     const apps = await this.getAllApps();
     return apps.map((app) => {
-      const vTag = mediaVersionMap.get(app.id) || "1";
+      const vTag = appCache.mediaVersionMap.get(app.id) || "1";
       const safeId = encodeURIComponent(app.id);
 
       const slimIconUrl =
@@ -737,8 +730,8 @@ export class AppStorageService {
     let iconUrl: string | null | undefined;
     let screenshots: AppItem["screenshots"] = [];
 
-    if (cachedApps) {
-      const cached = cachedApps.find((a) => a.id === appId);
+    if (appCache.cachedApps) {
+      const cached = appCache.cachedApps.find((a) => a.id === appId);
       if (cached) {
         iconUrl = cached.iconUrl;
         screenshots = cached.screenshots;

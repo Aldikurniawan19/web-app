@@ -1,46 +1,31 @@
 import { prisma } from "@/lib/prisma";
+import { withDbRetry as withRetry } from "@/lib/db-retry";
 import { WebProjectItem, CreateWebProjectInput, UpdateWebProjectInput } from "@/types/web-project";
 import { decodeDataImageUri, DecodedImageData } from "@/lib/media-decode";
 
-/**
- * In-memory cache untuk mengurangi beban query ke database Supabase.
- */
-let cachedWebProjects: WebProjectItem[] | null = null;
-let lastCacheTimestamp = 0;
 const CACHE_TTL_MS = 60_000;
-let pendingFetchPromise: Promise<WebProjectItem[]> | null = null;
+
+interface WebProjectCacheStore {
+  cachedWebProjects: WebProjectItem[] | null;
+  lastCacheTimestamp: number;
+  pendingFetchPromise: Promise<WebProjectItem[]> | null;
+}
+
+const globalForWebCache = globalThis as unknown as {
+  __allprojectsWebCache?: WebProjectCacheStore;
+};
 
 /**
- * Helper auto-retry query jika ada gangguan koneksi transien ke Supabase.
+ * In-memory cache berbasis globalThis agar terbagi antara RSC dan API Route Handlers
+ * untuk mengurangi beban query ke database Supabase.
  */
-async function withRetry<T>(fn: () => Promise<T>, maxRetries = 2): Promise<T> {
-  let attempt = 0;
-  while (true) {
-    try {
-      return await fn();
-    } catch (err: unknown) {
-      attempt++;
-      const msg = err instanceof Error ? err.message : String(err);
-      const isTransient =
-        msg.includes("Connection terminated") ||
-        msg.includes("closed") ||
-        msg.includes("timeout") ||
-        msg.includes("57014") ||
-        msg.includes("ECONNRESET") ||
-        msg.includes("ENOTFOUND") ||
-        msg.includes("connection pool");
-
-      if (isTransient && attempt < maxRetries) {
-        console.warn(
-          `[WebProject Retry] Percobaan ke-${attempt + 1} setelah error: ${msg.slice(0, 80)}`
-        );
-        await new Promise((r) => setTimeout(r, 300 * attempt));
-        continue;
-      }
-      throw err;
-    }
-  }
-}
+const webCache: WebProjectCacheStore =
+  globalForWebCache.__allprojectsWebCache ??
+  (globalForWebCache.__allprojectsWebCache = {
+    cachedWebProjects: null,
+    lastCacheTimestamp: 0,
+    pendingFetchPromise: null,
+  });
 
 /**
  * Service Layer untuk Akses Data Projek Web di Supabase PostgreSQL.
@@ -88,9 +73,9 @@ export class WebProjectService {
    * Membersihkan cache memory.
    */
   static invalidateCache(): void {
-    cachedWebProjects = null;
-    lastCacheTimestamp = 0;
-    pendingFetchPromise = null;
+    webCache.cachedWebProjects = null;
+    webCache.lastCacheTimestamp = 0;
+    webCache.pendingFetchPromise = null;
   }
 
   /**
@@ -98,15 +83,18 @@ export class WebProjectService {
    */
   static async getAllWebProjects(): Promise<WebProjectItem[]> {
     const now = Date.now();
-    if (cachedWebProjects !== null && now - lastCacheTimestamp < CACHE_TTL_MS) {
-      return cachedWebProjects;
+    if (
+      webCache.cachedWebProjects !== null &&
+      now - webCache.lastCacheTimestamp < CACHE_TTL_MS
+    ) {
+      return webCache.cachedWebProjects;
     }
 
-    if (pendingFetchPromise) {
-      return pendingFetchPromise;
+    if (webCache.pendingFetchPromise) {
+      return webCache.pendingFetchPromise;
     }
 
-    pendingFetchPromise = (async () => {
+    webCache.pendingFetchPromise = (async () => {
       try {
         let records = await withRetry(() =>
           prisma.webProject.findMany({
@@ -188,27 +176,27 @@ export class WebProjectService {
         }
 
         const mapped = records.map(this.mapToItem);
-        cachedWebProjects = mapped;
-        lastCacheTimestamp = Date.now();
+        webCache.cachedWebProjects = mapped;
+        webCache.lastCacheTimestamp = Date.now();
         return mapped;
       } catch (err) {
         console.error("Gagal membaca projek web dari database Supabase:", err);
-        if (cachedWebProjects !== null) return cachedWebProjects;
+        if (webCache.cachedWebProjects !== null) return webCache.cachedWebProjects;
         return [];
       } finally {
-        pendingFetchPromise = null;
+        webCache.pendingFetchPromise = null;
       }
     })();
 
-    return pendingFetchPromise;
+    return webCache.pendingFetchPromise;
   }
 
   /**
    * Mengambil satu projek web berdasarkan ID.
    */
   static async getWebProjectById(id: string): Promise<WebProjectItem | null> {
-    if (cachedWebProjects !== null) {
-      const found = cachedWebProjects.find((item) => item.id === id);
+    if (webCache.cachedWebProjects !== null) {
+      const found = webCache.cachedWebProjects.find((item) => item.id === id);
       if (found) return found;
     }
 
@@ -222,8 +210,11 @@ export class WebProjectService {
       if (!record) return null;
 
       const item = this.mapToItem(record);
-      if (cachedWebProjects !== null) {
-        cachedWebProjects = [item, ...cachedWebProjects.filter((p) => p.id !== id)];
+      if (webCache.cachedWebProjects !== null) {
+        webCache.cachedWebProjects = [
+          item,
+          ...webCache.cachedWebProjects.filter((p) => p.id !== id),
+        ];
       }
       return item;
     } catch (err) {
@@ -255,12 +246,15 @@ export class WebProjectService {
     );
 
     const newItem = this.mapToItem(record);
-    if (cachedWebProjects !== null) {
-      cachedWebProjects = [newItem, ...cachedWebProjects.filter((p) => p.id !== newItem.id)];
+    if (webCache.cachedWebProjects !== null) {
+      webCache.cachedWebProjects = [
+        newItem,
+        ...webCache.cachedWebProjects.filter((p) => p.id !== newItem.id),
+      ];
     } else {
-      cachedWebProjects = [newItem];
+      webCache.cachedWebProjects = [newItem];
     }
-    lastCacheTimestamp = Date.now();
+    webCache.lastCacheTimestamp = Date.now();
 
     return newItem;
   }
@@ -294,15 +288,15 @@ export class WebProjectService {
     );
 
     const updatedItem = this.mapToItem(record);
-    if (cachedWebProjects !== null) {
-      const idx = cachedWebProjects.findIndex((p) => p.id === id);
+    if (webCache.cachedWebProjects !== null) {
+      const idx = webCache.cachedWebProjects.findIndex((p) => p.id === id);
       if (idx >= 0) {
-        cachedWebProjects[idx] = updatedItem;
+        webCache.cachedWebProjects[idx] = updatedItem;
       } else {
-        cachedWebProjects = [updatedItem, ...cachedWebProjects];
+        webCache.cachedWebProjects = [updatedItem, ...webCache.cachedWebProjects];
       }
     }
-    lastCacheTimestamp = Date.now();
+    webCache.lastCacheTimestamp = Date.now();
 
     return updatedItem;
   }
@@ -311,10 +305,12 @@ export class WebProjectService {
    * Menghapus projek web berdasarkan ID.
    */
   static async deleteWebProject(id: string): Promise<boolean> {
-    if (cachedWebProjects !== null) {
-      cachedWebProjects = cachedWebProjects.filter((p) => p.id !== id);
+    if (webCache.cachedWebProjects !== null) {
+      webCache.cachedWebProjects = webCache.cachedWebProjects.filter(
+        (p) => p.id !== id
+      );
     }
-    lastCacheTimestamp = Date.now();
+    webCache.lastCacheTimestamp = Date.now();
 
     try {
       await withRetry(() =>
@@ -367,8 +363,8 @@ export class WebProjectService {
     projectId: string
   ): Promise<DecodedImageData | { redirectUrl: string } | null> {
     let imageUrl: string | null = null;
-    if (cachedWebProjects) {
-      const cached = cachedWebProjects.find((p) => p.id === projectId);
+    if (webCache.cachedWebProjects) {
+      const cached = webCache.cachedWebProjects.find((p) => p.id === projectId);
       if (cached) imageUrl = cached.imageUrl ?? null;
     }
 

@@ -4,12 +4,42 @@ import https from "https";
 import path from "path";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { withDbRetry } from "@/lib/db-retry";
 import type {
   ApkSecurityReportDetail,
   ApkSecurityStatus,
   ApkSecuritySummary,
   SecurityEngineHighlight,
 } from "@/types/security";
+
+const SECURITY_CACHE_TTL_MS = 60_000;
+
+interface ApkSecurityCacheStore {
+  reportByKey: Map<string, { data: ApkSecurityReportDetail | null; timestamp: number }>;
+}
+
+const globalForSecurityCache = globalThis as unknown as {
+  __allprojectsSecurityCache?: ApkSecurityCacheStore;
+};
+
+const securityCache: ApkSecurityCacheStore =
+  globalForSecurityCache.__allprojectsSecurityCache ??
+  (globalForSecurityCache.__allprojectsSecurityCache = {
+    reportByKey: new Map(),
+  });
+
+function invalidateSecurityCache(appId?: string): void {
+  if (!appId) {
+    securityCache.reportByKey.clear();
+    return;
+  }
+  const prefix = `${appId}::`;
+  for (const key of securityCache.reportByKey.keys()) {
+    if (key.startsWith(prefix)) {
+      securityCache.reportByKey.delete(key);
+    }
+  }
+}
 
 const VT_API_BASE = "https://www.virustotal.com/api/v3";
 const VT_DIRECT_UPLOAD_MAX_BYTES = 32 * 1024 * 1024;
@@ -1051,6 +1081,7 @@ export class ApkSecurityService {
         },
         select: SCAN_DETAIL_SELECT,
       });
+      invalidateSecurityCache(data.appId);
       return mapToDetail(updated);
     }
 
@@ -1075,6 +1106,7 @@ export class ApkSecurityService {
       select: SCAN_DETAIL_SELECT,
     });
 
+    invalidateSecurityCache(data.appId);
     return mapToDetail(created);
   }
 
@@ -1089,26 +1121,50 @@ export class ApkSecurityService {
   ): Promise<ApkSecurityReportDetail | null> {
     try {
       const cleanVersion = version ? version.trim().replace(/^v/i, "") : undefined;
+      const cacheKey = `${appId}::${cleanVersion || "*"}`;
 
-      let record = await prisma.apkSecurityScan.findFirst({
-        where: {
-          appId,
-          ...(cleanVersion ? { version: cleanVersion } : {}),
-        },
-        orderBy: { updatedAt: "desc" },
-        select: SCAN_DETAIL_SELECT,
-      });
+      if (!options?.syncPending) {
+        const cached = securityCache.reportByKey.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < SECURITY_CACHE_TTL_MS) {
+          return cached.data;
+        }
+      }
+
+      let record = await withDbRetry(
+        () =>
+          prisma.apkSecurityScan.findFirst({
+            where: {
+              appId,
+              ...(cleanVersion ? { version: cleanVersion } : {}),
+            },
+            orderBy: { updatedAt: "desc" },
+            select: SCAN_DETAIL_SELECT,
+          }),
+        3,
+        "SecurityReport Retry"
+      );
 
       // Fallback ke laporan scan terbaru milik aplikasi jika versi spesifik belum punya record
       if (!record && cleanVersion) {
-        record = await prisma.apkSecurityScan.findFirst({
-          where: { appId },
-          orderBy: { updatedAt: "desc" },
-          select: SCAN_DETAIL_SELECT,
-        });
+        record = await withDbRetry(
+          () =>
+            prisma.apkSecurityScan.findFirst({
+              where: { appId },
+              orderBy: { updatedAt: "desc" },
+              select: SCAN_DETAIL_SELECT,
+            }),
+          3,
+          "SecurityReport Fallback Retry"
+        );
       }
 
-      if (!record) return null;
+      if (!record) {
+        securityCache.reportByKey.set(cacheKey, {
+          data: null,
+          timestamp: Date.now(),
+        });
+        return null;
+      }
 
       if (
         options?.syncPending &&
@@ -1147,11 +1203,22 @@ export class ApkSecurityService {
             },
             select: SCAN_DETAIL_SELECT,
           });
-          return mapToDetail(updated);
+          const mappedUpdated = mapToDetail(updated);
+          invalidateSecurityCache(appId);
+          securityCache.reportByKey.set(cacheKey, {
+            data: mappedUpdated,
+            timestamp: Date.now(),
+          });
+          return mappedUpdated;
         }
       }
 
-      return mapToDetail(record);
+      const mapped = mapToDetail(record);
+      securityCache.reportByKey.set(cacheKey, {
+        data: mapped,
+        timestamp: Date.now(),
+      });
+      return mapped;
     } catch (err) {
       if (isMissingScanTableError(err)) {
         return null;
@@ -1169,13 +1236,18 @@ export class ApkSecurityService {
     if (apps.length === 0) return {};
 
     try {
-      const records = await prisma.apkSecurityScan.findMany({
-        where: {
-          appId: { in: apps.map((a) => a.id) },
-        },
-        orderBy: { updatedAt: "desc" },
-        select: SCAN_SUMMARY_SELECT,
-      });
+      const records = await withDbRetry(
+        () =>
+          prisma.apkSecurityScan.findMany({
+            where: {
+              appId: { in: apps.map((a) => a.id) },
+            },
+            orderBy: { updatedAt: "desc" },
+            select: SCAN_SUMMARY_SELECT,
+          }),
+        3,
+        "SecurityScansMap Retry"
+      );
 
       const appVersionMap = new Map(
         apps.map((a) => [a.id, a.version.trim().replace(/^v/i, "")])
@@ -1207,11 +1279,16 @@ export class ApkSecurityService {
     appId: string
   ): Promise<Record<string, ApkSecuritySummary>> {
     try {
-      const records = await prisma.apkSecurityScan.findMany({
-        where: { appId },
-        orderBy: { updatedAt: "desc" },
-        select: SCAN_SUMMARY_SELECT,
-      });
+      const records = await withDbRetry(
+        () =>
+          prisma.apkSecurityScan.findMany({
+            where: { appId },
+            orderBy: { updatedAt: "desc" },
+            select: SCAN_SUMMARY_SELECT,
+          }),
+        3,
+        "SecurityVersionsMap Retry"
+      );
 
       const result: Record<string, ApkSecuritySummary> = {};
       for (const rec of records) {
