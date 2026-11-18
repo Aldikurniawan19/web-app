@@ -41,12 +41,31 @@ export function AppDetailView({
   initialTab = "versi",
 }: AppDetailViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const detailTabsRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<AppDetailTab>(initialTab);
 
   // Reset tab aktif mengikuti initialTab setiap kali aplikasi dibuka atau target tab berubah
   useEffect(() => {
     setActiveTab(initialTab);
   }, [app.id, initialTab]);
+
+  // Aktifkan tab Keamanan APK sekaligus gulir mulus ke area laporan di bawah
+  const handleJumpToSecurityReport = () => {
+    setActiveTab("keamanan");
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        const target = detailTabsRef.current;
+        if (!target) return;
+        const navbarOffset = 80;
+        const top =
+          target.getBoundingClientRect().top + window.scrollY - navbarOffset;
+        window.scrollTo({
+          top: Math.max(0, top),
+          behavior: "smooth",
+        });
+      }, 60);
+    });
+  };
 
   useGSAP(
     () => {
@@ -159,8 +178,8 @@ export function AppDetailView({
                   {app.securityScan?.status === "clean" ? (
                     <button
                       type="button"
-                      onClick={() => setActiveTab("keamanan")}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-success-subtle px-3 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-200/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      onClick={handleJumpToSecurityReport}
+                      className="inline-flex flex-wrap items-center gap-1.5 rounded-full border border-emerald-200 bg-success-subtle px-3 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-200/70 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     >
                       <ShieldCheck className="h-3.5 w-3.5 text-emerald-700 shrink-0" aria-hidden="true" />
                       <span>
@@ -172,8 +191,8 @@ export function AppDetailView({
                   ) : (
                     <button
                       type="button"
-                      onClick={() => setActiveTab("keamanan")}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background-soft px-3 py-1 text-xs font-medium text-foreground-muted hover:text-foreground hover:border-border-subtle transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      onClick={handleJumpToSecurityReport}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background-soft px-3 py-1 text-xs font-medium text-foreground-muted hover:text-foreground hover:border-border-subtle transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                     >
                       <Shield className="h-3.5 w-3.5 text-foreground-subtle shrink-0" aria-hidden="true" />
                       <span>Lihat Status Keamanan APK</span>
@@ -212,7 +231,10 @@ export function AppDetailView({
         </div>
 
         {/* Detail Tabs Bar (Text only) */}
-        <div className="detail-anim flex items-center gap-2.5 overflow-x-auto border-b border-slate-200 pt-2 pb-3.5 px-1.5 -mx-1.5 scrollbar-none">
+        <div
+          ref={detailTabsRef}
+          className="detail-anim scroll-mt-20 flex items-center gap-2.5 overflow-x-auto border-b border-slate-200 pt-2 pb-3.5 px-1.5 -mx-1.5 scrollbar-none"
+        >
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (

@@ -220,11 +220,132 @@ export function StoreHero({
       aria-labelledby="hero-heading"
       className="relative -mt-16 pt-16 overflow-x-clip bg-background transition-colors duration-200"
     >
-      {/* Latar Atmosferik Halus di Bagian Atas Hero (Memudar Mulus ke bg-background) */}
+      {/* Motif Blueprint Kartu Aplikasi Khas AllProjects (Vektor Halus, Simetris, Tanpa Gradient Slop) */}
       <div
         aria-hidden="true"
-        className="hero-sky-atmosphere pointer-events-none absolute inset-x-0 top-0 h-[620px]"
-      />
+        className="hero-motif-mask pointer-events-none absolute inset-x-0 top-0 h-[560px] sm:h-[640px] overflow-hidden"
+      >
+        <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern
+              id="hero-app-wireframe-pattern"
+              x="50%"
+              y="0"
+              width="148"
+              height="96"
+              patternUnits="userSpaceOnUse"
+            >
+              {/* Baris 1: Siluet Kartu Aplikasi */}
+              <rect
+                x="6"
+                y="5"
+                width="136"
+                height="38"
+                rx="12"
+                fill="none"
+                stroke="var(--color-hero-pattern)"
+                strokeWidth="1"
+              />
+              <rect
+                x="15"
+                y="14"
+                width="20"
+                height="20"
+                rx="6"
+                fill="none"
+                stroke="var(--color-hero-pattern)"
+                strokeWidth="1"
+                strokeOpacity="0.8"
+              />
+              <line
+                x1="43"
+                y1="21"
+                x2="83"
+                y2="21"
+                stroke="var(--color-hero-pattern)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeOpacity="0.7"
+              />
+              <line
+                x1="43"
+                y1="28"
+                x2="67"
+                y2="28"
+                stroke="var(--color-hero-pattern)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeOpacity="0.45"
+              />
+
+              {/* Baris 2: Siluet Kartu Bergeser Setengah Lebar (Staggered) */}
+              <rect
+                x="-68"
+                y="53"
+                width="136"
+                height="38"
+                rx="12"
+                fill="none"
+                stroke="var(--color-hero-pattern)"
+                strokeWidth="1"
+              />
+              <line
+                x1="-31"
+                y1="69"
+                x2="9"
+                y2="69"
+                stroke="var(--color-hero-pattern)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeOpacity="0.7"
+              />
+
+              <rect
+                x="80"
+                y="53"
+                width="136"
+                height="38"
+                rx="12"
+                fill="none"
+                stroke="var(--color-hero-pattern)"
+                strokeWidth="1"
+              />
+              <rect
+                x="89"
+                y="62"
+                width="20"
+                height="20"
+                rx="6"
+                fill="none"
+                stroke="var(--color-hero-pattern)"
+                strokeWidth="1"
+                strokeOpacity="0.8"
+              />
+              <line
+                x1="117"
+                y1="69"
+                x2="157"
+                y2="69"
+                stroke="var(--color-hero-pattern)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeOpacity="0.7"
+              />
+              <line
+                x1="117"
+                y1="76"
+                x2="141"
+                y2="76"
+                stroke="var(--color-hero-pattern)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeOpacity="0.45"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#hero-app-wireframe-pattern)" />
+        </svg>
+      </div>
 
       {/* Bagian Atas Hero: Centered Minimalist Header */}
       <div className="relative mx-auto max-w-4xl px-4 pt-8 sm:px-6 sm:pt-12 lg:px-8 lg:pt-14 text-center">

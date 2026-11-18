@@ -3,7 +3,11 @@ import { withDbRetry as withRetry } from "@/lib/db-retry";
 import { AppItem, AppVersionItem, CreateAppInput, ReleaseNewVersionInput } from "@/types/store";
 import { GithubReleaseService } from "./github-release.service";
 import { ApkSecurityService } from "./apk-security.service";
-import { decodeDataImageUri, DecodedImageData } from "@/lib/media-decode";
+import {
+  decodeDataImageUri,
+  DecodedImageData,
+  extractDataImageDimensions,
+} from "@/lib/media-decode";
 
 const MAX_VERSIONS_PER_APP = 4;
 const GITHUB_STATS_TIMEOUT_MS = 2_000;
@@ -703,9 +707,11 @@ export class AppStorageService {
         ? app.screenshots.map((sc, idx) => {
             if (!sc || typeof sc.imageUrl !== "string") return sc;
             if (!sc.imageUrl.trim().startsWith("data:image/")) return sc;
+            const dims = extractDataImageDimensions(sc.imageUrl);
             return {
               ...sc,
               imageUrl: `/api/apps/media/${safeId}/screenshot/${idx}?v=${vTag}`,
+              ...(dims ? { width: dims.width, height: dims.height } : {}),
             };
           })
         : [];

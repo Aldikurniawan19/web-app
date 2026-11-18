@@ -64,6 +64,8 @@ export interface IPhoneMockupProps {
   className?: string;
   frameStyle?: CSSProperties;
   screenStyle?: CSSProperties;
+  screenWidthOverride?: number;
+  screenHeightOverride?: number;
 
   children?: ReactNode;
 }
@@ -204,6 +206,8 @@ export const IPhoneMockup: React.FC<IPhoneMockupProps> = ({
   className,
   frameStyle,
   screenStyle,
+  screenWidthOverride,
+  screenHeightOverride,
 
   children,
 }) => {
@@ -230,8 +234,8 @@ export const IPhoneMockup: React.FC<IPhoneMockupProps> = ({
     rawBezel === 0 ? 0 : Math.max(1, scaleSize(rawBezel));
 
   const isLandscape = orientation === "landscape";
-  const screenWidth = isLandscape ? H : W;
-  const screenHeight = isLandscape ? W : H;
+  const screenWidth = screenWidthOverride ?? (isLandscape ? H : W);
+  const screenHeight = screenHeightOverride ?? (isLandscape ? W : H);
 
   const outerWidth = screenWidth + resolvedBezel * 2;
   const outerHeight = screenHeight + resolvedBezel * 2;

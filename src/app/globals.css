@@ -366,21 +366,20 @@
   transition: filter 0.3s ease;
 }
 
-/* Latar atmosferik lembut di bagian atas hero (memudar mulus ke warna background) */
-.hero-sky-atmosphere {
-  background-image:
-    radial-gradient(
-      ellipse 52% 48% at 6% 0%,
-      rgba(96, 165, 250, 0.42) 0%,
-      rgba(147, 197, 253, 0.16) 45%,
-      transparent 78%
-    ),
-    radial-gradient(
-      ellipse 52% 48% at 94% 0%,
-      rgba(56, 189, 248, 0.38) 0%,
-      rgba(147, 197, 253, 0.14) 45%,
-      transparent 78%
-    );
+/* Masking Halus untuk Motif Latar Hero (Menjaga Kontras Teks Tengah & Memudar di Tepi) */
+.hero-motif-mask {
+  -webkit-mask-image: radial-gradient(
+    ellipse 84% 72% at 50% 26%,
+    rgba(0, 0, 0, 0.42) 0%,
+    rgba(0, 0, 0, 0.95) 48%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 84% 72% at 50% 26%,
+    rgba(0, 0, 0, 0.42) 0%,
+    rgba(0, 0, 0, 0.95) 48%,
+    transparent 100%
+  );
 }
 
 /* Animasi Scroll Reveal Ringan berbasis Compositor (Aman untuk LCP, Speed Index & CLS) */

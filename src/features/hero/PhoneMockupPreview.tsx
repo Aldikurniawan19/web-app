@@ -26,6 +26,11 @@ import { isLocalOptimizedMediaUrl } from "@/lib/media-url";
 
 const DEFAULT_SCREENSHOT_DELAY_MS = 2800;
 const SLIDE_TRANSITION_MS = 520;
+const PHONE_FRAME_SCALE = 0.62;
+const SCREEN_HEIGHT_PX = Math.round(852 * PHONE_FRAME_SCALE);
+const DEFAULT_SCREEN_WIDTH_PX = Math.round(393 * PHONE_FRAME_SCALE);
+const MIN_SCREEN_WIDTH_PX = 222;
+const MAX_SCREEN_WIDTH_PX = 286;
 
 interface PhoneMockupPreviewProps {
   app: AppItem;
@@ -432,9 +437,46 @@ export function PhoneMockupPreview({
   const [isHovered, setIsHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [mountExtraSlides, setMountExtraSlides] = useState(false);
+  const [naturalRatioByUrl, setNaturalRatioByUrl] = useState<
+    Record<string, number>
+  >({});
 
   const renderedSlides =
     mountExtraSlides || slideIndex > 0 ? slidesToRender : slidesToRender.slice(0, 1);
+
+  const primaryShot = uploadedScreenshots[0];
+  const primaryRatio =
+    primaryShot?.width && primaryShot?.height
+      ? primaryShot.width / primaryShot.height
+      : primaryShot?.imageUrl
+        ? naturalRatioByUrl[primaryShot.imageUrl]
+        : undefined;
+
+  const matchedScreenWidth =
+    primaryRatio && primaryRatio > 0.3 && primaryRatio < 0.75
+      ? Math.min(
+          MAX_SCREEN_WIDTH_PX,
+          Math.max(
+            MIN_SCREEN_WIDTH_PX,
+            Math.round(SCREEN_HEIGHT_PX * primaryRatio)
+          )
+        )
+      : DEFAULT_SCREEN_WIDTH_PX;
+
+  const handleImageLoaded = (
+    sc: AppScreenshot,
+    idx: number,
+    event: React.SyntheticEvent<HTMLImageElement>
+  ) => {
+    if (idx !== 0 || (sc.width && sc.height) || !sc.imageUrl) return;
+    const { naturalWidth, naturalHeight } = event.currentTarget;
+    if (naturalWidth <= 0 || naturalHeight <= 0) return;
+    const ratio = naturalWidth / naturalHeight;
+    const url = sc.imageUrl;
+    setNaturalRatioByUrl((prev) =>
+      prev[url] === ratio ? prev : { ...prev, [url]: ratio }
+    );
+  };
 
   // Reset posisi slide ke awal saat aplikasi berganti atau menjadi aktif kembali
   useEffect(() => {
@@ -510,19 +552,22 @@ export function PhoneMockupPreview({
       <IPhoneMockup
         model="15-pro"
         color="black"
-        scale={0.62}
-        screenBg="var(--color-surface)"
+        scale={PHONE_FRAME_SCALE}
+        screenWidthOverride={hasValidScreenshot ? matchedScreenWidth : undefined}
+        screenBg={
+          hasValidScreenshot ? "var(--color-foreground)" : "var(--color-surface)"
+        }
         safeArea={!hasValidScreenshot}
         safeAreaOverrides={{ top: 14, bottom: 10 }}
         showHomeIndicator={false}
       >
         {hasValidScreenshot ? (
-          <div className="relative flex-1 min-h-0 overflow-hidden bg-surface">
+          <div className="relative flex-1 min-h-0 overflow-hidden bg-foreground">
             <button
               type="button"
               onClick={() => onSelectApp?.(app)}
               aria-label={`Lihat detail aplikasi ${app.name}`}
-              className="absolute inset-0 block overflow-hidden p-0 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="absolute inset-0 block overflow-hidden border-0 bg-foreground p-0 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <div
                 className="flex h-full w-full"
@@ -539,28 +584,30 @@ export function PhoneMockupPreview({
                 {renderedSlides.map((sc, idx) => (
                   <div
                     key={`${app.id}-shot-${sc.id || idx}-${idx}`}
-                    className="relative flex h-full w-full shrink-0 items-center justify-center"
+                    className="relative flex h-full w-full shrink-0 items-center justify-center overflow-hidden bg-foreground"
                   >
                     {isLocalOptimizedMediaUrl(sc.imageUrl) ? (
                       <Image
                         src={sc.imageUrl}
                         alt={sc.title || `Tangkapan layar ${app.name}`}
                         fill
-                        sizes="244px"
+                        sizes={`${matchedScreenWidth}px`}
                         quality={80}
                         priority={Boolean(isPriority && idx === 0)}
                         loading={isPriority && idx === 0 ? undefined : "lazy"}
+                        onLoad={(e) => handleImageLoaded(sc, idx, e)}
                         onError={() => setImgError(true)}
-                        className="object-contain"
+                        className="object-cover"
                       />
                     ) : (
                       <img
                         src={sc.imageUrl}
                         alt={sc.title || `Tangkapan layar ${app.name}`}
+                        onLoad={(e) => handleImageLoaded(sc, idx, e)}
                         onError={() => setImgError(true)}
                         loading={isPriority && idx === 0 ? "eager" : "lazy"}
                         decoding="async"
-                        className="block h-full w-full object-contain"
+                        className="block h-full w-full object-cover"
                       />
                     )}
                   </div>

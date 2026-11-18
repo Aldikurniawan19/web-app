@@ -17,6 +17,8 @@ export interface AppScreenshot {
   description: string;
   type: "light" | "dark" | "editor" | "calendar";
   imageUrl?: string;
+  width?: number;
+  height?: number;
 }
 
 export interface AppVersionItem {
