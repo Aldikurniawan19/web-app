@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET() {
-  const projects = await WebProjectService.getAllWebProjects();
+  const projects = await WebProjectService.getPublicWebProjects();
   return NextResponse.json(
     { success: true, data: projects },
     {

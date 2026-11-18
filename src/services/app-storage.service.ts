@@ -2,16 +2,26 @@ import { prisma } from "@/lib/prisma";
 import { AppItem, AppVersionItem, CreateAppInput, ReleaseNewVersionInput } from "@/types/store";
 import { GithubReleaseService } from "./github-release.service";
 import { ApkSecurityService } from "./apk-security.service";
+import { decodeDataImageUri, DecodedImageData } from "@/lib/media-decode";
 
 const MAX_VERSIONS_PER_APP = 4;
+const GITHUB_STATS_TIMEOUT_MS = 2_000;
 
 /**
  * In-memory cache untuk mengurangi frekuensi query ke database Supabase.
  */
 let cachedApps: AppItem[] | null = null;
 let lastCacheTimestamp = 0;
-const CACHE_TTL_MS = 5_000;
+const CACHE_TTL_MS = 60_000;
 let pendingFetchPromise: Promise<AppItem[]> | null = null;
+const mediaVersionMap = new Map<string, string>();
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T | null> {
+  return Promise.race([
+    promise,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs)),
+  ]);
+}
 
 /**
  * Helper auto-retry query jika ada gangguan koneksi transien ke Supabase.
@@ -84,6 +94,7 @@ export class AppStorageService {
     apkUrl: true,
     apkFileName: true,
     createdAt: true,
+    updatedAt: true,
   } as const;
 
   /**
@@ -91,6 +102,12 @@ export class AppStorageService {
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private static mapToAppItem(record: any): AppItem {
+    const stampSource = record.updatedAt || record.createdAt;
+    const versionStamp = stampSource
+      ? new Date(stampSource).getTime().toString(36)
+      : "1";
+    mediaVersionMap.set(record.id, versionStamp);
+
     const apkFile = record.apkFileName || `${record.id}-v${record.version || "1.0.0"}.apk`;
     // Prioritaskan URL GitHub Releases resmi
     const defaultGithubUrl = `https://github.com/Aldikurniawan19/app-release/releases/download/apk-releases/${apkFile}`;
@@ -174,29 +191,34 @@ export class AppStorageService {
           }
         }
 
-        // Sinkronkan downloadsCount & URL GitHub Releases secara real-time dari akumulasi unduhan aset GitHub Releases
+        // Sinkronkan downloadsCount & URL GitHub Releases dengan batas waktu aman agar tidak memblokir SSR/API
         try {
-          const statsMap = await GithubReleaseService.getAllAppsDownloadStats(
-            mapped.map((a) => ({
-              id: a.id,
-              name: a.name,
-              apkFileName: a.apkFileName,
-              apkUrl: a.apkUrl,
-            }))
+          const statsMap = await withTimeout(
+            GithubReleaseService.getAllAppsDownloadStats(
+              mapped.map((a) => ({
+                id: a.id,
+                name: a.name,
+                apkFileName: a.apkFileName,
+                apkUrl: a.apkUrl,
+              }))
+            ),
+            GITHUB_STATS_TIMEOUT_MS
           );
-          for (const app of mapped) {
-            const stats = statsMap[app.id];
-            if (stats) {
-              if (stats.totalDownloads > 0) {
-                app.downloadsCount = stats.formattedTotal;
-              }
-              if (!app.apkUrl && stats.latestDownloadUrl) {
-                app.apkUrl = stats.latestDownloadUrl;
+          if (statsMap) {
+            for (const app of mapped) {
+              const stats = statsMap[app.id];
+              if (stats) {
+                if (stats.totalDownloads > 0) {
+                  app.downloadsCount = stats.formattedTotal;
+                }
+                if (!app.apkUrl && stats.latestDownloadUrl) {
+                  app.apkUrl = stats.latestDownloadUrl;
+                }
               }
             }
           }
         } catch {
-          // Tetap gunakan fallback downloadsCount dari database jika API GitHub tidak dapat diakses
+          // Tetap gunakan fallback downloadsCount dari database jika API GitHub lambat atau gagal
         }
 
         cachedApps = mapped;
@@ -242,12 +264,15 @@ export class AppStorageService {
 
         // Sinkronkan downloadsCount aktual & URL GitHub Releases dari akumulasi unduhan seluruh rilis GitHub
         try {
-          const stats = await GithubReleaseService.getAppDownloadStats({
-            appId: item.id,
-            appName: item.name,
-            apkFileName: item.apkFileName,
-            apkUrl: item.apkUrl,
-          });
+          const stats = await withTimeout(
+            GithubReleaseService.getAppDownloadStats({
+              appId: item.id,
+              appName: item.name,
+              apkFileName: item.apkFileName,
+              apkUrl: item.apkUrl,
+            }),
+            GITHUB_STATS_TIMEOUT_MS
+          );
           if (stats) {
             if (stats.totalDownloads > 0) {
               item.downloadsCount = stats.formattedTotal;
@@ -664,5 +689,89 @@ export class AppStorageService {
       console.error(`Gagal menghapus versi ${versionId}:`, err);
       return false;
     }
+  }
+
+  /**
+   * Mengembalikan daftar aplikasi ringan untuk halaman publik & SSR dengan ikon/screenshot base64
+   * dialihkan ke endpoint media biner agar JSON & HTML awal tetap berukuran beberapa KB saja.
+   */
+  static async getPublicCatalogApps(): Promise<AppItem[]> {
+    const apps = await this.getAllApps();
+    return apps.map((app) => {
+      const vTag = mediaVersionMap.get(app.id) || "1";
+      const safeId = encodeURIComponent(app.id);
+
+      const slimIconUrl =
+        app.iconUrl && app.iconUrl.trim().startsWith("data:image/")
+          ? `/api/apps/media/${safeId}/icon/0?v=${vTag}`
+          : app.iconUrl;
+
+      const slimScreenshots = Array.isArray(app.screenshots)
+        ? app.screenshots.map((sc, idx) => {
+            if (!sc || typeof sc.imageUrl !== "string") return sc;
+            if (!sc.imageUrl.trim().startsWith("data:image/")) return sc;
+            return {
+              ...sc,
+              imageUrl: `/api/apps/media/${safeId}/screenshot/${idx}?v=${vTag}`,
+            };
+          })
+        : [];
+
+      return {
+        ...app,
+        longDescription: app.description,
+        iconUrl: slimIconUrl,
+        screenshots: slimScreenshots,
+      };
+    });
+  }
+
+  /**
+   * Mengambil data biner ikon atau screenshot aplikasi untuk endpoint media cacheable.
+   */
+  static async getAppMediaBinary(
+    appId: string,
+    kind: "icon" | "screenshot",
+    slot: string
+  ): Promise<DecodedImageData | { redirectUrl: string } | null> {
+    let iconUrl: string | null | undefined;
+    let screenshots: AppItem["screenshots"] = [];
+
+    if (cachedApps) {
+      const cached = cachedApps.find((a) => a.id === appId);
+      if (cached) {
+        iconUrl = cached.iconUrl;
+        screenshots = cached.screenshots;
+      }
+    }
+
+    if (iconUrl === undefined && screenshots.length === 0) {
+      const record = await withRetry(() =>
+        prisma.app.findUnique({
+          where: { id: appId },
+          select: { iconUrl: true, screenshots: true },
+        })
+      );
+      if (!record) return null;
+      iconUrl = record.iconUrl;
+      screenshots =
+        (record.screenshots as unknown as AppItem["screenshots"]) || [];
+    }
+
+    let rawImageUrl: string | undefined;
+    if (kind === "icon") {
+      rawImageUrl = iconUrl || undefined;
+    } else if (Array.isArray(screenshots)) {
+      if (/^\d+$/.test(slot)) {
+        rawImageUrl = screenshots[Number(slot)]?.imageUrl;
+      } else {
+        rawImageUrl = screenshots.find((s) => s?.id === slot)?.imageUrl;
+      }
+    }
+
+    if (!rawImageUrl) return null;
+    const decoded = decodeDataImageUri(rawImageUrl);
+    if (decoded) return decoded;
+    return { redirectUrl: rawImageUrl };
   }
 }

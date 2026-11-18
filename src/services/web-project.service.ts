@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { WebProjectItem, CreateWebProjectInput, UpdateWebProjectInput } from "@/types/web-project";
+import { decodeDataImageUri, DecodedImageData } from "@/lib/media-decode";
 
 /**
  * In-memory cache untuk mengurangi beban query ke database Supabase.
@@ -339,5 +340,51 @@ export class WebProjectService {
       categoriesCount: categories.length,
       latestUpdated: items[0]?.updatedAt || items[0]?.createdAt || "-",
     };
+  }
+
+  /**
+   * Mengembalikan daftar projek web ringan untuk tampilan publik dengan gambar base64 dialihkan ke endpoint biner.
+   */
+  static async getPublicWebProjects(): Promise<WebProjectItem[]> {
+    const items = await this.getAllWebProjects();
+    return items.map((proj) => {
+      if (!proj.imageUrl || !proj.imageUrl.trim().startsWith("data:image/")) {
+        return proj;
+      }
+      const vSource = proj.updatedAt || proj.createdAt;
+      const vTag = vSource ? new Date(vSource).getTime().toString(36) : "1";
+      return {
+        ...proj,
+        imageUrl: `/api/web-projects/media/${encodeURIComponent(proj.id)}?v=${vTag}`,
+      };
+    });
+  }
+
+  /**
+   * Mengambil data biner gambar projek web untuk endpoint HTTP media cacheable.
+   */
+  static async getProjectImageBinary(
+    projectId: string
+  ): Promise<DecodedImageData | { redirectUrl: string } | null> {
+    let imageUrl: string | null = null;
+    if (cachedWebProjects) {
+      const cached = cachedWebProjects.find((p) => p.id === projectId);
+      if (cached) imageUrl = cached.imageUrl ?? null;
+    }
+
+    if (!imageUrl) {
+      const record = await withRetry(() =>
+        prisma.webProject.findUnique({
+          where: { id: projectId },
+          select: { imageUrl: true },
+        })
+      );
+      imageUrl = record?.imageUrl || null;
+    }
+
+    if (!imageUrl) return null;
+    const decoded = decodeDataImageUri(imageUrl);
+    if (decoded) return decoded;
+    return { redirectUrl: imageUrl };
   }
 }

@@ -1,4 +1,17 @@
 import type { ApkSecuritySummary, SecurityEngineHighlight } from "@/types/security";
+import type { AppItem } from "@/types/store";
+
+/**
+ * Memilih satu aplikasi contoh terbaik untuk ditampilkan pada section transparansi keamanan.
+ */
+export function pickFeaturedSecurityApp(apps: AppItem[]): AppItem | null {
+  if (apps.length === 0) return null;
+  return (
+    apps.find((app) => app.securityScan?.status === "clean") ||
+    apps.find((app) => Boolean(app.securityScan)) ||
+    apps[0]
+  );
+}
 
 export interface SecurityStatusPresentation {
   label: string;

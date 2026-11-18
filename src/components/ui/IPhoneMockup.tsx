@@ -272,7 +272,7 @@ export const IPhoneMockup: React.FC<IPhoneMockupProps> = ({
   // Ukuran ruang layout mengikuti dimensi fisik yang sudah dikalikan scale
   const layoutBoxStyle: CSSProperties = {
     boxSizing: "border-box",
-    display: "inline-block",
+    display: "block",
     position: "relative",
     width: outerWidth,
     height: outerHeight,

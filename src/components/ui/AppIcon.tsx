@@ -1,4 +1,5 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
+import Image from "next/image";
 import {
   FileText,
   GraduationCap,
@@ -12,6 +13,14 @@ import {
   ListTodo,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { isLocalOptimizedMediaUrl } from "@/lib/media-url";
+
+const ICON_PIXEL_SIZES = {
+  sm: 36,
+  md: 56,
+  lg: 72,
+  xl: 96,
+} as const;
 
 interface AppIconProps {
   type?: string;
@@ -20,6 +29,7 @@ interface AppIconProps {
   size?: "sm" | "md" | "lg" | "xl";
   colorClass?: string;
   alt?: string;
+  priority?: boolean;
 }
 
 export function AppIcon({
@@ -29,6 +39,7 @@ export function AppIcon({
   size = "md",
   colorClass = "bg-primary",
   alt = "App Icon",
+  priority = false,
 }: AppIconProps) {
   const [imageError, setImageError] = useState(false);
 
@@ -55,6 +66,7 @@ export function AppIcon({
 
   // Jika ada URL gambar ikon dan belum error, tampilkan gambar langsung
   if (iconUrl && !imageError) {
+    const pixelSize = ICON_PIXEL_SIZES[size];
     return (
       <div
         className={cn(
@@ -63,13 +75,29 @@ export function AppIcon({
           className
         )}
       >
-        <img
-          src={iconUrl}
-          alt={alt}
-          onError={() => setImageError(true)}
-          className="h-full w-full object-cover select-none"
-          loading="lazy"
-        />
+        {isLocalOptimizedMediaUrl(iconUrl) ? (
+          <Image
+            src={iconUrl}
+            alt={alt}
+            width={pixelSize}
+            height={pixelSize}
+            sizes={`${pixelSize}px`}
+            quality={80}
+            priority={priority}
+            loading={priority ? undefined : "lazy"}
+            onError={() => setImageError(true)}
+            className="h-full w-full object-cover select-none"
+          />
+        ) : (
+          <img
+            src={iconUrl}
+            alt={alt}
+            onError={() => setImageError(true)}
+            className="h-full w-full object-cover select-none"
+            loading={priority ? "eager" : "lazy"}
+            decoding="async"
+          />
+        )}
       </div>
     );
   }

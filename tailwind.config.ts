@@ -52,6 +52,12 @@ const config: Config = {
         },
       },
       fontFamily: {
+        sans: [
+          "var(--font-dm-sans)",
+          "var(--font-body)",
+          "DM Sans",
+          "sans-serif",
+        ],
         display: [
           "var(--font-outfit)",
           "var(--font-display)",
@@ -65,11 +71,13 @@ const config: Config = {
           "sans-serif",
         ],
         mono: [
+          "var(--font-jetbrains-mono)",
           "var(--font-mono)",
           "JetBrains Mono",
           "monospace",
         ],
         script: [
+          "var(--font-dancing-script)",
           "var(--font-script)",
           '"Dancing Script"',
           '"Brush Script MT"',

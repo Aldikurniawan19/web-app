@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { AUTH_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
 import { ApkSecurityService } from "@/services/apk-security.service";
 import { AppStorageService } from "@/services/app-storage.service";
@@ -90,6 +91,8 @@ export async function POST(request: NextRequest) {
     });
 
     AppStorageService.invalidateCache();
+    revalidatePath("/");
+    revalidatePath("/aplikasi");
 
     return NextResponse.json({
       success: true,

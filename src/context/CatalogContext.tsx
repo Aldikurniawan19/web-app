@@ -11,8 +11,8 @@ import React, {
 import { AppItem } from "@/types/store";
 import { WebProjectItem } from "@/types/web-project";
 
-export const APPS_SESSION_CACHE_KEY = "allprojects_apps_session";
-export const WEB_PROJECTS_SESSION_CACHE_KEY = "allprojects_web_session";
+export const APPS_SESSION_CACHE_KEY = "allprojects_apps_session_v2";
+export const WEB_PROJECTS_SESSION_CACHE_KEY = "allprojects_web_session_v2";
 
 /**
  * Helper untuk membersihkan cache sesi sementara di window saat admin mengubah data.
@@ -73,9 +73,10 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     // 2. SELALU fetch data terbaru dari server di latar belakang (Stale-While-Revalidate)
     // agar versi terbaru dari database langsung tampil seketika tanpa tertahan cache sesi
     try {
+      const fetchInit: RequestInit | undefined = force ? { cache: "no-store" } : undefined;
       const [appsResult, webResult] = await Promise.allSettled([
-        fetch("/api/apps", { cache: "no-store" }),
-        fetch("/api/web-projects", { cache: "no-store" }),
+        fetch("/api/apps", fetchInit),
+        fetch("/api/web-projects", fetchInit),
       ]);
 
       if (appsResult.status === "fulfilled" && appsResult.value && appsResult.value.ok) {
@@ -112,6 +113,25 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // Halaman beranda ("/") sudah mendapat data katalog awal dari Server Component (SSR/ISR),
+    // sehingga pembaruan latar belakang ditunda agar tidak memperebutkan bandwidth gambar LCP.
+    if (typeof window !== "undefined" && window.location.pathname === "/") {
+      let hasSessionCache = false;
+      try {
+        hasSessionCache = Boolean(sessionStorage.getItem(APPS_SESSION_CACHE_KEY));
+      } catch {}
+
+      if (hasSessionCache) {
+        loadCatalog();
+        return;
+      }
+
+      const timer = setTimeout(() => {
+        loadCatalog();
+      }, 2200);
+      return () => clearTimeout(timer);
+    }
+
     loadCatalog();
   }, [loadCatalog]);
 

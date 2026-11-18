@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { AppStorageService } from "@/services/app-storage.service";
 import { AUTH_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
 
@@ -110,6 +111,9 @@ export async function POST(request: NextRequest) {
       apkFileName: body.apkFileName || null,
     });
 
+    revalidatePath("/");
+    revalidatePath("/aplikasi");
+
     return NextResponse.json({
       success: true,
       message: "Aplikasi berhasil ditambahkan ke database Supabase.",
@@ -151,6 +155,9 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    revalidatePath("/");
+    revalidatePath("/aplikasi");
+
     return NextResponse.json({
       success: true,
       message: "Data aplikasi dan deskripsi berhasil diperbarui di Supabase.",
@@ -190,6 +197,9 @@ export async function DELETE(request: NextRequest) {
       { status: 404 }
     );
   }
+
+  revalidatePath("/");
+  revalidatePath("/aplikasi");
 
   return NextResponse.json({
     success: true,

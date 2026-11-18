@@ -1,8 +1,10 @@
-﻿"use client";
+"use client";
 
 import React from "react";
+import Image from "next/image";
 import { ExternalLink, Globe, Sparkles, Code2, Eye } from "lucide-react";
 import { WebProjectItem } from "@/types/web-project";
+import { isLocalOptimizedMediaUrl } from "@/lib/media-url";
 import { cn } from "@/lib/utils";
 
 interface WebProjectCardProps {
@@ -19,12 +21,25 @@ export function WebProjectCard({ project, onOpenDetail }: WebProjectCardProps) {
       {/* Top: Foto Tampilan Sekilas (Persegi & Proporsional) */}
       <div className="relative aspect-[16/10] sm:aspect-[4/3] w-full overflow-hidden bg-slate-100 border-b border-slate-100">
         {project.imageUrl ? (
-          <img
-            src={project.imageUrl}
-            alt={`Tampilan sekilas ${project.name}`}
-            loading="lazy"
-            className="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105"
-          />
+          isLocalOptimizedMediaUrl(project.imageUrl) ? (
+            <Image
+              src={project.imageUrl}
+              alt={`Tampilan sekilas ${project.name}`}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              quality={75}
+              loading="lazy"
+              className="object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105"
+            />
+          ) : (
+            <img
+              src={project.imageUrl}
+              alt={`Tampilan sekilas ${project.name}`}
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover object-top transition-transform duration-500 ease-out group-hover:scale-105"
+            />
+          )
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center p-6 text-slate-400 bg-gradient-to-br from-slate-50 to-slate-100">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-primary shadow-sm">

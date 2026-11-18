@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Sparkles, Smartphone, Globe, ArrowRight } from "lucide-react";
 import { AppItem } from "@/types/store";
@@ -10,15 +10,8 @@ import { AppCardSkeleton } from "@/features/catalog/AppCardSkeleton";
 import { WebProjectCard } from "@/features/catalog/WebProjectCard";
 import { WebProjectCardSkeleton } from "@/features/catalog/WebProjectCardSkeleton";
 import { cn } from "@/lib/utils";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
-
-// Register ScrollTrigger plugin on client side
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 export type CatalogFilterTab = "aplikasi" | "web";
 
@@ -62,17 +55,17 @@ export function AppGridSection({
   };
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [minListHeight, setMinListHeight] = useState<number | null>(null);
+  const [tabIndicator, setTabIndicator] = useState<{
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+    ready: boolean;
+  }>({ left: 0, top: 0, width: 0, height: 0, ready: false });
 
-
-  const containerRef = useRef<HTMLDivElement>(null);
   const cardsContainerRef = useRef<HTMLDivElement>(null);
-  const tabContainerRef = useRef<HTMLDivElement>(null);
-  const tabPillRef = useRef<HTMLDivElement>(null);
   const tabBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const prevTabRef = useRef<CatalogFilterTab | null>(null);
-  const isInitialTabMount = useRef<boolean>(true);
 
   // Cek apakah mode pembatasan aktif (misal di halaman Beranda: maks 3)
   const isAppsLimited = Boolean(limit && apps.length > limit);
@@ -88,176 +81,31 @@ export function AppGridSection({
     setCurrentPage(1);
   }, [activeTab, apps.length]);
 
-  // Animasi Background Pill Kenyal untuk Filter Switch (Aplikasi vs Web)
-  useEffect(() => {
-    const pill = tabPillRef.current;
+  const updateTabIndicator = useCallback(() => {
     const targetBtn = tabBtnRefs.current[activeTab];
+    if (!targetBtn) return;
 
-    if (!pill || !targetBtn) return;
-
-    // Gunakan offsetLeft/offsetTop dari container relative agar 100% tepat dan tidak tergeser padding
-    const targetX = targetBtn.offsetLeft;
-    const targetY = targetBtn.offsetTop;
-    const targetWidth = targetBtn.offsetWidth;
-    const targetHeight = targetBtn.offsetHeight;
-
-    const prevTab = prevTabRef.current;
-
-    if (isInitialTabMount.current || !prevTab || prevTab === activeTab) {
-      gsap.set(pill, {
-        x: targetX,
-        y: targetY,
-        width: targetWidth,
-        height: targetHeight,
-        opacity: 1,
-        scaleX: 1,
-        scaleY: 1,
-        transformOrigin: "center center",
-      });
-      isInitialTabMount.current = false;
-      prevTabRef.current = activeTab;
-      return;
-    }
-
-    const currentX = gsap.getProperty(pill, "x") as number;
-    const currentWidth = gsap.getProperty(pill, "width") as number;
-    const startX = typeof currentX === "number" && !isNaN(currentX) ? currentX : targetX;
-    const startWidth = typeof currentWidth === "number" && !isNaN(currentWidth) ? currentWidth : targetWidth;
-
-    const startRight = startX + startWidth;
-    const targetRight = targetX + targetWidth;
-    const isMovingRight = targetX > startX;
-
-    gsap.killTweensOf(pill);
-
-    // Animasi pergerakan fluida independen: ujung depan melesat lebih dulu, ujung ekor menyusul
-    // sehingga pill benar-benar "molor" dan meluncur ke arah tujuan (bukan membesar di tempat)
-    const state = {
-      left: startX,
-      right: startRight,
-    };
-
-    const updatePill = () => {
-      const curWidth = Math.max(state.right - state.left, 24);
-      gsap.set(pill, {
-        x: state.left,
-        width: curWidth,
-        y: targetY,
-        height: targetHeight,
-      });
-    };
-
-    const tl = gsap.timeline();
-
-    if (isMovingRight) {
-      // BERGERAK KE KANAN:
-      // Ujung kanan (depan) melesat duluan ke target
-      tl.to(
-        state,
-        {
-          right: targetRight,
-          duration: 0.52,
-          ease: "power2.out",
-          onUpdate: updatePill,
-        },
-        0
-      );
-
-      // Ujung kiri (ekor) menyusul dengan jeda sedikit (molor ke arah kanan!)
-      tl.to(
-        state,
-        {
-          left: targetX,
-          duration: 0.62,
-          ease: "elastic.out(1.05, 0.72)",
-          onUpdate: updatePill,
-        },
-        0.08
-      );
-    } else {
-      // BERGERAK KE KIRI:
-      // Ujung kiri (depan) melesat duluan ke target
-      tl.to(
-        state,
-        {
-          left: targetX,
-          duration: 0.52,
-          ease: "power2.out",
-          onUpdate: updatePill,
-        },
-        0
-      );
-
-      // Ujung kanan (ekor) menyusul dengan jeda sedikit (molor ke arah kiri!)
-      tl.to(
-        state,
-        {
-          right: targetRight,
-          duration: 0.62,
-          ease: "elastic.out(1.05, 0.72)",
-          onUpdate: updatePill,
-        },
-        0.08
-      );
-    }
-
-    // Efek ketebalan fluida air: menipis saat melar memanjang, lalu membal kenyal di tujuan
-    tl.to(
-      pill,
-      {
-        scaleY: 0.88,
-        duration: 0.22,
-        ease: "power1.out",
-        transformOrigin: "center center",
-      },
-      0
-    );
-    tl.to(
-      pill,
-      {
-        scaleY: 1.05,
-        duration: 0.26,
-        ease: "power1.inOut",
-        transformOrigin: "center center",
-      },
-      0.22
-    );
-    tl.to(
-      pill,
-      {
-        scaleY: 1,
-        duration: 0.3,
-        ease: "elastic.out(1.05, 0.65)",
-        transformOrigin: "center center",
-      },
-      0.48
-    );
-
-    prevTabRef.current = activeTab;
+    setTabIndicator({
+      left: targetBtn.offsetLeft,
+      top: targetBtn.offsetTop,
+      width: targetBtn.offsetWidth,
+      height: targetBtn.offsetHeight,
+      ready: true,
+    });
   }, [activeTab]);
+
+  // Sinkronkan posisi indikator tab filter (Aplikasi vs Web) berbasis CSS ringan tanpa GSAP
+  useLayoutEffect(() => {
+    updateTabIndicator();
+  }, [updateTabIndicator]);
 
   useEffect(() => {
-    const handleResize = () => {
-      const pill = tabPillRef.current;
-      const targetBtn = tabBtnRefs.current[activeTab];
-
-      if (!pill || !targetBtn) return;
-
-      gsap.set(pill, {
-        x: targetBtn.offsetLeft,
-        y: targetBtn.offsetTop,
-        width: targetBtn.offsetWidth,
-        height: targetBtn.offsetHeight,
-        transformOrigin: "center center",
-      });
-    };
-
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", updateTabIndicator);
     if (typeof document !== "undefined" && document.fonts) {
-      document.fonts.ready.then(handleResize);
+      document.fonts.ready.then(updateTabIndicator);
     }
-    return () => window.removeEventListener("resize", handleResize);
-  }, [activeTab]);
+    return () => window.removeEventListener("resize", updateTabIndicator);
+  }, [updateTabIndicator]);
 
   // Data aplikasi yang ditampilkan (maksimal 3 jika ada limit, atau sesuai paginasi)
   const displayedApps = React.useMemo(() => {
@@ -320,16 +168,6 @@ export function AppGridSection({
     return () => window.removeEventListener("resize", handleResize);
   }, [updateStableHeight, shouldPaginate, activeTab]);
 
-  // Sinkronisasi posisi ScrollTrigger di seluruh halaman saat data aplikasi berubah atau selesai dimuat
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const timer = setTimeout(() => {
-        ScrollTrigger.refresh();
-      }, 150);
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading, apps.length, webProjects.length, activeTab]);
-
   const scrollToKatalogTop = () => {
     const katalogEl = document.getElementById("katalog");
     if (katalogEl) {
@@ -345,155 +183,33 @@ export function AppGridSection({
     }
   };
 
-  // Animasi Muncul Kartu (Aplikasi atau Projek Web)
-  useGSAP(
-    () => {
-      if (isLoading || !containerRef.current) return;
-
-      const items = gsap.utils.toArray<HTMLElement>(
-        activeTab === "aplikasi" ? ".app-card-item" : ".web-card-item"
-      );
-      if (!items || items.length === 0) return;
-
-      gsap.fromTo(
-        items,
-        {
-          opacity: 0,
-          y: 24,
-          scale: 0.98,
-        },
-        {
-          opacity: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.45,
-          stagger: 0.05,
-          ease: "power3.out",
-          clearProps: "transform,opacity",
-          onComplete: () => {
-            setIsTransitioning(false);
-          },
-        }
-      );
-    },
-    {
-      dependencies: [activeTab, currentPage, displayedApps, displayedWebProjects, isLoading],
-      scope: containerRef,
-    }
-  );
-
-  // Animasi saat berpindah tab filter
   const handleTabChange = (newTab: CatalogFilterTab) => {
-    if (newTab === activeTab || isTransitioning) return;
-    setIsTransitioning(true);
-
-    const currentCards = containerRef.current?.querySelectorAll(
-      activeTab === "aplikasi" ? ".app-card-item" : ".web-card-item"
-    );
-
-    if (currentCards && currentCards.length > 0) {
-      gsap.to(currentCards, {
-        opacity: 0,
-        y: 12,
-        scale: 0.98,
-        duration: 0.18,
-        stagger: 0.015,
-        ease: "power2.in",
-        onComplete: () => {
-          setActiveTab(newTab);
-          setCurrentPage(1);
-        },
-      });
-    } else {
-      setActiveTab(newTab);
-      setCurrentPage(1);
-      setIsTransitioning(false);
-    }
+    if (newTab === activeTab) return;
+    setActiveTab(newTab);
+    setCurrentPage(1);
   };
 
-  // Animasi Keluar saat membuka detail aplikasi
   const handleOpenDetailWithAnimation = (app: AppItem) => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-
-    const cards = containerRef.current?.querySelectorAll(".app-card-item");
-    if (cards && cards.length > 0) {
-      gsap.to(cards, {
-        opacity: 0,
-        y: 16,
-        scale: 0.98,
-        duration: 0.2,
-        stagger: 0.02,
-        ease: "power2.in",
-        onComplete: () => {
-          onOpenDetail(app);
-          setIsTransitioning(false);
-        },
-      });
-    } else {
-      onOpenDetail(app);
-      setIsTransitioning(false);
-    }
+    onOpenDetail(app);
   };
 
-  // Animasi Keluar dan Perpindahan Halaman Paginasi + Auto Scroll ke Atas
   const handlePageChange = (newPage: number) => {
-    if (newPage === currentPage || isTransitioning || newPage < 1 || newPage > totalPages) return;
-    setIsTransitioning(true);
-
+    if (newPage === currentPage || newPage < 1 || newPage > totalPages) return;
     scrollToKatalogTop();
-
-    const cards = containerRef.current?.querySelectorAll(".app-card-item");
-    if (cards && cards.length > 0) {
-      gsap.to(cards, {
-        opacity: 0,
-        y: newPage > currentPage ? -14 : 14,
-        scale: 0.98,
-        duration: 0.2,
-        stagger: 0.015,
-        ease: "power2.in",
-        onComplete: () => {
-          setCurrentPage(newPage);
-        },
-      });
-    } else {
-      setCurrentPage(newPage);
-      setIsTransitioning(false);
-    }
+    setCurrentPage(newPage);
   };
 
-  // Animasi Keluar saat mereset pencarian
   const handleResetSearchWithAnimation = () => {
-    if (isTransitioning || !onResetSearch) return;
-    setIsTransitioning(true);
-
-    const cards = containerRef.current?.querySelectorAll(
-      activeTab === "aplikasi" ? ".app-card-item" : ".web-card-item"
-    );
-    if (cards && cards.length > 0) {
-      gsap.to(cards, {
-        opacity: 0,
-        y: 12,
-        duration: 0.2,
-        ease: "power2.in",
-        onComplete: () => {
-          onResetSearch();
-          setIsTransitioning(false);
-        },
-      });
-    } else {
-      onResetSearch();
-      setIsTransitioning(false);
-    }
+    onResetSearch?.();
   };
 
   return (
-    <section ref={containerRef} id="katalog" className="py-12 sm:py-16 bg-background w-full">
+    <section id="katalog" className="py-12 sm:py-16 bg-background w-full">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Section Header: Title, Segmented Tabs Filter & Total Count */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           {/* Left: Dynamic Section Title */}
-          <div className="space-y-1">
+          <ScrollReveal className="space-y-1">
             <h2 className="text-2xl font-extrabold tracking-normal sm:text-3xl font-display select-none py-0.5">
               <span className="inline-block text-3d-bubble-main">
                 {activeTab === "aplikasi" ? "Aplikasi" : "Projek Web"}
@@ -507,20 +223,24 @@ export function AppGridSection({
                 ? "Paket aplikasi Android resmi siap unduh dan pasang langsung."
                 : "Koleksi karya website interaktif dengan teknologi modern."}
             </p>
-          </div>
+          </ScrollReveal>
 
           {/* Right: Segmented Filter Switch (Aplikasi & Web) + Total Count */}
           <div className="flex flex-wrap items-center gap-3 sm:gap-4 self-start md:self-auto">
             {!hideFilterTabs && (
-              <div
-                ref={tabContainerRef}
-                className="relative inline-flex items-center rounded-2xl border border-slate-200 bg-slate-100/80 p-1.5 shadow-inner"
-              >
-                {/* Elastic Sliding Pill Indicator */}
+              <div className="relative inline-flex items-center rounded-2xl border border-slate-200 bg-slate-100/80 p-1.5 shadow-inner">
+                {/* Sliding Pill Indicator CSS Ringan */}
                 <div
-                  ref={tabPillRef}
-                  className="absolute top-0 left-0 pointer-events-none rounded-xl bg-gradient-to-b from-blue-500 via-primary to-blue-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] z-0 will-change-transform"
-                  style={{ opacity: 0 }}
+                  aria-hidden="true"
+                  className={cn(
+                    "absolute top-0 left-0 pointer-events-none rounded-xl bg-gradient-to-b from-blue-500 via-primary to-blue-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.2)] z-0 transition-[transform,width,opacity] duration-250 ease-out",
+                    tabIndicator.ready ? "opacity-100" : "opacity-0"
+                  )}
+                  style={{
+                    transform: `translate3d(${tabIndicator.left}px, ${tabIndicator.top}px, 0)`,
+                    width: tabIndicator.width || undefined,
+                    height: tabIndicator.height || undefined,
+                  }}
                 />
 
                 <button
@@ -532,7 +252,9 @@ export function AppGridSection({
                   className={cn(
                     "relative z-10 flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-colors select-none",
                     activeTab === "aplikasi"
-                      ? "text-white"
+                      ? !tabIndicator.ready
+                        ? "bg-primary text-white"
+                        : "text-white"
                       : "text-slate-600 hover:text-slate-900"
                   )}
                 >
@@ -549,7 +271,9 @@ export function AppGridSection({
                   className={cn(
                     "relative z-10 flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition-colors select-none",
                     activeTab === "web"
-                      ? "text-white"
+                      ? !tabIndicator.ready
+                        ? "bg-primary text-white"
+                        : "text-white"
                       : "text-slate-600 hover:text-slate-900"
                   )}
                 >
@@ -604,17 +328,18 @@ export function AppGridSection({
                   minHeight: minListHeight ? `${minListHeight}px` : undefined,
                 }}
               >
-                {displayedApps.map((app) => (
-                  <div
+                {displayedApps.map((app, index) => (
+                  <ScrollReveal
                     key={app.id}
-                    className="app-card-item w-full will-change-transform"
+                    delayMs={Math.min(index, 3) * 65}
+                    className="app-card-item w-full"
                   >
                     <AppCard
                       app={app}
                       onOpenDetail={handleOpenDetailWithAnimation}
                       onDownload={onDownload}
                     />
-                  </div>
+                  </ScrollReveal>
                 ))}
               </div>
             ) : (
@@ -658,7 +383,7 @@ export function AppGridSection({
               <div className="mt-12 flex items-center justify-center gap-2 animate-in fade-in">
                 <button
                   type="button"
-                  disabled={currentPage === 1 || isTransitioning}
+                  disabled={currentPage === 1}
                   onClick={() => handlePageChange(currentPage - 1)}
                   className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-100 text-slate-700 shadow-sm hover:-translate-y-0.5 active:translate-y-0.5 transition-all disabled:opacity-40"
                   aria-label="Halaman sebelumnya"
@@ -670,7 +395,6 @@ export function AppGridSection({
                   <button
                     key={pageNum}
                     type="button"
-                    disabled={isTransitioning}
                     onClick={() => handlePageChange(pageNum)}
                     className={cn(
                       "flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold transition-all",
@@ -685,7 +409,7 @@ export function AppGridSection({
 
                 <button
                   type="button"
-                  disabled={currentPage === totalPages || isTransitioning}
+                  disabled={currentPage === totalPages}
                   onClick={() => handlePageChange(currentPage + 1)}
                   className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-gradient-to-b from-white to-slate-100 text-slate-700 shadow-sm hover:-translate-y-0.5 active:translate-y-0.5 transition-all disabled:opacity-40"
                   aria-label="Halaman berikutnya"
@@ -712,16 +436,17 @@ export function AppGridSection({
               </div>
             ) : displayedWebProjects.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-                {displayedWebProjects.map((project) => (
-                  <div
+                {displayedWebProjects.map((project, index) => (
+                  <ScrollReveal
                     key={project.id}
-                    className="web-card-item w-full will-change-transform"
+                    delayMs={Math.min(index, 3) * 65}
+                    className="web-card-item w-full h-full"
                   >
                     <WebProjectCard
                       project={project}
                       onOpenDetail={(proj) => onOpenWebDetail?.(proj)}
                     />
-                  </div>
+                  </ScrollReveal>
                 ))}
               </div>
             ) : (

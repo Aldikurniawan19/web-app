@@ -2,8 +2,6 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Search, X } from "lucide-react";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
 import {
   Carousel,
   CarouselApi,
@@ -72,7 +70,6 @@ export function StoreHero({
   onExploreCatalog,
   autoplayDelay = DEFAULT_AUTOPLAY_DELAY_MS,
 }: StoreHeroProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [mainApi, setMainApi] = useState<CarouselApi>();
@@ -152,31 +149,6 @@ export function StoreHero({
     [mainApi]
   );
 
-  useGSAP(
-    () => {
-      if (
-        typeof window !== "undefined" &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      ) {
-        return;
-      }
-
-      gsap.fromTo(
-        ".hero-anim",
-        { opacity: 0, y: 14 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-          stagger: 0.06,
-          ease: "power3.out",
-          clearProps: "opacity,transform",
-        }
-      );
-    },
-    { dependencies: [], scope: containerRef }
-  );
-
   // Pintasan "/" membuka dan memfokuskan pencarian
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -244,7 +216,6 @@ export function StoreHero({
 
   return (
     <section
-      ref={containerRef}
       id="beranda"
       aria-labelledby="hero-heading"
       className="relative -mt-16 pt-16 overflow-x-clip bg-background transition-colors duration-200"
@@ -258,8 +229,8 @@ export function StoreHero({
       {/* Bagian Atas Hero: Centered Minimalist Header */}
       <div className="relative mx-auto max-w-4xl px-4 pt-8 sm:px-6 sm:pt-12 lg:px-8 lg:pt-14 text-center">
         {/* Top Social-Proof / Studio Pill Badge */}
-        <div className="hero-anim flex justify-center">
-          <div className="inline-flex items-center gap-2.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs shadow-sm">
+        <div className="flex justify-center">
+          <div className="inline-flex min-h-[38px] items-center gap-2.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs shadow-sm">
             {isWaitingInitialData ? (
               <>
                 <div className="flex items-center -space-x-1.5" aria-hidden="true">
@@ -317,7 +288,7 @@ export function StoreHero({
         {/* Judul 2-Nada Centered */}
         <h1
           id="hero-heading"
-          className="hero-anim mt-5 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-[56px] lg:leading-[1.08]"
+          className="mt-5 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-[56px] lg:leading-[1.08]"
         >
           <span className="block">Pusat Aplikasi</span>
           <span className="block text-foreground-muted">
@@ -326,13 +297,13 @@ export function StoreHero({
         </h1>
 
         {/* Subjudul Singkat Centered */}
-        <p className="hero-anim mx-auto mt-4 max-w-lg text-sm leading-relaxed text-foreground-muted sm:text-base">
+        <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-foreground-muted sm:text-base">
           Unduh berkas APK terverifikasi dengan riwayat versi rapi, serta
           jelajahi koleksi projek web modern dalam satu platform.
         </p>
 
         {/* CTA Utama + Tombol Pencarian Ringkas */}
-        <div className="hero-anim mt-6 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Button
             type="button"
             variant="primary"
@@ -413,16 +384,16 @@ export function StoreHero({
       </div>
 
       {/* Area Handphone Membelah Batas Hero (Menyatu Mulus dengan Bagian Bawah) */}
-      <div className="hero-anim relative mt-8 sm:mt-10 w-full">
+      <div className="relative mt-8 sm:mt-10 w-full">
         <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center px-4 sm:px-6 lg:px-8">
           {isWaitingInitialData ? (
             <>
-              <div className="w-full max-w-sm flex items-center justify-center pt-2 pb-6">
+              <div className="w-full max-w-sm min-h-[574px] flex items-center justify-center pt-2 pb-6">
                 <PhoneMockupSkeleton />
               </div>
 
               {/* Skeleton Strip Pilihan Aplikasi */}
-              <div className="mt-4 w-full max-w-3xl pb-10 sm:pb-12">
+              <div className="mt-4 w-full max-w-3xl min-h-[184px] sm:min-h-[196px] pb-10 sm:pb-12">
                 <div className="mb-3 flex items-center justify-center gap-2 text-xs font-medium text-foreground-muted">
                   <span>Pilihan Aplikasi</span>
                   <span
@@ -469,7 +440,7 @@ export function StoreHero({
             <>
               {/* Carousel Handphone Utama (Tidak bergeser otomatis antar aplikasi; tangkapan layar di dalamnya bergeser otomatis) */}
               <Carousel
-                className="w-full max-w-sm"
+                className="w-full max-w-sm min-h-[574px]"
                 setApi={setMainApi}
                 opts={{ loop: showcaseApps.length > 1 }}
                 aria-label="Pratinjau layar handphone aplikasi Android"
@@ -483,6 +454,7 @@ export function StoreHero({
                       <PhoneMockupPreview
                         app={app}
                         isActive={current === index}
+                        isPriority={index === 0}
                         autoplayDelay={autoplayDelay}
                         onSelectApp={onSelectApp}
                         onDownloadApp={onDownloadApp}
@@ -493,7 +465,7 @@ export function StoreHero({
               </Carousel>
 
               {/* Strip Pilihan Aplikasi di Bagian Bawah Tepat di Bawah Handphone */}
-              <div className="mt-4 w-full max-w-3xl pb-10 sm:pb-12">
+              <div className="mt-4 w-full max-w-3xl min-h-[184px] sm:min-h-[196px] pb-10 sm:pb-12">
                 <div className="mb-3 flex items-center justify-center gap-2 text-xs font-medium text-foreground-muted">
                   <span>Pilihan Aplikasi</span>
                   <span className="font-mono text-[11px] text-foreground">
@@ -502,7 +474,7 @@ export function StoreHero({
                 </div>
 
                 <Carousel
-                  className="relative w-full"
+                  className="relative w-full min-h-[112px] sm:min-h-[120px]"
                   setApi={setThumbApi}
                   opts={{
                     loop: showcaseApps.length > 4,

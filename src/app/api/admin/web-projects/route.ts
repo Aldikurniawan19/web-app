@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { WebProjectService } from "@/services/web-project.service";
 import { AUTH_COOKIE_NAME, verifySessionToken } from "@/lib/auth";
 
@@ -83,6 +84,9 @@ export async function POST(request: NextRequest) {
       featured: Boolean(body.featured),
     });
 
+    revalidatePath("/");
+    revalidatePath("/projek-web");
+
     return NextResponse.json({
       success: true,
       message: "Projek web berhasil ditambahkan ke database Supabase.",
@@ -124,6 +128,9 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    revalidatePath("/");
+    revalidatePath("/projek-web");
+
     return NextResponse.json({
       success: true,
       message: "Data projek web berhasil diperbarui di Supabase.",
@@ -163,6 +170,9 @@ export async function DELETE(request: NextRequest) {
       { status: 404 }
     );
   }
+
+  revalidatePath("/");
+  revalidatePath("/projek-web");
 
   return NextResponse.json({
     success: true,

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import {
   BookOpen,
   CheckCircle2,
@@ -21,6 +22,7 @@ import { AppItem, AppScreenshot } from "@/types/store";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { IPhoneMockup } from "@/components/ui/IPhoneMockup";
 import { cn } from "@/lib/utils";
+import { isLocalOptimizedMediaUrl } from "@/lib/media-url";
 
 const DEFAULT_SCREENSHOT_DELAY_MS = 2800;
 const SLIDE_TRANSITION_MS = 520;
@@ -28,6 +30,7 @@ const SLIDE_TRANSITION_MS = 520;
 interface PhoneMockupPreviewProps {
   app: AppItem;
   isActive?: boolean;
+  isPriority?: boolean;
   autoplayDelay?: number;
   onSelectApp?: (app: AppItem) => void;
   onDownloadApp?: (app: AppItem) => void;
@@ -408,6 +411,7 @@ export function PhoneMockupSkeleton({ className }: { className?: string }) {
 export function PhoneMockupPreview({
   app,
   isActive = true,
+  isPriority = false,
   autoplayDelay = DEFAULT_SCREENSHOT_DELAY_MS,
   onSelectApp,
   onDownloadApp,
@@ -427,15 +431,29 @@ export function PhoneMockupPreview({
   const [isTransitionEnabled, setIsTransitionEnabled] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [mountExtraSlides, setMountExtraSlides] = useState(false);
+
+  const renderedSlides =
+    mountExtraSlides || slideIndex > 0 ? slidesToRender : slidesToRender.slice(0, 1);
 
   // Reset posisi slide ke awal saat aplikasi berganti atau menjadi aktif kembali
   useEffect(() => {
     setIsTransitionEnabled(false);
     setSlideIndex(0);
     setImgError(false);
+    setMountExtraSlides(false);
     const rafId = requestAnimationFrame(() => setIsTransitionEnabled(true));
     return () => cancelAnimationFrame(rafId);
   }, [app.id, isActive]);
+
+  // Tunda pemasangan slide ke-2 dst agar LCP tangkapan layar utama tidak terhambat saat muat awal
+  useEffect(() => {
+    if (!isActive || !hasMultipleShots) return;
+    const timer = setTimeout(() => {
+      setMountExtraSlides(true);
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [app.id, isActive, hasMultipleShots]);
 
   // Geser otomatis tangkapan layar di dalam layar HP ketika slide HP ini sedang aktif
   useEffect(() => {
@@ -518,17 +536,33 @@ export function PhoneMockupPreview({
                       : "none",
                 }}
               >
-                {slidesToRender.map((sc, idx) => (
+                {renderedSlides.map((sc, idx) => (
                   <div
                     key={`${app.id}-shot-${sc.id || idx}-${idx}`}
-                    className="flex h-full w-full shrink-0 items-center justify-center"
+                    className="relative flex h-full w-full shrink-0 items-center justify-center"
                   >
-                    <img
-                      src={sc.imageUrl}
-                      alt={sc.title || `Tangkapan layar ${app.name}`}
-                      onError={() => setImgError(true)}
-                      className="block h-full w-full object-contain"
-                    />
+                    {isLocalOptimizedMediaUrl(sc.imageUrl) ? (
+                      <Image
+                        src={sc.imageUrl}
+                        alt={sc.title || `Tangkapan layar ${app.name}`}
+                        fill
+                        sizes="244px"
+                        quality={80}
+                        priority={Boolean(isPriority && idx === 0)}
+                        loading={isPriority && idx === 0 ? undefined : "lazy"}
+                        onError={() => setImgError(true)}
+                        className="object-contain"
+                      />
+                    ) : (
+                      <img
+                        src={sc.imageUrl}
+                        alt={sc.title || `Tangkapan layar ${app.name}`}
+                        onError={() => setImgError(true)}
+                        loading={isPriority && idx === 0 ? "eager" : "lazy"}
+                        decoding="async"
+                        className="block h-full w-full object-contain"
+                      />
+                    )}
                   </div>
                 ))}
               </div>

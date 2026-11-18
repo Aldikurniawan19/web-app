@@ -19,16 +19,19 @@ import type { ApkSecurityReportDetail } from "@/types/security";
 import { AppIcon } from "@/components/ui/AppIcon";
 import { Button } from "@/components/ui/Button";
 import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
+import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import {
   formatScanDate,
   getEngineCategoryLabel,
   getSecurityStatusPresentation,
+  pickFeaturedSecurityApp,
 } from "@/lib/security-format";
 import { cn } from "@/lib/utils";
 
 interface SecurityTransparencySectionProps {
   apps: AppItem[];
   isLoading?: boolean;
+  initialDetail?: ApkSecurityReportDetail | null;
   onOpenSecurityDetail: (app: AppItem) => void;
   onOpenAppDetail?: (app: AppItem) => void;
 }
@@ -43,26 +46,39 @@ const PREVIEW_ENGINES_LIMIT = 6;
 export function SecurityTransparencySection({
   apps,
   isLoading = false,
+  initialDetail = null,
   onOpenSecurityDetail,
   onOpenAppDetail,
 }: SecurityTransparencySectionProps) {
   // Prioritaskan satu aplikasi contoh yang sudah memiliki hasil scan VirusTotal bersih
-  const featuredApp = useMemo(() => {
-    if (apps.length === 0) return null;
-    return (
-      apps.find((app) => app.securityScan?.status === "clean") ||
-      apps.find((app) => Boolean(app.securityScan)) ||
-      apps[0]
-    );
-  }, [apps]);
+  const featuredApp = useMemo(() => pickFeaturedSecurityApp(apps), [apps]);
 
-  const [detail, setDetail] = useState<ApkSecurityReportDetail | null>(null);
+  const [detail, setDetail] = useState<ApkSecurityReportDetail | null>(() => {
+    if (
+      initialDetail &&
+      featuredApp &&
+      initialDetail.appId === featuredApp.id &&
+      initialDetail.version === featuredApp.version
+    ) {
+      return initialDetail;
+    }
+    return null;
+  });
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [copiedSha, setCopiedSha] = useState(false);
 
   useEffect(() => {
     if (!featuredApp) {
       setDetail(null);
+      return;
+    }
+
+    if (
+      initialDetail &&
+      initialDetail.appId === featuredApp.id &&
+      initialDetail.version === featuredApp.version
+    ) {
+      setDetail(initialDetail);
       return;
     }
 
@@ -89,7 +105,7 @@ export function SecurityTransparencySection({
     return () => {
       isCancelled = true;
     };
-  }, [featuredApp?.id, featuredApp?.version, featuredApp?.securityScan?.status]);
+  }, [featuredApp?.id, featuredApp?.version, featuredApp?.securityScan?.status, initialDetail]);
 
   const activeScan = detail ?? featuredApp?.securityScan ?? null;
   const presentation = getSecurityStatusPresentation(
@@ -156,7 +172,7 @@ export function SecurityTransparencySection({
     >
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Header Section */}
-        <div className="max-w-2xl space-y-2">
+        <ScrollReveal className="max-w-2xl space-y-2">
           <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-success-subtle px-3 py-1 text-xs font-bold text-emerald-800">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" aria-hidden="true" />
             <span>Verifikasi Keamanan VirusTotal</span>
@@ -173,7 +189,7 @@ export function SecurityTransparencySection({
           <p className="text-xs sm:text-sm text-foreground-muted leading-relaxed">
             Setiap berkas APK diperiksa menggunakan multi-mesin antivirus dan diverifikasi sidik jari SHA-256 sebelum dipublikasikan ke katalog.
           </p>
-        </div>
+        </ScrollReveal>
 
         {/* Konten 2 Kolom: Mobile (Atas: Aplikasi, Bawah: Bukti Cek) | Desktop (Kiri: Bukti Cek, Kanan: Aplikasi) */}
         {isLoading && apps.length === 0 ? (
@@ -188,27 +204,28 @@ export function SecurityTransparencySection({
         ) : (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-stretch">
             {/* BAGIAN KIRI (Desktop) / BAWAH (Mobile): Bukti Data Hasil Cek */}
-            <div className="order-2 lg:order-1 lg:col-span-7 flex flex-col justify-between gap-5 rounded-2xl border border-border bg-surface p-4 sm:p-6 shadow-sm">
-              <div className="space-y-4 sm:space-y-5">
+            <ScrollReveal className="order-2 lg:order-1 lg:col-span-7 flex min-w-0 w-full" delayMs={80}>
+              <div className="flex min-w-0 w-full flex-1 flex-col justify-between gap-5 rounded-2xl border border-border bg-surface p-4 sm:p-6 shadow-sm">
+              <div className="min-w-0 space-y-4 sm:space-y-5">
                 {/* Banner Status Hasil Cek */}
                 <div
                   className={cn(
-                    "flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border p-4",
+                    "flex min-w-0 flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl border p-3.5 sm:p-4",
                     presentation.panelClass
                   )}
                 >
-                  <div className="flex items-start gap-3.5">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-surface shadow-sm">
+                  <div className="flex min-w-0 items-start gap-3 sm:gap-3.5">
+                    <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-surface shadow-sm">
                       {renderStatusIcon()}
                     </div>
-                    <div className="space-y-1 min-w-0">
+                    <div className="min-w-0 flex-1 space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="text-sm sm:text-base font-bold text-foreground font-display">
                           {presentation.headline}
                         </h3>
                         <span
                           className={cn(
-                            "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-bold",
+                            "inline-flex shrink-0 items-center rounded-full border px-2.5 py-0.5 text-[11px] font-bold",
                             presentation.badgeClass
                           )}
                         >
@@ -280,9 +297,9 @@ export function SecurityTransparencySection({
                         return (
                           <div
                             key={engine.engineName}
-                            className="flex items-center justify-between gap-2 rounded-xl border border-border bg-background-soft px-3 py-2 text-xs"
+                            className="flex min-w-0 items-center justify-between gap-2 rounded-xl border border-border bg-background-soft px-3 py-2 text-xs"
                           >
-                            <span className="truncate font-semibold text-foreground">
+                            <span className="min-w-0 truncate font-semibold text-foreground">
                               {engine.engineName}
                             </span>
                             <span
@@ -307,14 +324,14 @@ export function SecurityTransparencySection({
               </div>
 
               {/* Footer Kiri: Checksum SHA-256 + Tautan Bukti Resmi */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-border pt-4">
+              <div className="flex min-w-0 flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-border pt-4">
                 {activeScan?.sha256 ? (
                   <div className="flex w-full sm:w-auto sm:flex-1 min-w-0 items-center gap-2 rounded-xl border border-border bg-background-soft px-3 py-2 sm:py-1.5">
                     <FileCheck2 className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                     <span className="text-[11px] font-semibold text-foreground-muted shrink-0">
                       SHA-256
                     </span>
-                    <code className="truncate font-mono text-[11px] text-foreground flex-1">
+                    <code className="min-w-0 truncate font-mono text-[11px] text-foreground flex-1">
                       {activeScan.sha256}
                     </code>
                     <button
@@ -348,10 +365,12 @@ export function SecurityTransparencySection({
                   </a>
                 )}
               </div>
-            </div>
+              </div>
+            </ScrollReveal>
 
             {/* BAGIAN KANAN (Desktop) / ATAS (Mobile): Aplikasinya */}
-            <aside className="order-1 lg:order-2 lg:col-span-5 flex flex-col justify-between gap-5 rounded-2xl border border-border bg-surface p-4 sm:p-6 shadow-sm">
+            <ScrollReveal className="order-1 lg:order-2 lg:col-span-5 flex min-w-0 w-full" delayMs={0}>
+              <aside className="flex min-w-0 w-full flex-1 flex-col justify-between gap-5 rounded-2xl border border-border bg-surface p-4 sm:p-6 shadow-sm">
               <div className="space-y-4">
                 {/* Identitas Aplikasi */}
                 <div className="flex items-start sm:items-center gap-3.5 sm:gap-4">
@@ -439,7 +458,8 @@ export function SecurityTransparencySection({
                   </Button>
                 )}
               </div>
-            </aside>
+              </aside>
+            </ScrollReveal>
           </div>
         )}
       </div>

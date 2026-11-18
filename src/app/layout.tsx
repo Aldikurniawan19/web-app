@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit, DM_Sans } from "next/font/google";
+import { Outfit, DM_Sans, JetBrains_Mono, Dancing_Script } from "next/font/google";
 import { CatalogProvider } from "@/context/CatalogContext";
 import "./globals.css";
 
@@ -14,6 +14,20 @@ const fontBody = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
   weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const fontMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+const fontScript = Dancing_Script({
+  subsets: ["latin"],
+  variable: "--font-dancing-script",
+  weight: ["600", "700"],
   display: "swap",
 });
 
@@ -88,18 +102,12 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${fontDisplay.variable} ${fontBody.variable} scroll-smooth`}
+      className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable} ${fontScript.variable} scroll-smooth`}
     >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="icon" href="/assets/logoAllProjects.png" type="image/png" sizes="any" />
         <link rel="shortcut icon" href="/assets/logoAllProjects.png" type="image/png" />
         <link rel="apple-touch-icon" href="/assets/logoAllProjects.png" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Dancing+Script:wght@600;700&family=Outfit:wght@400..800&family=JetBrains+Mono:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
