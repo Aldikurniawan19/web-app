@@ -52,7 +52,7 @@ function scrollToSection(sectionId: string) {
 }
 
 /**
- * Hero Section halaman beranda AllProjects bergaya centered flagship:
+ * Hero Section halaman beranda alllprojects bergaya centered flagship:
  * - Bagian atas: atmosfer langit lembut, badge sosial, judul 2-nada, deskripsi, dan CTA pill.
  * - Komponen handphone utama membelah batas antara area hero (setengah atas)
  *   dan area bawah (setengah bawah beserta strip pilihan aplikasi).
@@ -220,7 +220,7 @@ export function StoreHero({
       aria-labelledby="hero-heading"
       className="relative -mt-16 pt-16 overflow-x-clip bg-background transition-colors duration-200"
     >
-      {/* Motif Blueprint Kartu Aplikasi Khas AllProjects (Vektor Halus, Simetris, Tanpa Gradient Slop) */}
+      {/* Motif Blueprint Kartu Aplikasi Khas alllprojects (Vektor Halus, Simetris, Tanpa Gradient Slop) */}
       <div
         aria-hidden="true"
         className="hero-motif-mask pointer-events-none absolute inset-x-0 top-0 h-[560px] sm:h-[640px] overflow-hidden"
@@ -395,7 +395,7 @@ export function StoreHero({
                     <>
                       Katalog Resmi{" "}
                       <strong className="font-semibold text-foreground">
-                        AllProjects
+                        alllprojects
                       </strong>{" "}
                       APK &amp; Web
                     </>

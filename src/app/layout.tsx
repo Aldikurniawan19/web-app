@@ -50,11 +50,11 @@ const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.tri
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "AllProjects (AlllProjek) — Pusat Aplikasi Android APK Aman & Projek Web",
+    default: "alllprojects — Pusat Aplikasi Android APK Aman & Projek Web",
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "AllProjects (AlllProjek / AllProjek) adalah pusat download aplikasi Android APK gratis, aman, dan terverifikasi bebas virus VirusTotal, serta koleksi projek web modern dalam satu platform.",
+    "alllprojects adalah pusat download aplikasi Android APK gratis, aman, dan terverifikasi bebas virus VirusTotal, serta koleksi projek web modern dalam satu platform.",
   applicationName: SITE_NAME,
   authors: [{ name: SITE_PUBLISHER, url: SITE_URL }],
   creator: SITE_PUBLISHER,
@@ -80,9 +80,9 @@ export const metadata: Metadata = {
       }
     : {}),
   openGraph: {
-    title: "AllProjects (AlllProjek) — Pusat Aplikasi Android APK Aman & Projek Web",
+    title: "alllprojects — Pusat Aplikasi Android APK Aman & Projek Web",
     description:
-      "Unduh berkas APK Android terverifikasi bebas virus dengan riwayat versi rapi dan jelajahi koleksi projek web modern di AllProjects (alllprojects.my.id).",
+      "Unduh berkas APK Android terverifikasi bebas virus dengan riwayat versi rapi dan jelajahi koleksi projek web modern di alllprojects (alllprojects.my.id).",
     url: SITE_URL,
     siteName: SITE_NAME,
     locale: "id_ID",
@@ -92,15 +92,15 @@ export const metadata: Metadata = {
         url: SITE_LOGO_PATH,
         width: 512,
         height: 512,
-        alt: "Logo AllProjects — Pusat Aplikasi Android & Projek Web",
+        alt: "Logo alllprojects — Pusat Aplikasi Android & Projek Web",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AllProjects (AlllProjek) — Pusat Aplikasi Android APK & Projek Web",
+    title: "alllprojects — Pusat Aplikasi Android APK & Projek Web",
     description:
-      "Download aplikasi Android APK aman bebas virus VirusTotal dan jelajahi katalog projek web modern di AllProjects.",
+      "Download aplikasi Android APK aman bebas virus VirusTotal dan jelajahi katalog projek web modern di alllprojects.",
     images: [SITE_LOGO_PATH],
   },
   icons: {

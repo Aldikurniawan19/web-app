@@ -52,12 +52,12 @@ export async function generateMetadata(): Promise<Metadata> {
       ? `Jelajahi ${appsCount} aplikasi Android APK dan ${webCount} projek web modern di `
       : "Temukan dan unduh aplikasi Android APK gratis bebas virus serta koleksi projek web modern di ";
 
-  const description = `${countText}AllProjects (AlllProjek / AllProjek) — terverifikasi VirusTotal dengan riwayat versi rapi dan panduan instalasi lengkap.`;
+  const description = `${countText}alllprojects — terverifikasi VirusTotal dengan riwayat versi rapi dan panduan instalasi lengkap.`;
 
   return {
     title: {
       absolute:
-        "AllProjects (AlllProjek) — Pusat Aplikasi Android APK Aman & Projek Web",
+        "alllprojects — Pusat Aplikasi Android APK Aman & Projek Web",
     },
     description,
     keywords: buildSeoKeywords(dynamicKeywords),
@@ -68,7 +68,7 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: "AllProjects (AlllProjek) — Pusat Aplikasi Android APK Aman & Projek Web",
+      title: "alllprojects — Pusat Aplikasi Android APK Aman & Projek Web",
       description,
       url: SITE_URL,
     },
@@ -110,10 +110,10 @@ export default async function AppHubPage() {
         "@type": "CollectionPage",
         "@id": `${SITE_URL}/#webpage`,
         url: SITE_URL,
-        name: "AllProjects (AlllProjek) — Pusat Aplikasi Android APK & Projek Web",
+        name: "alllprojects — Pusat Aplikasi Android APK & Projek Web",
         alternateName: [...SITE_ALTERNATE_NAMES],
         description:
-          "Katalog aplikasi Android APK terverifikasi bebas virus VirusTotal dan projek web modern di AllProjects (alllprojects.my.id).",
+          "Katalog aplikasi Android APK terverifikasi bebas virus VirusTotal dan projek web modern di alllprojects (alllprojects.my.id).",
         inLanguage: "id-ID",
         isPartOf: { "@id": `${SITE_URL}/#website` },
         about: { "@id": `${SITE_URL}/#organization` },
@@ -160,15 +160,15 @@ export default async function AppHubPage() {
         mainEntity: [
           {
             "@type": "Question",
-            name: "Apakah file APK di AllProjects (AlllProjek) aman dan bebas virus?",
+            name: "Apakah file APK di alllprojects aman dan bebas virus?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Ya. Setiap berkas APK diperiksa menggunakan multi-mesin antivirus VirusTotal API v3 dan diverifikasi sidik jari SHA-256 sebelum dipublikasikan ke katalog AllProjects.",
+              text: "Ya. Setiap berkas APK diperiksa menggunakan multi-mesin antivirus VirusTotal API v3 dan diverifikasi sidik jari SHA-256 sebelum dipublikasikan ke katalog alllprojects.",
             },
           },
           {
             "@type": "Question",
-            name: "Bagaimana cara memasang berkas APK dari AllProjects di ponsel Android?",
+            name: "Bagaimana cara memasang berkas APK dari alllprojects di ponsel Android?",
             acceptedAnswer: {
               "@type": "Answer",
               text: "Unduh berkas APK dari katalog, aktifkan izin Instal aplikasi tidak dikenal pada browser atau pengelola berkas Android, ketuk berkas APK yang telah diunduh, lalu pilih Instal.",

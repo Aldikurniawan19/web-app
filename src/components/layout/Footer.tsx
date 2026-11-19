@@ -18,7 +18,7 @@ export function Footer() {
     { label: "Koleksi Web App Modern", href: "/projek-web" },
     { label: "Verifikasi VirusTotal", href: "/#keamanan" },
     {
-      label: "GitHub AllProjects",
+      label: "GitHub alllprojects",
       href: "https://github.com/Aldikurniawan19",
       external: true,
     },
@@ -60,18 +60,18 @@ export function Footer() {
                 <Link
                   href="/"
                   className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5 flex items-baseline"
-                  aria-label="Beranda AllProjects"
+                  aria-label="Beranda alllprojects"
                 >
                   <span className="inline-block font-script text-2xl sm:text-3xl font-bold text-3d-white pr-1">
-                    All
+                    Alll
                   </span>
                   <ShimmerTitleText variant="sky" showSparkles={true}>
-                    Projects
+                    projects
                   </ShimmerTitleText>
                 </Link>
               </div>
               <p className="text-xs text-blue-100 leading-relaxed max-w-md">
-                AllProjects (AlllProjek / AllProjek) adalah platform katalog untuk menemukan dan mengunduh aplikasi Android APK gratis yang terverifikasi bebas virus VirusTotal, sekaligus mengeksplorasi berbagai projek web modern.
+                alllprojects adalah platform katalog untuk menemukan dan mengunduh aplikasi Android APK gratis yang terverifikasi bebas virus VirusTotal, sekaligus mengeksplorasi berbagai projek web modern.
               </p>
             </div>
 
@@ -127,7 +127,7 @@ export function Footer() {
 
           {/* Bottom Copyright Bar */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-blue-500/30 pt-8 pb-16 md:pb-0 text-xs text-blue-200/90">
-            <p>© {currentYear} AllProjects Studio (alllprojects.my.id).</p>
+            <p>© {currentYear} alllprojects (alllprojects.my.id).</p>
             <div className="flex items-center gap-6 text-xs text-blue-100">
               <Link href="/aplikasi" className="hover:text-white transition-colors">
                 Aplikasi Android

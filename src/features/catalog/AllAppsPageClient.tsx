@@ -344,7 +344,7 @@ export function AllAppsPageClient({
                     <ShimmerTitleText>Aplikasi</ShimmerTitleText>
                   </h1>
                   <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                    Temukan dan unduh seluruh paket aplikasi Android APK resmi yang terverifikasi bebas virus di ekosistem AllProjects (AlllProjek).
+                    Temukan dan unduh seluruh paket aplikasi Android APK resmi yang terverifikasi bebas virus di ekosistem alllprojects.
                   </p>
                 </div>
 

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import Link from "next/link";
@@ -106,7 +106,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                 <Smartphone className="h-5 w-5" />
               </div>
               <div className="flex flex-col">
-                <span className="leading-tight font-extrabold text-foreground">AllProjects</span>
+                <span className="leading-tight font-extrabold text-foreground">alllprojects</span>
                 <span className="text-[10px] uppercase font-bold tracking-widest text-primary">
                   Admin Portal
                 </span>

@@ -1,6 +1,6 @@
 /**
  * Sumber kebenaran tunggal untuk konfigurasi SEO, domain kanonis, kata kunci,
- * dan structured data halaman publik AllProjects (alllprojects.my.id).
+ * dan structured data halaman publik alllprojects (alllprojects.my.id).
  */
 
 const DEFAULT_PRODUCTION_SITE_URL = "https://alllprojects.my.id";
@@ -19,39 +19,43 @@ export const SITE_URL = normalizeOrigin(
   process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_PRODUCTION_SITE_URL
 );
 
-export const SITE_NAME = "AllProjects";
-export const SITE_PUBLISHER = "AllProjects Studio";
+export const SITE_NAME = "alllprojects";
+export const SITE_PUBLISHER = "alllprojects";
 export const SITE_FAVICON_PATH = "/assets/favicon-48.png";
 export const SITE_APPLE_ICON_PATH = "/assets/apple-touch-icon.png";
 export const SITE_LOGO_PATH = "/assets/og-logo.png";
 export const SITE_GITHUB_URL = "https://github.com/Aldikurniawan19";
 
 export const SITE_ALTERNATE_NAMES = [
+  "alllprojects",
+  "alllprojek",
   "AlllProjects",
   "AlllProjek",
-  "AllProjek",
+  "allprojek",
   "All Projek",
-  "AllProject",
-  "All Projects",
-  "AlllProject",
-  "AllProjects Indonesia",
-  "AllProjects Studio",
+  "allprojects",
+  "allproject",
+  "alllproject",
+  "alllprojects Indonesia",
   "alllprojects.my.id",
 ] as const;
 
 export const CORE_SEO_KEYWORDS: readonly string[] = [
   // Nama brand & variasi ejaan populer yang sering diketik di Google
-  "alllprojek",
   "alllprojects",
   "alllprojects.my.id",
+  "alllprojek",
+  "alllprojects apk",
+  "alllprojects android",
+  "alllprojects web",
+  "alllprojek apk",
+  "alllproject",
   "allprojek",
   "all projek",
   "allprojects",
   "allproject",
   "all projects",
   "all project",
-  "alllproject",
-  "alllprojek apk",
   "allprojek apk",
   "allprojects apk",
   "allprojects android",

@@ -205,7 +205,7 @@
               <div className="flex items-center gap-2 rounded-xl bg-white px-4 py-1 text-xs font-mono text-slate-600 border border-slate-200 max-w-sm sm:max-w-md truncate">
                 <Globe className="h-3.5 w-3.5 text-primary shrink-0" />
                 <span className="truncate">
-                  {project.liveUrl || `https://${project.id}.allprojects.dev`}
+                  {project.liveUrl || `https://${project.id}.alllprojects.my.id`}
                 </span>
               </div>
 

@@ -100,7 +100,7 @@ export default function AdminAppsListPage() {
             Kelola Seluruh Aplikasi APK
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Publikasikan, edit metadata deskripsi, atau hapus aplikasi dari ekosistem AllProjects.
+            Publikasikan, edit metadata deskripsi, atau hapus aplikasi dari ekosistem alllprojects.
           </p>
         </div>
 

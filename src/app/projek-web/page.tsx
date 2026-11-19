@@ -24,8 +24,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const description =
     count > 0
-      ? `Jelajahi ${count} koleksi projek web modern, aplikasi web, SaaS, dan dashboard interaktif di AllProjects (AlllProjek / AllProjek).`
-      : "Koleksi lengkap projek website modern, aplikasi web, dan dashboard interaktif karya AllProjects (AlllProjek / AllProjek).";
+      ? `Jelajahi ${count} koleksi projek web modern, aplikasi web, SaaS, dan dashboard interaktif di alllprojects.`
+      : "Koleksi lengkap projek website modern, aplikasi web, dan dashboard interaktif karya alllprojects.";
 
   return {
     title: "Katalog Projek Web Modern & Portofolio Web App",
@@ -34,6 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "katalog projek web",
       "contoh web app modern",
       "portofolio website",
+      "alllprojects web",
       "alllprojek web",
       "allprojek web",
       ...webKeywords,
@@ -45,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: "Katalog Projek Web Modern & Portofolio Web App | AllProjects",
+      title: "Katalog Projek Web Modern & Portofolio Web App | alllprojects",
       description,
       url: getSiteUrl("/projek-web"),
     },
@@ -69,9 +70,9 @@ export default async function AllWebProjectsPage() {
       {
         "@type": "CollectionPage",
         url: getSiteUrl("/projek-web"),
-        name: "Katalog Projek Web — AllProjects (AlllProjek)",
+        name: "Katalog Projek Web — alllprojects",
         description:
-          "Koleksi projek web modern, landing page, SaaS, dan aplikasi web interaktif di AllProjects.",
+          "Koleksi projek web modern, landing page, SaaS, dan aplikasi web interaktif di alllprojects.",
         inLanguage: "id-ID",
         isPartOf: { "@id": `${SITE_URL}/#website` },
       },
@@ -94,7 +95,7 @@ export default async function AllWebProjectsPage() {
       },
       {
         "@type": "ItemList",
-        name: "Daftar Projek Web AllProjects",
+        name: "Daftar Projek Web alllprojects",
         numberOfItems: initialWebProjects.length,
         itemListElement: initialWebProjects.slice(0, 20).map((proj, index) => ({
           "@type": "ListItem",

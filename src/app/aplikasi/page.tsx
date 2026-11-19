@@ -25,8 +25,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const description =
     count > 0
-      ? `Unduh ${count} aplikasi Android APK gratis dan aman bebas virus di katalog resmi AllProjects (AlllProjek / AllProjek). Lengkap dengan riwayat versi dan verifikasi VirusTotal.`
-      : "Daftar lengkap aplikasi Android APK gratis dan aman bebas virus di katalog resmi AllProjects (AlllProjek / AllProjek) dengan verifikasi VirusTotal.";
+      ? `Unduh ${count} aplikasi Android APK gratis dan aman bebas virus di katalog resmi alllprojects. Lengkap dengan riwayat versi dan verifikasi VirusTotal.`
+      : "Daftar lengkap aplikasi Android APK gratis dan aman bebas virus di katalog resmi alllprojects dengan verifikasi VirusTotal.";
 
   return {
     title: "Katalog Aplikasi Android APK Gratis & Bebas Virus",
@@ -35,6 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "katalog aplikasi android",
       "daftar apk gratis",
       "download apk android aman",
+      "alllprojects aplikasi",
       "alllprojek aplikasi",
       "allprojek apk",
       ...appKeywords,
@@ -46,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
       },
     },
     openGraph: {
-      title: "Katalog Aplikasi Android APK Gratis & Bebas Virus | AllProjects",
+      title: "Katalog Aplikasi Android APK Gratis & Bebas Virus | alllprojects",
       description,
       url: getSiteUrl("/aplikasi"),
     },
@@ -70,9 +71,9 @@ export default async function AllAppsPage() {
       {
         "@type": "CollectionPage",
         url: getSiteUrl("/aplikasi"),
-        name: "Katalog Aplikasi Android APK — AllProjects (AlllProjek)",
+        name: "Katalog Aplikasi Android APK — alllprojects",
         description:
-          "Katalog lengkap paket aplikasi Android APK terverifikasi VirusTotal di AllProjects.",
+          "Katalog lengkap paket aplikasi Android APK terverifikasi VirusTotal di alllprojects.",
         inLanguage: "id-ID",
         isPartOf: { "@id": `${SITE_URL}/#website` },
       },
@@ -95,7 +96,7 @@ export default async function AllAppsPage() {
       },
       {
         "@type": "ItemList",
-        name: "Daftar Aplikasi Android AllProjects",
+        name: "Daftar Aplikasi Android alllprojects",
         numberOfItems: initialApps.length,
         itemListElement: initialApps.slice(0, 20).map((app, index) => ({
           "@type": "ListItem",

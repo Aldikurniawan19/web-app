@@ -308,7 +308,7 @@ export function AllWebProjectsPageClient({
                     <ShimmerTitleText>Projek Web</ShimmerTitleText>
                   </h1>
                   <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                    Jelajahi seluruh koleksi projek website interaktif, aplikasi web, dan dashboard modern di AllProjects (AlllProjek).
+                    Jelajahi seluruh koleksi projek website interaktif, aplikasi web, dan dashboard modern di alllprojects.
                   </p>
                 </div>
 

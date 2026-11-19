@@ -321,13 +321,13 @@ export function Navbar({
                   isScrolled ? "text-3d-white" : "text-3d-bubble-main"
                 )}
               >
-                All
+                Alll
               </span>
               <ShimmerTitleText
                 variant={isScrolled ? "sky" : "blue"}
                 showSparkles={true}
               >
-                Projects
+                projects
               </ShimmerTitleText>
             </span>
           </div>
