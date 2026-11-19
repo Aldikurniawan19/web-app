@@ -235,7 +235,10 @@ export class GithubReleaseService {
       const url = `https://api.github.com/repos/${this.owner}/${this.repo}/releases?per_page=100`;
       const res = await fetch(url, {
         headers: this.headers,
-        cache: "no-store",
+        signal: AbortSignal.timeout(4_000),
+        ...(forceRefresh
+          ? { cache: "no-store" as const }
+          : { next: { revalidate: 60 } }),
       });
 
       if (!res.ok) {

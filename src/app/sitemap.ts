@@ -11,24 +11,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let latestWebUpdate = now;
 
   try {
-    const [apps, webProjects] = await Promise.all([
-      AppStorageService.getPublicCatalogApps(),
-      WebProjectService.getPublicWebProjects(),
+    const [appUpdatedAt, webUpdatedAt] = await Promise.all([
+      AppStorageService.getLatestUpdatedAt(),
+      WebProjectService.getLatestUpdatedAt(),
     ]);
 
-    if (apps.length > 0) {
-      latestAppUpdate = now;
+    if (appUpdatedAt) {
+      latestAppUpdate = appUpdatedAt;
     }
-
-    const latestWebTimestamp = webProjects
-      .map((item) => item.updatedAt || item.createdAt)
-      .filter((v): v is string => Boolean(v))
-      .map((iso) => new Date(iso).getTime())
-      .filter((t) => !isNaN(t))
-      .sort((a, b) => b - a)[0];
-
-    if (latestWebTimestamp) {
-      latestWebUpdate = new Date(latestWebTimestamp);
+    if (webUpdatedAt) {
+      latestWebUpdate = webUpdatedAt;
     }
   } catch {
     // Tetap kirim sitemap utama meski database sedang tidak terjangkau saat build

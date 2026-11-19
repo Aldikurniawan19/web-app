@@ -3,25 +3,30 @@ import { isTransientDbError, withDbRetry as withRetry } from "@/lib/db-retry";
 import { AppItem, AppVersionItem, CreateAppInput, ReleaseNewVersionInput } from "@/types/store";
 import { GithubReleaseService } from "./github-release.service";
 import { ApkSecurityService } from "./apk-security.service";
-import {
-  decodeDataImageUri,
-  DecodedImageData,
-  extractDataImageDimensions,
-} from "@/lib/media-decode";
+import { decodeDataImageUri, DecodedImageData } from "@/lib/media-decode";
 
 const MAX_VERSIONS_PER_APP = 4;
 const GITHUB_STATS_TIMEOUT_MS = 2_000;
 const CACHE_TTL_MS = 60_000;
+const MEDIA_CACHE_TTL_MS = 300_000;
+const MAX_MEDIA_CACHE_ENTRIES = 48;
+const DATA_URI_MARKER = "__DATA_URI__";
+
+type MediaBinaryResult = DecodedImageData | { redirectUrl: string };
 
 interface AppCacheStore {
   cachedApps: AppItem[] | null;
   lastCacheTimestamp: number;
   pendingFetchPromise: Promise<AppItem[]> | null;
+  cachedPublicApps: AppItem[] | null;
+  lastPublicCacheTimestamp: number;
+  pendingPublicFetchPromise: Promise<AppItem[]> | null;
   mediaVersionMap: Map<string, string>;
+  mediaBinaryCache: Map<string, { value: MediaBinaryResult; timestamp: number }>;
 }
 
 const globalForAppCache = globalThis as unknown as {
-  __allprojectsAppCache?: AppCacheStore;
+  __allprojectsAppCacheV2?: AppCacheStore;
 };
 
 /**
@@ -29,12 +34,16 @@ const globalForAppCache = globalThis as unknown as {
  * di Next.js dev maupun produksi, mengurangi frekuensi query ke database Supabase.
  */
 const appCache: AppCacheStore =
-  globalForAppCache.__allprojectsAppCache ??
-  (globalForAppCache.__allprojectsAppCache = {
+  globalForAppCache.__allprojectsAppCacheV2 ??
+  (globalForAppCache.__allprojectsAppCacheV2 = {
     cachedApps: null,
     lastCacheTimestamp: 0,
     pendingFetchPromise: null,
+    cachedPublicApps: null,
+    lastPublicCacheTimestamp: 0,
+    pendingPublicFetchPromise: null,
     mediaVersionMap: new Map<string, string>(),
+    mediaBinaryCache: new Map(),
   });
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T | null> {
@@ -141,6 +150,10 @@ export class AppStorageService {
     appCache.cachedApps = null;
     appCache.lastCacheTimestamp = 0;
     appCache.pendingFetchPromise = null;
+    appCache.cachedPublicApps = null;
+    appCache.lastPublicCacheTimestamp = 0;
+    appCache.pendingPublicFetchPromise = null;
+    appCache.mediaBinaryCache.clear();
   }
 
   /**
@@ -356,6 +369,8 @@ export class AppStorageService {
       appCache.cachedApps = [newItem];
     }
     appCache.lastCacheTimestamp = Date.now();
+    appCache.cachedPublicApps = null;
+    appCache.lastPublicCacheTimestamp = 0;
 
     return newItem;
   }
@@ -477,6 +492,9 @@ export class AppStorageService {
       }
     }
     appCache.lastCacheTimestamp = Date.now();
+    appCache.cachedPublicApps = null;
+    appCache.lastPublicCacheTimestamp = 0;
+    appCache.mediaBinaryCache.clear();
 
     return updatedItem;
   }
@@ -595,6 +613,9 @@ export class AppStorageService {
       appCache.cachedApps = appCache.cachedApps.filter((a) => a.id !== id);
     }
     appCache.lastCacheTimestamp = Date.now();
+    appCache.cachedPublicApps = null;
+    appCache.lastPublicCacheTimestamp = 0;
+    appCache.mediaBinaryCache.clear();
 
     try {
       await withRetry(() =>
@@ -696,88 +717,277 @@ export class AppStorageService {
   }
 
   /**
-   * Mengembalikan daftar aplikasi ringan untuk halaman publik & SSR dengan ikon/screenshot base64
-   * dialihkan ke endpoint media biner agar JSON & HTML awal tetap berukuran beberapa KB saja.
+   * Mengembalikan timestamp pembaruan terakhir tabel aplikasi untuk sitemap.xml (query ultra-ringan).
    */
-  static async getPublicCatalogApps(): Promise<AppItem[]> {
-    const apps = await this.getAllApps();
-    return apps.map((app) => {
-      const vTag = appCache.mediaVersionMap.get(app.id) || "1";
-      const safeId = encodeURIComponent(app.id);
-
-      const slimIconUrl =
-        app.iconUrl && app.iconUrl.trim().startsWith("data:image/")
-          ? `/api/apps/media/${safeId}/icon/0?v=${vTag}`
-          : app.iconUrl;
-
-      const slimScreenshots = Array.isArray(app.screenshots)
-        ? app.screenshots.map((sc, idx) => {
-            if (!sc || typeof sc.imageUrl !== "string") return sc;
-            if (!sc.imageUrl.trim().startsWith("data:image/")) return sc;
-            const dims = extractDataImageDimensions(sc.imageUrl);
-            return {
-              ...sc,
-              imageUrl: `/api/apps/media/${safeId}/screenshot/${idx}?v=${vTag}`,
-              ...(dims ? { width: dims.width, height: dims.height } : {}),
-            };
-          })
-        : [];
-
-      return {
-        ...app,
-        longDescription: app.description,
-        iconUrl: slimIconUrl,
-        screenshots: slimScreenshots,
-      };
-    });
+  static async getLatestUpdatedAt(): Promise<Date | null> {
+    try {
+      const latest = await withRetry(() =>
+        prisma.app.findFirst({
+          orderBy: { updatedAt: "desc" },
+          select: { updatedAt: true },
+        })
+      );
+      return latest?.updatedAt ?? null;
+    } catch {
+      return null;
+    }
   }
 
   /**
-   * Mengambil data biner ikon atau screenshot aplikasi untuk endpoint media cacheable.
+   * Mengembalikan daftar aplikasi ringan untuk halaman publik & SSR tanpa mengunduh
+   * blob ikon/screenshot Base64 berukuran puluhan MB dari PostgreSQL.
+   */
+  static async getPublicCatalogApps(): Promise<AppItem[]> {
+    const now = Date.now();
+
+    if (
+      appCache.cachedPublicApps !== null &&
+      now - appCache.lastPublicCacheTimestamp < CACHE_TTL_MS
+    ) {
+      return appCache.cachedPublicApps;
+    }
+
+    if (appCache.pendingPublicFetchPromise) {
+      return appCache.pendingPublicFetchPromise;
+    }
+
+    appCache.pendingPublicFetchPromise = (async () => {
+      try {
+        const records = await withRetry(() =>
+          prisma.$queryRaw<Array<Record<string, unknown>>>`
+            SELECT
+              "id",
+              "name",
+              "tagline",
+              "description",
+              "category",
+              "rating",
+              "reviewsCount",
+              "fileSize",
+              "version",
+              "developer",
+              "lastUpdated",
+              "platforms",
+              CASE
+                WHEN COALESCE("iconUrl", '') LIKE 'data:image/%' THEN ${DATA_URI_MARKER}
+                ELSE "iconUrl"
+              END AS "iconUrl",
+              "iconType",
+              "iconColor",
+              "features",
+              COALESCE(
+                (
+                  SELECT jsonb_agg(
+                    jsonb_build_object(
+                      'id', elem->>'id',
+                      'title', elem->>'title',
+                      'description', elem->>'description',
+                      'type', elem->>'type',
+                      'imageUrl', CASE
+                        WHEN COALESCE(elem->>'imageUrl', '') LIKE 'data:image/%' THEN ${DATA_URI_MARKER}
+                        ELSE elem->>'imageUrl'
+                      END
+                    )
+                    ORDER BY ord
+                  )
+                  FROM jsonb_array_elements(
+                    CASE
+                      WHEN "screenshots" IS NOT NULL AND jsonb_typeof("screenshots"::jsonb) = 'array'
+                      THEN "screenshots"::jsonb
+                      ELSE '[]'::jsonb
+                    END
+                  ) WITH ORDINALITY AS t(elem, ord)
+                ),
+                '[]'::jsonb
+              ) AS "screenshots",
+              "downloadsCount",
+              "systemRequirements",
+              "apkUrl",
+              "apkFileName",
+              "createdAt",
+              "updatedAt"
+            FROM "apps"
+            ORDER BY "createdAt" DESC
+          `
+        );
+
+        const mapped = records.map((rec) => {
+          const item = this.mapToAppItem(rec);
+          const vTag = appCache.mediaVersionMap.get(item.id) || "1";
+          const safeId = encodeURIComponent(item.id);
+
+          const slimIconUrl =
+            item.iconUrl === DATA_URI_MARKER
+              ? `/api/apps/media/${safeId}/icon/0?v=${vTag}`
+              : item.iconUrl;
+
+          const slimScreenshots = Array.isArray(item.screenshots)
+            ? item.screenshots.map((sc, idx) => {
+                if (!sc || typeof sc.imageUrl !== "string") return sc;
+                if (sc.imageUrl !== DATA_URI_MARKER) return sc;
+                return {
+                  ...sc,
+                  imageUrl: `/api/apps/media/${safeId}/screenshot/${idx}?v=${vTag}`,
+                };
+              })
+            : [];
+
+          return {
+            ...item,
+            longDescription: item.description,
+            iconUrl: slimIconUrl,
+            screenshots: slimScreenshots,
+          };
+        });
+
+        // Lampirkan ringkasan scan keamanan APK dalam 1 query batch ringan
+        const scanMap = await ApkSecurityService.getLatestScansMapForApps(
+          mapped.map((a) => ({ id: a.id, version: a.version }))
+        );
+        for (const app of mapped) {
+          if (scanMap[app.id]) {
+            app.securityScan = scanMap[app.id];
+          }
+        }
+
+        // Sinkronkan downloadsCount & URL GitHub Releases dengan batas waktu ketat
+        try {
+          const statsMap = await withTimeout(
+            GithubReleaseService.getAllAppsDownloadStats(
+              mapped.map((a) => ({
+                id: a.id,
+                name: a.name,
+                apkFileName: a.apkFileName,
+                apkUrl: a.apkUrl,
+              }))
+            ),
+            GITHUB_STATS_TIMEOUT_MS
+          );
+          if (statsMap) {
+            for (const app of mapped) {
+              const stats = statsMap[app.id];
+              if (stats) {
+                if (stats.totalDownloads > 0) {
+                  app.downloadsCount = stats.formattedTotal;
+                }
+                if (!app.apkUrl && stats.latestDownloadUrl) {
+                  app.apkUrl = stats.latestDownloadUrl;
+                }
+              }
+            }
+          }
+        } catch {
+          // Gunakan downloadsCount dari database jika API GitHub sedang lambat
+        }
+
+        appCache.cachedPublicApps = mapped;
+        appCache.lastPublicCacheTimestamp = Date.now();
+        return mapped;
+      } catch (err) {
+        if (isTransientDbError(err)) {
+          console.warn(
+            "[AppStorageService] Koneksi/DNS Supabase sedang tidak stabil saat memuat katalog publik:",
+            err instanceof Error ? err.message : String(err)
+          );
+        } else {
+          console.error("Gagal membaca katalog publik aplikasi dari Supabase:", err);
+        }
+        if (appCache.cachedPublicApps !== null) {
+          return appCache.cachedPublicApps;
+        }
+        return [];
+      } finally {
+        appCache.pendingPublicFetchPromise = null;
+      }
+    })();
+
+    return appCache.pendingPublicFetchPromise;
+  }
+
+  /**
+   * Mengambil data biner ikon atau satu slot screenshot aplikasi untuk endpoint media cacheable.
+   * Hanya menarik 1 media yang diminta dari PostgreSQL (bukan seluruh array screenshot).
    */
   static async getAppMediaBinary(
     appId: string,
     kind: "icon" | "screenshot",
     slot: string
-  ): Promise<DecodedImageData | { redirectUrl: string } | null> {
-    let iconUrl: string | null | undefined;
-    let screenshots: AppItem["screenshots"] = [];
+  ): Promise<MediaBinaryResult | null> {
+    const cacheKey = `${appId}:${kind}:${slot}`;
+    const cachedMedia = appCache.mediaBinaryCache.get(cacheKey);
+    if (cachedMedia && Date.now() - cachedMedia.timestamp < MEDIA_CACHE_TTL_MS) {
+      return cachedMedia.value;
+    }
+
+    let rawImageUrl: string | undefined;
 
     if (appCache.cachedApps) {
       const cached = appCache.cachedApps.find((a) => a.id === appId);
       if (cached) {
-        iconUrl = cached.iconUrl;
-        screenshots = cached.screenshots;
+        if (kind === "icon") {
+          rawImageUrl = cached.iconUrl || undefined;
+        } else if (Array.isArray(cached.screenshots)) {
+          if (/^\d+$/.test(slot)) {
+            rawImageUrl = cached.screenshots[Number(slot)]?.imageUrl;
+          } else {
+            rawImageUrl = cached.screenshots.find((s) => s?.id === slot)?.imageUrl;
+          }
+        }
       }
     }
 
-    if (iconUrl === undefined && screenshots.length === 0) {
-      const record = await withRetry(() =>
-        prisma.app.findUnique({
-          where: { id: appId },
-          select: { iconUrl: true, screenshots: true },
-        })
-      );
-      if (!record) return null;
-      iconUrl = record.iconUrl;
-      screenshots =
-        (record.screenshots as unknown as AppItem["screenshots"]) || [];
-    }
-
-    let rawImageUrl: string | undefined;
-    if (kind === "icon") {
-      rawImageUrl = iconUrl || undefined;
-    } else if (Array.isArray(screenshots)) {
-      if (/^\d+$/.test(slot)) {
-        rawImageUrl = screenshots[Number(slot)]?.imageUrl;
+    if (!rawImageUrl) {
+      if (kind === "icon") {
+        const rows = await withRetry(() =>
+          prisma.$queryRaw<Array<{ iconUrl: string | null }>>`
+            SELECT "iconUrl" FROM "apps" WHERE "id" = ${appId} LIMIT 1
+          `
+        );
+        rawImageUrl = rows[0]?.iconUrl || undefined;
+      } else if (/^\d+$/.test(slot)) {
+        const slotIndex = Number(slot);
+        const rows = await withRetry(() =>
+          prisma.$queryRaw<Array<{ imageUrl: string | null }>>`
+            SELECT (("screenshots"::jsonb) -> ${slotIndex} ->> 'imageUrl') AS "imageUrl"
+            FROM "apps"
+            WHERE "id" = ${appId}
+            LIMIT 1
+          `
+        );
+        rawImageUrl = rows[0]?.imageUrl || undefined;
       } else {
-        rawImageUrl = screenshots.find((s) => s?.id === slot)?.imageUrl;
+        const rows = await withRetry(() =>
+          prisma.$queryRaw<Array<{ imageUrl: string | null }>>`
+            SELECT elem ->> 'imageUrl' AS "imageUrl"
+            FROM "apps",
+            LATERAL jsonb_array_elements(
+              CASE
+                WHEN "screenshots" IS NOT NULL AND jsonb_typeof("screenshots"::jsonb) = 'array'
+                THEN "screenshots"::jsonb
+                ELSE '[]'::jsonb
+              END
+            ) AS elem
+            WHERE "id" = ${appId} AND elem ->> 'id' = ${slot}
+            LIMIT 1
+          `
+        );
+        rawImageUrl = rows[0]?.imageUrl || undefined;
       }
     }
 
     if (!rawImageUrl) return null;
     const decoded = decodeDataImageUri(rawImageUrl);
-    if (decoded) return decoded;
-    return { redirectUrl: rawImageUrl };
+    const result: MediaBinaryResult = decoded ?? { redirectUrl: rawImageUrl };
+
+    if (appCache.mediaBinaryCache.size >= MAX_MEDIA_CACHE_ENTRIES) {
+      const oldestKey = appCache.mediaBinaryCache.keys().next().value;
+      if (oldestKey) appCache.mediaBinaryCache.delete(oldestKey);
+    }
+    appCache.mediaBinaryCache.set(cacheKey, {
+      value: result,
+      timestamp: Date.now(),
+    });
+
+    return result;
   }
 }

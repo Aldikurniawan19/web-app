@@ -4,15 +4,19 @@ import { WebProjectItem, CreateWebProjectInput, UpdateWebProjectInput } from "@/
 import { decodeDataImageUri, DecodedImageData } from "@/lib/media-decode";
 
 const CACHE_TTL_MS = 60_000;
+const DATA_URI_MARKER = "__DATA_URI__";
 
 interface WebProjectCacheStore {
   cachedWebProjects: WebProjectItem[] | null;
   lastCacheTimestamp: number;
   pendingFetchPromise: Promise<WebProjectItem[]> | null;
+  cachedPublicWebProjects: WebProjectItem[] | null;
+  lastPublicCacheTimestamp: number;
+  pendingPublicFetchPromise: Promise<WebProjectItem[]> | null;
 }
 
 const globalForWebCache = globalThis as unknown as {
-  __allprojectsWebCache?: WebProjectCacheStore;
+  __allprojectsWebCacheV2?: WebProjectCacheStore;
 };
 
 /**
@@ -20,11 +24,14 @@ const globalForWebCache = globalThis as unknown as {
  * untuk mengurangi beban query ke database Supabase.
  */
 const webCache: WebProjectCacheStore =
-  globalForWebCache.__allprojectsWebCache ??
-  (globalForWebCache.__allprojectsWebCache = {
+  globalForWebCache.__allprojectsWebCacheV2 ??
+  (globalForWebCache.__allprojectsWebCacheV2 = {
     cachedWebProjects: null,
     lastCacheTimestamp: 0,
     pendingFetchPromise: null,
+    cachedPublicWebProjects: null,
+    lastPublicCacheTimestamp: 0,
+    pendingPublicFetchPromise: null,
   });
 
 /**
@@ -76,6 +83,9 @@ export class WebProjectService {
     webCache.cachedWebProjects = null;
     webCache.lastCacheTimestamp = 0;
     webCache.pendingFetchPromise = null;
+    webCache.cachedPublicWebProjects = null;
+    webCache.lastPublicCacheTimestamp = 0;
+    webCache.pendingPublicFetchPromise = null;
   }
 
   /**
@@ -262,6 +272,8 @@ export class WebProjectService {
       webCache.cachedWebProjects = [newItem];
     }
     webCache.lastCacheTimestamp = Date.now();
+    webCache.cachedPublicWebProjects = null;
+    webCache.lastPublicCacheTimestamp = 0;
 
     return newItem;
   }
@@ -304,6 +316,8 @@ export class WebProjectService {
       }
     }
     webCache.lastCacheTimestamp = Date.now();
+    webCache.cachedPublicWebProjects = null;
+    webCache.lastPublicCacheTimestamp = 0;
 
     return updatedItem;
   }
@@ -318,6 +332,8 @@ export class WebProjectService {
       );
     }
     webCache.lastCacheTimestamp = Date.now();
+    webCache.cachedPublicWebProjects = null;
+    webCache.lastPublicCacheTimestamp = 0;
 
     try {
       await withRetry(() =>
@@ -346,21 +362,96 @@ export class WebProjectService {
   }
 
   /**
-   * Mengembalikan daftar projek web ringan untuk tampilan publik dengan gambar base64 dialihkan ke endpoint biner.
+   * Mengembalikan timestamp pembaruan terakhir tabel projek web untuk sitemap.xml (query ultra-ringan).
+   */
+  static async getLatestUpdatedAt(): Promise<Date | null> {
+    try {
+      const latest = await withRetry(() =>
+        prisma.webProject.findFirst({
+          orderBy: { updatedAt: "desc" },
+          select: { updatedAt: true },
+        })
+      );
+      return latest?.updatedAt ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Mengembalikan daftar projek web ringan untuk SSR/publik tanpa mengunduh blob gambar Base64 dari PostgreSQL.
    */
   static async getPublicWebProjects(): Promise<WebProjectItem[]> {
-    const items = await this.getAllWebProjects();
-    return items.map((proj) => {
-      if (!proj.imageUrl || !proj.imageUrl.trim().startsWith("data:image/")) {
-        return proj;
+    const now = Date.now();
+    if (
+      webCache.cachedPublicWebProjects !== null &&
+      now - webCache.lastPublicCacheTimestamp < CACHE_TTL_MS
+    ) {
+      return webCache.cachedPublicWebProjects;
+    }
+
+    if (webCache.pendingPublicFetchPromise) {
+      return webCache.pendingPublicFetchPromise;
+    }
+
+    webCache.pendingPublicFetchPromise = (async () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const records = await withRetry(() =>
+          prisma.$queryRaw<Array<Record<string, unknown>>>`
+            SELECT
+              "id",
+              "name",
+              "description",
+              CASE
+                WHEN COALESCE("imageUrl", '') LIKE 'data:image/%' THEN ${DATA_URI_MARKER}
+                ELSE "imageUrl"
+              END AS "imageUrl",
+              "technologies",
+              "liveUrl",
+              "githubUrl",
+              "category",
+              "featured",
+              "createdAt",
+              "updatedAt"
+            FROM "web_projects"
+            ORDER BY "featured" DESC, "createdAt" DESC
+          `
+        );
+
+        const mapped = records.map((rec) => {
+          const item = this.mapToItem(rec);
+          if (item.imageUrl !== DATA_URI_MARKER) return item;
+          const vSource = item.updatedAt || item.createdAt;
+          const vTag = vSource ? new Date(vSource).getTime().toString(36) : "1";
+          return {
+            ...item,
+            imageUrl: `/api/web-projects/media/${encodeURIComponent(item.id)}?v=${vTag}`,
+          };
+        });
+
+        webCache.cachedPublicWebProjects = mapped;
+        webCache.lastPublicCacheTimestamp = Date.now();
+        return mapped;
+      } catch (err) {
+        if (isTransientDbError(err)) {
+          console.warn(
+            "[WebProjectService] Koneksi/DNS Supabase sedang tidak stabil saat memuat katalog publik:",
+            err instanceof Error ? err.message : String(err)
+          );
+        } else {
+          console.error("Gagal membaca katalog publik projek web dari Supabase:", err);
+        }
+        if (webCache.cachedPublicWebProjects !== null) {
+          return webCache.cachedPublicWebProjects;
+        }
+        return [];
+      } finally {
+        webCache.pendingPublicFetchPromise = null;
       }
-      const vSource = proj.updatedAt || proj.createdAt;
-      const vTag = vSource ? new Date(vSource).getTime().toString(36) : "1";
-      return {
-        ...proj,
-        imageUrl: `/api/web-projects/media/${encodeURIComponent(proj.id)}?v=${vTag}`,
-      };
-    });
+    })();
+
+    return webCache.pendingPublicFetchPromise;
   }
 
   /**
