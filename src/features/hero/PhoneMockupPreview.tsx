@@ -436,13 +436,15 @@ export function PhoneMockupPreview({
   const [isTransitionEnabled, setIsTransitionEnabled] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
-  const [mountExtraSlides, setMountExtraSlides] = useState(false);
+  const [maxMountedSlide, setMaxMountedSlide] = useState(0);
   const [naturalRatioByUrl, setNaturalRatioByUrl] = useState<
     Record<string, number>
   >({});
 
-  const renderedSlides =
-    mountExtraSlides || slideIndex > 0 ? slidesToRender : slidesToRender.slice(0, 1);
+  const renderedSlides = slidesToRender.slice(
+    0,
+    Math.min(slidesToRender.length, Math.max(maxMountedSlide, slideIndex) + 1)
+  );
 
   const primaryShot = uploadedScreenshots[0];
   const primaryRatio =
@@ -483,19 +485,32 @@ export function PhoneMockupPreview({
     setIsTransitionEnabled(false);
     setSlideIndex(0);
     setImgError(false);
-    setMountExtraSlides(false);
+    setMaxMountedSlide(0);
     const rafId = requestAnimationFrame(() => setIsTransitionEnabled(true));
     return () => cancelAnimationFrame(rafId);
   }, [app.id, isActive]);
 
-  // Tunda pemasangan slide ke-2 dst agar LCP tangkapan layar utama tidak terhambat saat muat awal
+  // Siapkan slide berikutnya secara bertahap (1 slide lebih awal) agar LCP dan bandwidth seluler tidak terbebani
   useEffect(() => {
-    if (!isActive || !hasMultipleShots) return;
+    if (!isActive || !hasMultipleShots || imgError) return;
+    const nextSlideToMount = Math.min(slidesToRender.length - 1, slideIndex + 1);
+    if (nextSlideToMount <= maxMountedSlide) return;
+
+    const leadDelay = slideIndex === 0 ? Math.max(2000, autoplayDelay - 600) : 350;
     const timer = setTimeout(() => {
-      setMountExtraSlides(true);
-    }, 700);
+      setMaxMountedSlide((prev) => Math.max(prev, nextSlideToMount));
+    }, leadDelay);
     return () => clearTimeout(timer);
-  }, [app.id, isActive, hasMultipleShots]);
+  }, [
+    app.id,
+    isActive,
+    hasMultipleShots,
+    imgError,
+    slideIndex,
+    maxMountedSlide,
+    slidesToRender.length,
+    autoplayDelay,
+  ]);
 
   // Geser otomatis tangkapan layar di dalam layar HP ketika slide HP ini sedang aktif
   useEffect(() => {

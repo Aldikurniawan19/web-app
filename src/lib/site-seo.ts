@@ -21,7 +21,9 @@ export const SITE_URL = normalizeOrigin(
 
 export const SITE_NAME = "AllProjects";
 export const SITE_PUBLISHER = "AllProjects Studio";
-export const SITE_LOGO_PATH = "/assets/logoAllProjects.png";
+export const SITE_FAVICON_PATH = "/assets/favicon-48.png";
+export const SITE_APPLE_ICON_PATH = "/assets/apple-touch-icon.png";
+export const SITE_LOGO_PATH = "/assets/og-logo.png";
 export const SITE_GITHUB_URL = "https://github.com/Aldikurniawan19";
 
 export const SITE_ALTERNATE_NAMES = [

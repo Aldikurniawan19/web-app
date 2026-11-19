@@ -12,12 +12,20 @@ export async function GET(
   context: { params: Promise<{ projectId: string }> }
 ) {
   const { projectId } = await context.params;
-  const media = await WebProjectService.getProjectImageBinary(projectId);
+  let media;
+  try {
+    media = await WebProjectService.getProjectImageBinary(projectId);
+  } catch {
+    return NextResponse.json(
+      { success: false, message: "Gambar projek web sedang tidak tersedia sementara." },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
 
   if (!media) {
     return NextResponse.json(
       { success: false, message: "Gambar projek web tidak ditemukan." },
-      { status: 404 }
+      { status: 404, headers: { "Cache-Control": "no-store" } }
     );
   }
 

@@ -59,11 +59,19 @@ export function HomeCatalogClient({
     apps: contextApps,
     webProjects: contextWebProjects,
     isLoading: isContextLoading,
+    refreshCatalog,
   } = useCatalog();
   const appsList = contextApps.length > 0 ? contextApps : initialApps;
   const webProjectsList =
     contextWebProjects.length > 0 ? contextWebProjects : initialWebProjects;
   const isLoading = !hasServerData && appsList.length === 0 && isContextLoading;
+
+  // Jika SSR sempat kosong karena gangguan DB sementara, segera ambil katalog langsung di client
+  useEffect(() => {
+    if (!hasServerData || initialApps.length === 0 || initialWebProjects.length === 0) {
+      void refreshCatalog();
+    }
+  }, [hasServerData, initialApps.length, initialWebProjects.length, refreshCatalog]);
 
   const [activeView, setActiveView] = useState<"catalog" | "detail" | "detail-web">("catalog");
   const [selectedApp, setSelectedApp] = useState<AppItem | null>(

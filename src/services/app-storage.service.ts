@@ -737,7 +737,9 @@ export class AppStorageService {
    * Mengembalikan daftar aplikasi ringan untuk halaman publik & SSR tanpa mengunduh
    * blob ikon/screenshot Base64 berukuran puluhan MB dari PostgreSQL.
    */
-  static async getPublicCatalogApps(): Promise<AppItem[]> {
+  static async getPublicCatalogApps(options?: {
+    throwOnError?: boolean;
+  }): Promise<AppItem[]> {
     const now = Date.now();
 
     if (
@@ -895,6 +897,9 @@ export class AppStorageService {
         if (appCache.cachedPublicApps !== null) {
           return appCache.cachedPublicApps;
         }
+        if (options?.throwOnError) {
+          throw err;
+        }
         return [];
       } finally {
         appCache.pendingPublicFetchPromise = null;
@@ -945,10 +950,14 @@ export class AppStorageService {
         );
         rawImageUrl = rows[0]?.iconUrl || undefined;
       } else if (/^\d+$/.test(slot)) {
-        const slotIndex = Number(slot);
+        const slotIndex = Number.parseInt(slot, 10);
         const rows = await withRetry(() =>
           prisma.$queryRaw<Array<{ imageUrl: string | null }>>`
-            SELECT (("screenshots"::jsonb) -> ${slotIndex} ->> 'imageUrl') AS "imageUrl"
+            SELECT CASE
+              WHEN "screenshots" IS NOT NULL AND jsonb_typeof("screenshots"::jsonb) = 'array'
+              THEN (("screenshots"::jsonb) -> (${slotIndex})::int ->> 'imageUrl')
+              ELSE NULL
+            END AS "imageUrl"
             FROM "apps"
             WHERE "id" = ${appId}
             LIMIT 1

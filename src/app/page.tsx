@@ -86,7 +86,7 @@ export default async function AppHubPage() {
       AppStorageService.getPublicCatalogApps(),
       WebProjectService.getPublicWebProjects(),
     ]);
-    hasServerData = true;
+    hasServerData = initialApps.length > 0 || initialWebProjects.length > 0;
 
     const featuredApp = pickFeaturedSecurityApp(initialApps);
     if (featuredApp) {

@@ -38,35 +38,60 @@ export function ScrollReveal({
     }
 
     const rect = element.getBoundingClientRect();
-    // Elemen yang sudah terlihat atau terlewati di viewport tidak perlu disembunyikan
-    if (rect.top < window.innerHeight * 0.98) {
+    // Elemen yang sudah terlihat atau mendekati viewport tidak perlu disembunyikan
+    if (rect.top < window.innerHeight + 40) {
       setRevealState("settled");
       return;
     }
 
     setRevealState("hidden");
 
+    let revealed = false;
+    const triggerReveal = () => {
+      if (revealed) return;
+      revealed = true;
+      setRevealState("visible");
+      observer.disconnect();
+      window.removeEventListener("scroll", checkViewportFallback);
+      window.removeEventListener("resize", checkViewportFallback);
+    };
+
+    // Fallback scroll/resize agar kartu tinggi pada browser seluler tidak pernah terjebak di opacity: 0
+    const checkViewportFallback = () => {
+      if (revealed) return;
+      const currentRect = element.getBoundingClientRect();
+      if (currentRect.top < window.innerHeight + 80) {
+        triggerReveal();
+      }
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (
             entry.isIntersecting ||
-            entry.boundingClientRect.top < window.innerHeight
+            entry.boundingClientRect.top < window.innerHeight + 80
           ) {
-            setRevealState("visible");
-            observer.disconnect();
+            triggerReveal();
             break;
           }
         }
       },
       {
-        threshold: 0.05,
-        rootMargin: "0px 0px -24px 0px",
+        threshold: 0,
+        rootMargin: "0px 0px 80px 0px",
       }
     );
 
     observer.observe(element);
-    return () => observer.disconnect();
+    window.addEventListener("scroll", checkViewportFallback, { passive: true });
+    window.addEventListener("resize", checkViewportFallback, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", checkViewportFallback);
+      window.removeEventListener("resize", checkViewportFallback);
+    };
   }, []);
 
   // Lepas kelas transisi/transform setelah animasi masuk selesai agar layer GPU & stacking context bersih

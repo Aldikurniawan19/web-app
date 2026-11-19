@@ -20,12 +20,20 @@ export async function GET(
     );
   }
 
-  const media = await AppStorageService.getAppMediaBinary(appId, kind, slot);
+  let media;
+  try {
+    media = await AppStorageService.getAppMediaBinary(appId, kind, slot);
+  } catch {
+    return NextResponse.json(
+      { success: false, message: "Media sedang tidak tersedia sementara." },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
 
   if (!media) {
     return NextResponse.json(
       { success: false, message: "Media tidak ditemukan." },
-      { status: 404 }
+      { status: 404, headers: { "Cache-Control": "no-store" } }
     );
   }
 

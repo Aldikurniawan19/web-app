@@ -58,7 +58,7 @@ export default async function AllWebProjectsPage() {
 
   try {
     initialWebProjects = await WebProjectService.getPublicWebProjects();
-    hasServerData = true;
+    hasServerData = initialWebProjects.length > 0;
   } catch (error) {
     console.error("[AllWebProjectsPage] Gagal memuat daftar projek web di server:", error);
   }

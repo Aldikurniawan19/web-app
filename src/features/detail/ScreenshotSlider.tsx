@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   ChevronLeft,
   ChevronRight,
@@ -9,10 +10,10 @@ import {
   Plus,
   Maximize2,
   X,
-  Image as ImageIcon,
 } from "lucide-react";
 import { AppScreenshot } from "@/types/store";
 import { cn } from "@/lib/utils";
+import { isLocalOptimizedMediaUrl } from "@/lib/media-url";
 
 interface ScreenshotSliderProps {
   appName: string;
@@ -225,12 +226,26 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
                         onClick={() => setLightboxIndex(idx)}
                         className="group relative cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
                       >
-                        <div className="aspect-[9/16] max-h-80 w-full overflow-hidden bg-slate-100 flex items-center justify-center">
-                          <img
-                            src={sc.imageUrl}
-                            alt={sc.title || `${appName} screenshot ${idx + 1}`}
-                            className="h-full w-full object-contain select-none"
-                          />
+                        <div className="relative aspect-[9/16] max-h-80 w-full overflow-hidden bg-slate-100 flex items-center justify-center">
+                          {isLocalOptimizedMediaUrl(sc.imageUrl) ? (
+                            <Image
+                              src={sc.imageUrl}
+                              alt={sc.title || `${appName} screenshot ${idx + 1}`}
+                              fill
+                              sizes="(max-width: 640px) 92vw, 320px"
+                              quality={80}
+                              loading="lazy"
+                              className="object-contain select-none"
+                            />
+                          ) : (
+                            <img
+                              src={sc.imageUrl}
+                              alt={sc.title || `${appName} screenshot ${idx + 1}`}
+                              loading="lazy"
+                              decoding="async"
+                              className="h-full w-full object-contain select-none"
+                            />
+                          )}
                         </div>
                         <div className="p-3 border-t border-slate-100">
                           <h4 className="text-xs font-bold text-slate-900 truncate">
@@ -317,11 +332,25 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
                         className="group relative cursor-pointer flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:border-primary/50 hover:shadow-md transition-all hover:-translate-y-0.5 h-full"
                       >
                         <div className="relative aspect-[9/16] max-h-72 w-full overflow-hidden bg-slate-100 flex items-center justify-center p-2">
-                          <img
-                            src={sc.imageUrl}
-                            alt={sc.title || `${appName} screenshot ${idx + 1}`}
-                            className="h-full w-full object-contain select-none group-hover:scale-105 transition-transform duration-300"
-                          />
+                          {isLocalOptimizedMediaUrl(sc.imageUrl) ? (
+                            <Image
+                              src={sc.imageUrl}
+                              alt={sc.title || `${appName} screenshot ${idx + 1}`}
+                              fill
+                              sizes="(max-width: 1024px) 25vw, 280px"
+                              quality={80}
+                              loading="lazy"
+                              className="object-contain p-2 select-none group-hover:scale-105 transition-transform duration-300"
+                            />
+                          ) : (
+                            <img
+                              src={sc.imageUrl}
+                              alt={sc.title || `${appName} screenshot ${idx + 1}`}
+                              loading="lazy"
+                              decoding="async"
+                              className="h-full w-full object-contain select-none group-hover:scale-105 transition-transform duration-300"
+                            />
+                          )}
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-colors">
                             <div className="opacity-0 group-hover:opacity-100 transition-opacity flex h-9 w-9 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-xs">
                               <Maximize2 className="h-4 w-4" />

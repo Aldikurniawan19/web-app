@@ -42,9 +42,19 @@ export function AllAppsPageClient({
   initialApps = [],
   hasServerData = false,
 }: AllAppsPageClientProps) {
-  const { apps: contextApps, isLoading: isContextLoading } = useCatalog();
+  const {
+    apps: contextApps,
+    isLoading: isContextLoading,
+    refreshCatalog,
+  } = useCatalog();
   const apps = contextApps.length > 0 ? contextApps : initialApps;
   const isLoading = !hasServerData && apps.length === 0 && isContextLoading;
+
+  useEffect(() => {
+    if (!hasServerData || initialApps.length === 0) {
+      void refreshCatalog();
+    }
+  }, [hasServerData, initialApps.length, refreshCatalog]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<AppCategory>("Semua");

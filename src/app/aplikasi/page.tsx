@@ -59,7 +59,7 @@ export default async function AllAppsPage() {
 
   try {
     initialApps = await AppStorageService.getPublicCatalogApps();
-    hasServerData = true;
+    hasServerData = initialApps.length > 0;
   } catch (error) {
     console.error("[AllAppsPage] Gagal memuat daftar aplikasi di server:", error);
   }

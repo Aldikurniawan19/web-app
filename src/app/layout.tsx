@@ -5,6 +5,8 @@ import {
   buildSeoKeywords,
   getSiteUrl,
   SITE_ALTERNATE_NAMES,
+  SITE_APPLE_ICON_PATH,
+  SITE_FAVICON_PATH,
   SITE_GITHUB_URL,
   SITE_LOGO_PATH,
   SITE_NAME,
@@ -32,6 +34,7 @@ const fontMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   weight: ["400", "500", "600", "700"],
   display: "swap",
+  preload: false,
 });
 
 const fontScript = Dancing_Script({
@@ -39,6 +42,7 @@ const fontScript = Dancing_Script({
   variable: "--font-dancing-script",
   weight: ["600", "700"],
   display: "swap",
+  preload: false,
 });
 
 const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
@@ -101,11 +105,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: SITE_LOGO_PATH },
-      { url: SITE_LOGO_PATH, type: "image/png" },
+      { url: SITE_FAVICON_PATH, type: "image/png", sizes: "48x48" },
     ],
-    shortcut: SITE_LOGO_PATH,
-    apple: SITE_LOGO_PATH,
+    shortcut: SITE_FAVICON_PATH,
+    apple: [
+      { url: SITE_APPLE_ICON_PATH, type: "image/png", sizes: "180x180" },
+    ],
   },
 };
 
@@ -160,9 +165,6 @@ export default function RootLayout({
       className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable} ${fontScript.variable} scroll-smooth`}
     >
       <head>
-        <link rel="icon" href={SITE_LOGO_PATH} type="image/png" sizes="any" />
-        <link rel="shortcut icon" href={SITE_LOGO_PATH} type="image/png" />
-        <link rel="apple-touch-icon" href={SITE_LOGO_PATH} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

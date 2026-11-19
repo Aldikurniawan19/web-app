@@ -381,7 +381,9 @@ export class WebProjectService {
   /**
    * Mengembalikan daftar projek web ringan untuk SSR/publik tanpa mengunduh blob gambar Base64 dari PostgreSQL.
    */
-  static async getPublicWebProjects(): Promise<WebProjectItem[]> {
+  static async getPublicWebProjects(options?: {
+    throwOnError?: boolean;
+  }): Promise<WebProjectItem[]> {
     const now = Date.now();
     if (
       webCache.cachedPublicWebProjects !== null &&
@@ -444,6 +446,9 @@ export class WebProjectService {
         }
         if (webCache.cachedPublicWebProjects !== null) {
           return webCache.cachedPublicWebProjects;
+        }
+        if (options?.throwOnError) {
+          throw err;
         }
         return [];
       } finally {

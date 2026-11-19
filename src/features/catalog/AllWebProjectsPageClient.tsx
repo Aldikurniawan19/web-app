@@ -44,10 +44,20 @@ export function AllWebProjectsPageClient({
   initialWebProjects = [],
   hasServerData = false,
 }: AllWebProjectsPageClientProps) {
-  const { webProjects: contextWebProjects, isLoading: isContextLoading } = useCatalog();
+  const {
+    webProjects: contextWebProjects,
+    isLoading: isContextLoading,
+    refreshCatalog,
+  } = useCatalog();
   const projects =
     contextWebProjects.length > 0 ? contextWebProjects : initialWebProjects;
   const isLoading = !hasServerData && projects.length === 0 && isContextLoading;
+
+  useEffect(() => {
+    if (!hasServerData || initialWebProjects.length === 0) {
+      void refreshCatalog();
+    }
+  }, [hasServerData, initialWebProjects.length, refreshCatalog]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Semua");
