@@ -379,6 +379,41 @@ export class WebProjectService {
   }
 
   /**
+   * Mengembalikan daftar ID dan tanggal pembaruan projek web untuk sitemap.xml & generateStaticParams.
+   */
+  static async getPublicSitemapEntries(): Promise<
+    Array<{ id: string; updatedAt: Date }>
+  > {
+    try {
+      const rows = await withRetry(() =>
+        prisma.webProject.findMany({
+          orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+          select: { id: true, updatedAt: true },
+        })
+      );
+      return rows;
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Memetakan baris query ringan publik menjadi WebProjectItem dengan URL media cacheable.
+   */
+  private static mapPublicWebRecord(
+    rec: Record<string, unknown>
+  ): WebProjectItem {
+    const item = this.mapToItem(rec);
+    if (item.imageUrl !== DATA_URI_MARKER) return item;
+    const vSource = item.updatedAt || item.createdAt;
+    const vTag = vSource ? new Date(vSource).getTime().toString(36) : "1";
+    return {
+      ...item,
+      imageUrl: `/api/web-projects/media/${encodeURIComponent(item.id)}?v=${vTag}`,
+    };
+  }
+
+  /**
    * Mengembalikan daftar projek web ringan untuk SSR/publik tanpa mengunduh blob gambar Base64 dari PostgreSQL.
    */
   static async getPublicWebProjects(options?: {
@@ -421,16 +456,7 @@ export class WebProjectService {
           `
         );
 
-        const mapped = records.map((rec) => {
-          const item = this.mapToItem(rec);
-          if (item.imageUrl !== DATA_URI_MARKER) return item;
-          const vSource = item.updatedAt || item.createdAt;
-          const vTag = vSource ? new Date(vSource).getTime().toString(36) : "1";
-          return {
-            ...item,
-            imageUrl: `/api/web-projects/media/${encodeURIComponent(item.id)}?v=${vTag}`,
-          };
-        });
+        const mapped = records.map((rec) => this.mapPublicWebRecord(rec));
 
         webCache.cachedPublicWebProjects = mapped;
         webCache.lastPublicCacheTimestamp = Date.now();
@@ -457,6 +483,66 @@ export class WebProjectService {
     })();
 
     return webCache.pendingPublicFetchPromise;
+  }
+
+  /**
+   * Mengambil satu projek web versi publik/ringan berdasarkan ID untuk halaman detail SSR (/projek-web/[id]).
+   */
+  static async getPublicWebProjectById(
+    id: string
+  ): Promise<WebProjectItem | null> {
+    const normalizedId = id.trim();
+    if (!normalizedId) return null;
+
+    if (
+      webCache.cachedPublicWebProjects !== null &&
+      Date.now() - webCache.lastPublicCacheTimestamp < CACHE_TTL_MS
+    ) {
+      const cached = webCache.cachedPublicWebProjects.find(
+        (p) => p.id === normalizedId
+      );
+      if (cached) return cached;
+    }
+
+    try {
+      const records = await withRetry(() =>
+        prisma.$queryRaw<Array<Record<string, unknown>>>`
+          SELECT
+            "id",
+            "name",
+            "description",
+            CASE
+              WHEN COALESCE("imageUrl", '') LIKE 'data:image/%' THEN ${DATA_URI_MARKER}
+              ELSE "imageUrl"
+            END AS "imageUrl",
+            "technologies",
+            "liveUrl",
+            "githubUrl",
+            "category",
+            "featured",
+            "createdAt",
+            "updatedAt"
+          FROM "web_projects"
+          WHERE "id" = ${normalizedId}
+          LIMIT 1
+        `
+      );
+
+      const rec = records[0];
+      if (!rec) return null;
+
+      return this.mapPublicWebRecord(rec);
+    } catch (err) {
+      if (isTransientDbError(err)) {
+        console.warn(
+          `[WebProjectService] Gangguan koneksi sementara saat memuat detail publik ${normalizedId}:`,
+          err instanceof Error ? err.message : String(err)
+        );
+      } else {
+        console.error(`Gagal membaca detail publik projek web ${normalizedId}:`, err);
+      }
+      return null;
+    }
   }
 
   /**

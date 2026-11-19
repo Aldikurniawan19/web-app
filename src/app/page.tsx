@@ -134,7 +134,7 @@ export default async function AppHubPage() {
               applicationCategory: app.category || "UtilitiesApplication",
               softwareVersion: app.version,
               fileSize: app.fileSize,
-              url: getSiteUrl("/aplikasi"),
+              url: getSiteUrl(`/aplikasi/${encodeURIComponent(app.id)}`),
               offers: {
                 "@type": "Offer",
                 price: "0",
@@ -150,7 +150,7 @@ export default async function AppHubPage() {
               name: proj.name,
               description: proj.description,
               applicationCategory: proj.category || "WebApplication",
-              url: proj.liveUrl || getSiteUrl("/projek-web"),
+              url: getSiteUrl(`/projek-web/${encodeURIComponent(proj.id)}`),
             },
           })),
         ],

@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
     AppStorageService.invalidateCache();
     revalidatePath("/");
     revalidatePath("/aplikasi");
+    revalidatePath(`/aplikasi/${encodeURIComponent(appId)}`);
 
     return NextResponse.json({
       success: true,

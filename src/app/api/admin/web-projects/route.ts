@@ -86,6 +86,8 @@ export async function POST(request: NextRequest) {
 
     revalidatePath("/");
     revalidatePath("/projek-web");
+    revalidatePath(`/projek-web/${encodeURIComponent(newProject.id)}`);
+    revalidatePath("/sitemap.xml");
 
     return NextResponse.json({
       success: true,
@@ -130,6 +132,8 @@ export async function PUT(request: NextRequest) {
 
     revalidatePath("/");
     revalidatePath("/projek-web");
+    revalidatePath(`/projek-web/${encodeURIComponent(id)}`);
+    revalidatePath("/sitemap.xml");
 
     return NextResponse.json({
       success: true,
@@ -173,6 +177,8 @@ export async function DELETE(request: NextRequest) {
 
   revalidatePath("/");
   revalidatePath("/projek-web");
+  revalidatePath(`/projek-web/${encodeURIComponent(id)}`);
+  revalidatePath("/sitemap.xml");
 
   return NextResponse.json({
     success: true,

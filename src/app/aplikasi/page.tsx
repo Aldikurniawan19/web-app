@@ -109,6 +109,7 @@ export default async function AllAppsPage() {
             applicationCategory: app.category || "UtilitiesApplication",
             softwareVersion: app.version,
             fileSize: app.fileSize,
+            url: getSiteUrl(`/aplikasi/${encodeURIComponent(app.id)}`),
             offers: {
               "@type": "Offer",
               price: "0",

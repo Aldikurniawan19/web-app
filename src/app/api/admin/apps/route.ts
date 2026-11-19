@@ -113,6 +113,8 @@ export async function POST(request: NextRequest) {
 
     revalidatePath("/");
     revalidatePath("/aplikasi");
+    revalidatePath(`/aplikasi/${encodeURIComponent(newApp.id)}`);
+    revalidatePath("/sitemap.xml");
 
     return NextResponse.json({
       success: true,
@@ -157,6 +159,8 @@ export async function PUT(request: NextRequest) {
 
     revalidatePath("/");
     revalidatePath("/aplikasi");
+    revalidatePath(`/aplikasi/${encodeURIComponent(id)}`);
+    revalidatePath("/sitemap.xml");
 
     return NextResponse.json({
       success: true,
@@ -200,6 +204,8 @@ export async function DELETE(request: NextRequest) {
 
   revalidatePath("/");
   revalidatePath("/aplikasi");
+  revalidatePath(`/aplikasi/${encodeURIComponent(id)}`);
+  revalidatePath("/sitemap.xml");
 
   return NextResponse.json({
     success: true,

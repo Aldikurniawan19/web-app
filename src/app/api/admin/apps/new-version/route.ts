@@ -62,6 +62,8 @@ export async function POST(request: NextRequest) {
 
     revalidatePath("/");
     revalidatePath("/aplikasi");
+    revalidatePath(`/aplikasi/${encodeURIComponent(updatedApp.id)}`);
+    revalidatePath("/sitemap.xml");
 
     return NextResponse.json({
       success: true,

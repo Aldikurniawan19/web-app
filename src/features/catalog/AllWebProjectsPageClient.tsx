@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { WebProjectCard } from "@/features/catalog/WebProjectCard";
@@ -13,14 +13,6 @@ import { Search, Globe, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCatalog } from "@/context/CatalogContext";
 import gsap from "gsap";
-
-const WebProjectDetailView = dynamic(
-  () =>
-    import("@/features/detail/WebProjectDetailView").then(
-      (m) => m.WebProjectDetailView
-    ),
-  { ssr: false }
-);
 
 const WEB_PAGE_CATEGORIES = [
   "Semua",
@@ -44,6 +36,7 @@ export function AllWebProjectsPageClient({
   initialWebProjects = [],
   hasServerData = false,
 }: AllWebProjectsPageClientProps) {
+  const router = useRouter();
   const {
     webProjects: contextWebProjects,
     isLoading: isContextLoading,
@@ -61,8 +54,6 @@ export function AllWebProjectsPageClient({
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Semua");
-  const [selectedProject, setSelectedProject] = useState<WebProjectItem | null>(null);
-  const [activeView, setActiveView] = useState<"catalog" | "detail">("catalog");
 
   const catPillRef = useRef<HTMLDivElement>(null);
   const catBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -273,14 +264,7 @@ export function AllWebProjectsPageClient({
   }, [selectedCategory]);
 
   const handleOpenDetail = (project: WebProjectItem) => {
-    setSelectedProject(project);
-    setActiveView("detail");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleBackToCatalog = () => {
-    setActiveView("catalog");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    router.push(`/projek-web/${encodeURIComponent(project.id)}`);
   };
 
   return (
@@ -290,8 +274,7 @@ export function AllWebProjectsPageClient({
 
       {/* 2. Main Content Body */}
       <main className="flex-1 w-full">
-        {activeView === "catalog" ? (
-          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
             {/* Breadcrumb & Title */}
             <div className="space-y-4">
               <Breadcrumb
@@ -410,27 +393,6 @@ export function AllWebProjectsPageClient({
               </div>
             )}
           </div>
-        ) : selectedProject ? (
-          <WebProjectDetailView
-            project={selectedProject}
-            onBack={handleBackToCatalog}
-            breadcrumbs={[
-              {
-                label: "Beranda",
-                icon: Home,
-                href: "/",
-              },
-              {
-                label: "Katalog Projek Web",
-                onClick: handleBackToCatalog,
-              },
-              {
-                label: `Detail ${selectedProject.name}`,
-                isCurrent: true,
-              },
-            ]}
-          />
-        ) : null}
       </main>
 
       {/* 3. Footer */}

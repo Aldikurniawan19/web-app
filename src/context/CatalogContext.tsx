@@ -15,7 +15,15 @@ import { WebProjectItem } from "@/types/web-project";
 export const APPS_SESSION_CACHE_KEY = "allprojects_apps_session_v2";
 export const WEB_PROJECTS_SESSION_CACHE_KEY = "allprojects_web_session_v2";
 
-const SSR_PUBLIC_PATHS = new Set(["/", "/aplikasi", "/projek-web"]);
+function isSsrPublicPath(pathname: string): boolean {
+  return (
+    pathname === "/" ||
+    pathname === "/aplikasi" ||
+    pathname.startsWith("/aplikasi/") ||
+    pathname === "/projek-web" ||
+    pathname.startsWith("/projek-web/")
+  );
+}
 
 async function fetchJsonWithRetry(
   url: string,
@@ -153,7 +161,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
     // Halaman publik SSR/ISR (/, /aplikasi, /projek-web) sudah membawa data segar dari server.
     // Tunda revalidasi latar belakang sampai pengguna berinteraksi atau jaringan senggang
     // agar tidak mengganggu bandwidth gambar LCP dan network-quiet Lighthouse mobile.
-    if (SSR_PUBLIC_PATHS.has(window.location.pathname)) {
+    if (isSsrPublicPath(window.location.pathname)) {
       let triggered = false;
       const triggerOnce = () => {
         if (triggered || hasLoadedFromNetworkRef.current) return;

@@ -734,6 +734,57 @@ export class AppStorageService {
   }
 
   /**
+   * Mengembalikan daftar ID dan tanggal pembaruan aplikasi untuk sitemap.xml & generateStaticParams.
+   */
+  static async getPublicSitemapEntries(): Promise<
+    Array<{ id: string; updatedAt: Date }>
+  > {
+    try {
+      const rows = await withRetry(() =>
+        prisma.app.findMany({
+          orderBy: { createdAt: "desc" },
+          select: { id: true, updatedAt: true },
+        })
+      );
+      return rows;
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Memetakan baris query ringan publik menjadi AppItem dengan URL endpoint media cacheable.
+   */
+  private static mapPublicCatalogRecord(rec: Record<string, unknown>): AppItem {
+    const item = this.mapToAppItem(rec);
+    const vTag = appCache.mediaVersionMap.get(item.id) || "1";
+    const safeId = encodeURIComponent(item.id);
+
+    const slimIconUrl =
+      item.iconUrl === DATA_URI_MARKER
+        ? `/api/apps/media/${safeId}/icon/0?v=${vTag}`
+        : item.iconUrl;
+
+    const slimScreenshots = Array.isArray(item.screenshots)
+      ? item.screenshots.map((sc, idx) => {
+          if (!sc || typeof sc.imageUrl !== "string") return sc;
+          if (sc.imageUrl !== DATA_URI_MARKER) return sc;
+          return {
+            ...sc,
+            imageUrl: `/api/apps/media/${safeId}/screenshot/${idx}?v=${vTag}`,
+          };
+        })
+      : [];
+
+    return {
+      ...item,
+      longDescription: item.longDescription || item.description,
+      iconUrl: slimIconUrl,
+      screenshots: slimScreenshots,
+    };
+  }
+
+  /**
    * Mengembalikan daftar aplikasi ringan untuk halaman publik & SSR tanpa mengunduh
    * blob ikon/screenshot Base64 berukuran puluhan MB dari PostgreSQL.
    */
@@ -762,6 +813,7 @@ export class AppStorageService {
               "name",
               "tagline",
               "description",
+              "longDescription",
               "category",
               "rating",
               "reviewsCount",
@@ -813,34 +865,7 @@ export class AppStorageService {
           `
         );
 
-        const mapped = records.map((rec) => {
-          const item = this.mapToAppItem(rec);
-          const vTag = appCache.mediaVersionMap.get(item.id) || "1";
-          const safeId = encodeURIComponent(item.id);
-
-          const slimIconUrl =
-            item.iconUrl === DATA_URI_MARKER
-              ? `/api/apps/media/${safeId}/icon/0?v=${vTag}`
-              : item.iconUrl;
-
-          const slimScreenshots = Array.isArray(item.screenshots)
-            ? item.screenshots.map((sc, idx) => {
-                if (!sc || typeof sc.imageUrl !== "string") return sc;
-                if (sc.imageUrl !== DATA_URI_MARKER) return sc;
-                return {
-                  ...sc,
-                  imageUrl: `/api/apps/media/${safeId}/screenshot/${idx}?v=${vTag}`,
-                };
-              })
-            : [];
-
-          return {
-            ...item,
-            longDescription: item.description,
-            iconUrl: slimIconUrl,
-            screenshots: slimScreenshots,
-          };
-        });
+        const mapped = records.map((rec) => this.mapPublicCatalogRecord(rec));
 
         // Lampirkan ringkasan scan keamanan APK dalam 1 query batch ringan
         const scanMap = await ApkSecurityService.getLatestScansMapForApps(
@@ -907,6 +932,130 @@ export class AppStorageService {
     })();
 
     return appCache.pendingPublicFetchPromise;
+  }
+
+  /**
+   * Mengambil satu aplikasi versi publik/ringan berdasarkan ID untuk halaman detail SSR (/aplikasi/[id]).
+   */
+  static async getPublicCatalogAppById(id: string): Promise<AppItem | null> {
+    const normalizedId = id.trim();
+    if (!normalizedId) return null;
+
+    if (
+      appCache.cachedPublicApps !== null &&
+      Date.now() - appCache.lastPublicCacheTimestamp < CACHE_TTL_MS
+    ) {
+      const cached = appCache.cachedPublicApps.find((a) => a.id === normalizedId);
+      if (cached) return cached;
+    }
+
+    try {
+      const records = await withRetry(() =>
+        prisma.$queryRaw<Array<Record<string, unknown>>>`
+          SELECT
+            "id",
+            "name",
+            "tagline",
+            "description",
+            "longDescription",
+            "category",
+            "rating",
+            "reviewsCount",
+            "fileSize",
+            "version",
+            "developer",
+            "lastUpdated",
+            "platforms",
+            CASE
+              WHEN COALESCE("iconUrl", '') LIKE 'data:image/%' THEN ${DATA_URI_MARKER}
+              ELSE "iconUrl"
+            END AS "iconUrl",
+            "iconType",
+            "iconColor",
+            "features",
+            COALESCE(
+              (
+                SELECT jsonb_agg(
+                  jsonb_build_object(
+                    'id', elem->>'id',
+                    'title', elem->>'title',
+                    'description', elem->>'description',
+                    'type', elem->>'type',
+                    'imageUrl', CASE
+                      WHEN COALESCE(elem->>'imageUrl', '') LIKE 'data:image/%' THEN ${DATA_URI_MARKER}
+                      ELSE elem->>'imageUrl'
+                    END
+                  )
+                  ORDER BY ord
+                )
+                FROM jsonb_array_elements(
+                  CASE
+                    WHEN "screenshots" IS NOT NULL AND jsonb_typeof("screenshots"::jsonb) = 'array'
+                    THEN "screenshots"::jsonb
+                    ELSE '[]'::jsonb
+                  END
+                ) WITH ORDINALITY AS t(elem, ord)
+              ),
+              '[]'::jsonb
+            ) AS "screenshots",
+            "downloadsCount",
+            "systemRequirements",
+            "apkUrl",
+            "apkFileName",
+            "createdAt",
+            "updatedAt"
+          FROM "apps"
+          WHERE "id" = ${normalizedId}
+          LIMIT 1
+        `
+      );
+
+      const rec = records[0];
+      if (!rec) return null;
+
+      const app = this.mapPublicCatalogRecord(rec);
+
+      const scanMap = await ApkSecurityService.getLatestScansMapForApps([
+        { id: app.id, version: app.version },
+      ]);
+      if (scanMap[app.id]) {
+        app.securityScan = scanMap[app.id];
+      }
+
+      try {
+        const stats = await withTimeout(
+          GithubReleaseService.getAppDownloadStats({
+            appId: app.id,
+            appName: app.name,
+            apkFileName: app.apkFileName,
+            apkUrl: app.apkUrl,
+          }),
+          GITHUB_STATS_TIMEOUT_MS
+        );
+        if (stats) {
+          if (stats.totalDownloads > 0) {
+            app.downloadsCount = stats.formattedTotal;
+          }
+          if (!app.apkUrl && stats.latestDownloadUrl) {
+            app.apkUrl = stats.latestDownloadUrl;
+          }
+        }
+      } catch {
+        // Gunakan fallback downloadsCount dari database
+      }
+
+      return app;
+    } catch (err) {
+      if (isTransientDbError(err)) {
+        console.warn(
+          `[AppStorageService] Gangguan koneksi sementara saat memuat detail publik ${normalizedId}:`,
+          err instanceof Error ? err.message : String(err)
+        );
+      } else {
+        console.error(`Gagal membaca detail publik aplikasi ${normalizedId}:`, err);
+      }
+      return null;
+    }
   }
 
   /**

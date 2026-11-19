@@ -43,7 +43,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
   const [category, setCategory] = useState<Exclude<AppCategory, "Semua">>(
     initialData?.category || "Produktivitas"
   );
-  const [developer, setDeveloper] = useState(initialData?.developer || "AppHub Studio");
+  const [developer, setDeveloper] = useState(initialData?.developer || "alllprojects");
   const [version, setVersion] = useState(initialData?.version || "1.0.0");
   const [fileSize, setFileSize] = useState(initialData?.fileSize || "15.0 MB");
   const [downloadsCount, setDownloadsCount] = useState(initialData?.downloadsCount || "10 rb+");
@@ -135,7 +135,7 @@ export function AppForm({ initialData, isEditing = false }: AppFormProps) {
         downloadsCount: downloadsCount.trim() || "10 rb+",
         lastUpdated: lastUpdated.trim(),
         description: description.trim(),
-        longDescription: initialData?.longDescription || description.trim(),
+        longDescription: description.trim(),
         iconUrl,
         iconType: "document",
         iconColor: "bg-blue-500",

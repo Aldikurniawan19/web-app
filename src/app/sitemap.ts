@@ -7,29 +7,48 @@ export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  let latestAppUpdate = now;
-  let latestWebUpdate = now;
+  let appEntries: Array<{ id: string; updatedAt: Date }> = [];
+  let webEntries: Array<{ id: string; updatedAt: Date }> = [];
 
   try {
-    const [appUpdatedAt, webUpdatedAt] = await Promise.all([
-      AppStorageService.getLatestUpdatedAt(),
-      WebProjectService.getLatestUpdatedAt(),
+    [appEntries, webEntries] = await Promise.all([
+      AppStorageService.getPublicSitemapEntries(),
+      WebProjectService.getPublicSitemapEntries(),
     ]);
-
-    if (appUpdatedAt) {
-      latestAppUpdate = appUpdatedAt;
-    }
-    if (webUpdatedAt) {
-      latestWebUpdate = webUpdatedAt;
-    }
   } catch {
     // Tetap kirim sitemap utama meski database sedang tidak terjangkau saat build
   }
+
+  const latestAppUpdate =
+    appEntries.reduce<Date | null>(
+      (max, entry) => (!max || entry.updatedAt > max ? entry.updatedAt : max),
+      null
+    ) ?? now;
+
+  const latestWebUpdate =
+    webEntries.reduce<Date | null>(
+      (max, entry) => (!max || entry.updatedAt > max ? entry.updatedAt : max),
+      null
+    ) ?? now;
 
   const latestHomeUpdate =
     latestAppUpdate.getTime() >= latestWebUpdate.getTime()
       ? latestAppUpdate
       : latestWebUpdate;
+
+  const appDetailUrls: MetadataRoute.Sitemap = appEntries.map((entry) => ({
+    url: getSiteUrl(`/aplikasi/${encodeURIComponent(entry.id)}`),
+    lastModified: entry.updatedAt,
+    changeFrequency: "weekly",
+    priority: 0.85,
+  }));
+
+  const webDetailUrls: MetadataRoute.Sitemap = webEntries.map((entry) => ({
+    url: getSiteUrl(`/projek-web/${encodeURIComponent(entry.id)}`),
+    lastModified: entry.updatedAt,
+    changeFrequency: "weekly",
+    priority: 0.8,
+  }));
 
   return [
     {
@@ -50,5 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 0.9,
     },
+    ...appDetailUrls,
+    ...webDetailUrls,
   ];
 }

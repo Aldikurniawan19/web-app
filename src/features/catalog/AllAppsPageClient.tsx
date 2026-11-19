@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { AppCard } from "@/features/catalog/AppCard";
@@ -14,11 +15,6 @@ import { Search, ChevronLeft, ChevronRight, Smartphone, Home } from "lucide-reac
 import { cn } from "@/lib/utils";
 import { useCatalog } from "@/context/CatalogContext";
 import gsap from "gsap";
-
-const AppDetailView = dynamic(
-  () => import("@/features/detail/AppDetailView").then((m) => m.AppDetailView),
-  { ssr: false }
-);
 
 const DownloadModal = dynamic(
   () => import("@/features/download/DownloadModal").then((m) => m.DownloadModal),
@@ -42,6 +38,7 @@ export function AllAppsPageClient({
   initialApps = [],
   hasServerData = false,
 }: AllAppsPageClientProps) {
+  const router = useRouter();
   const {
     apps: contextApps,
     isLoading: isContextLoading,
@@ -59,8 +56,6 @@ export function AllAppsPageClient({
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<AppCategory>("Semua");
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedApp, setSelectedApp] = useState<AppItem | null>(null);
-  const [activeView, setActiveView] = useState<"catalog" | "detail">("catalog");
   const [downloadModalApp, setDownloadModalApp] = useState<AppItem | null>(null);
   const [guideModalApp, setGuideModalApp] = useState<AppItem | null>(null);
 
@@ -285,32 +280,8 @@ export function AllAppsPageClient({
     return filteredApps.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredApps, currentPage, shouldPaginate]);
 
-  // Sinkronkan selectedApp dengan data terbaru di apps
-  useEffect(() => {
-    if (selectedApp && apps.length > 0) {
-      const latest = apps.find((a) => a.id === selectedApp.id);
-      if (
-        latest &&
-        (latest.version !== selectedApp.version ||
-          latest.apkUrl !== selectedApp.apkUrl ||
-          latest.fileSize !== selectedApp.fileSize ||
-          latest.lastUpdated !== selectedApp.lastUpdated)
-      ) {
-        setSelectedApp(latest);
-      }
-    }
-  }, [apps, selectedApp]);
-
   const handleOpenDetail = (app: AppItem) => {
-    const latest = apps.find((a) => a.id === app.id) || app;
-    setSelectedApp(latest);
-    setActiveView("detail");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleBackToCatalog = () => {
-    setActiveView("catalog");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    router.push(`/aplikasi/${encodeURIComponent(app.id)}`);
   };
 
   const handleDownload = (app: AppItem) => {
@@ -326,8 +297,7 @@ export function AllAppsPageClient({
 
       {/* 2. Main Content Body */}
       <main className="flex-1 w-full">
-        {activeView === "catalog" ? (
-          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
             {/* Breadcrumb & Title */}
             <div className="space-y-4">
               <Breadcrumb
@@ -497,28 +467,6 @@ export function AllAppsPageClient({
               </div>
             )}
           </div>
-        ) : selectedApp ? (
-          <AppDetailView
-            app={selectedApp}
-            onBack={handleBackToCatalog}
-            onDownload={handleDownload}
-            breadcrumbs={[
-              {
-                label: "Beranda",
-                icon: Home,
-                href: "/",
-              },
-              {
-                label: "Katalog Aplikasi",
-                onClick: handleBackToCatalog,
-              },
-              {
-                label: `Detail ${selectedApp.name}`,
-                isCurrent: true,
-              },
-            ]}
-          />
-        ) : null}
       </main>
 
       {/* 3. Footer */}

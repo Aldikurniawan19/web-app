@@ -2,10 +2,10 @@
 
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { FloatingBottomBar } from "@/components/layout/FloatingBottomBar";
-import { Home } from "lucide-react";
 import { StoreHero } from "@/features/hero/StoreHero";
 import { AppGridSection } from "@/features/catalog/AppGridSection";
 import { SecurityTransparencySection } from "@/features/security/SecurityTransparencySection";
@@ -15,19 +15,6 @@ import { AppItem } from "@/types/store";
 import { WebProjectItem } from "@/types/web-project";
 import type { ApkSecurityReportDetail } from "@/types/security";
 import { useCatalog } from "@/context/CatalogContext";
-
-const AppDetailView = dynamic(
-  () => import("@/features/detail/AppDetailView").then((m) => m.AppDetailView),
-  { ssr: false }
-);
-
-const WebProjectDetailView = dynamic(
-  () =>
-    import("@/features/detail/WebProjectDetailView").then(
-      (m) => m.WebProjectDetailView
-    ),
-  { ssr: false }
-);
 
 const DownloadModal = dynamic(
   () => import("@/features/download/DownloadModal").then((m) => m.DownloadModal),
@@ -55,6 +42,7 @@ export function HomeCatalogClient({
   initialSecurityDetail = null,
   hasServerData = false,
 }: HomeCatalogClientProps) {
+  const router = useRouter();
   const {
     apps: contextApps,
     webProjects: contextWebProjects,
@@ -73,12 +61,6 @@ export function HomeCatalogClient({
     }
   }, [hasServerData, initialApps.length, initialWebProjects.length, refreshCatalog]);
 
-  const [activeView, setActiveView] = useState<"catalog" | "detail" | "detail-web">("catalog");
-  const [selectedApp, setSelectedApp] = useState<AppItem | null>(
-    () => initialApps[0] ?? null
-  );
-  const [detailInitialTab, setDetailInitialTab] = useState<AppDetailTab>("versi");
-  const [selectedWebProject, setSelectedWebProject] = useState<WebProjectItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Sinkronkan parameter pencarian ?q= dari URL (mendukung Google Sitelinks SearchAction)
@@ -95,28 +77,6 @@ export function HomeCatalogClient({
   const [activeNav, setActiveNav] = useState<string>("beranda");
   const isManualScrollLockRef = useRef<boolean>(false);
   const scrollLockTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Sinkronkan selectedApp dengan data terbaru di appsList
-  useEffect(() => {
-    if (appsList.length > 0) {
-      if (!selectedApp) {
-        setSelectedApp(appsList[0]);
-      } else {
-        const latest = appsList.find((a) => a.id === selectedApp.id);
-        if (
-          latest &&
-          (latest.version !== selectedApp.version ||
-            latest.apkUrl !== selectedApp.apkUrl ||
-            latest.fileSize !== selectedApp.fileSize ||
-            latest.lastUpdated !== selectedApp.lastUpdated ||
-            latest.securityScan?.status !== selectedApp.securityScan?.status ||
-            latest.securityScan?.sha256 !== selectedApp.securityScan?.sha256)
-        ) {
-          setSelectedApp(latest);
-        }
-      }
-    }
-  }, [appsList, selectedApp]);
 
   // Filter apps based on search query
   const filteredApps = useMemo(() => {
@@ -151,11 +111,6 @@ export function HomeCatalogClient({
 
   // Scroll Spy untuk mengaktifkan menu navbar & bottom navbar secara otomatis saat scrolling
   useEffect(() => {
-    if (activeView !== "catalog") {
-      setActiveNav("aplikasi");
-      return;
-    }
-
     let rafId: number | null = null;
 
     const syncActiveNavFromScroll = () => {
@@ -250,24 +205,19 @@ export function HomeCatalogClient({
       window.removeEventListener("touchstart", releaseManualLock);
       observer?.disconnect();
     };
-  }, [activeView, isLoading, appsList.length]);
+  }, [isLoading, appsList.length]);
 
   const handleOpenDetail = (app: AppItem, initialTab: AppDetailTab = "versi") => {
-    setSelectedApp(app);
-    setDetailInitialTab(initialTab);
-    setActiveView("detail");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const baseHref = `/aplikasi/${encodeURIComponent(app.id)}`;
+    const targetHref =
+      initialTab && initialTab !== "versi"
+        ? `${baseHref}?tab=${encodeURIComponent(initialTab)}`
+        : baseHref;
+    router.push(targetHref);
   };
 
   const handleOpenWebDetail = (project: WebProjectItem) => {
-    setSelectedWebProject(project);
-    setActiveView("detail-web");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleBackToCatalog = () => {
-    setActiveView("catalog");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    router.push(`/projek-web/${encodeURIComponent(project.id)}`);
   };
 
   const handleDownload = (app: AppItem) => {
@@ -286,14 +236,7 @@ export function HomeCatalogClient({
     }, 850);
 
     if (navId === "beranda") {
-      if (activeView !== "catalog") {
-        setActiveView("catalog");
-        setTimeout(() => {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }, 50);
-      } else {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
@@ -306,24 +249,15 @@ export function HomeCatalogClient({
     const targetId = sectionIdByNav[navId];
     if (!targetId) return;
 
-    const scrollToTargetSection = () => {
-      const element = document.getElementById(targetId);
-      if (element) {
-        const navbarHeight = 64;
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
-        window.scrollTo({
-          top: Math.max(0, offsetPosition),
-          behavior: "smooth",
-        });
-      }
-    };
-
-    if (activeView !== "catalog") {
-      setActiveView("catalog");
-      setTimeout(scrollToTargetSection, 50);
-    } else {
-      scrollToTargetSection();
+    const element = document.getElementById(targetId);
+    if (element) {
+      const navbarHeight = 64;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
+      window.scrollTo({
+        top: Math.max(0, offsetPosition),
+        behavior: "smooth",
+      });
     }
   };
 
@@ -339,98 +273,56 @@ export function HomeCatalogClient({
 
       {/* 2. Main Content Body */}
       <main className="flex-1">
-        {activeView === "catalog" ? (
-          <>
-            {/* Store Hero Section dengan Carousel Tampilan Handphone */}
-            <StoreHero
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              onSearchSubmit={() => handleNavClick("aplikasi")}
-              apps={filteredApps}
-              totalAppsCount={appsList.length}
-              totalWebProjectsCount={webProjectsList.length}
-              isLoading={isLoading}
-              onSelectApp={handleOpenDetail}
-              onDownloadApp={handleDownload}
-              onExploreCatalog={() => handleNavClick("aplikasi")}
-              onOpenGuide={() => handleNavClick("panduan")}
-            />
+        {/* Store Hero Section dengan Carousel Tampilan Handphone */}
+        <StoreHero
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSearchSubmit={() => handleNavClick("aplikasi")}
+          apps={filteredApps}
+          totalAppsCount={appsList.length}
+          totalWebProjectsCount={webProjectsList.length}
+          isLoading={isLoading}
+          onSelectApp={handleOpenDetail}
+          onDownloadApp={handleDownload}
+          onExploreCatalog={() => handleNavClick("aplikasi")}
+          onOpenGuide={() => handleNavClick("panduan")}
+        />
 
-            {/* Catalog List Section with Dual Filters (Aplikasi & Web) - Limit 3 di Beranda */}
-            <AppGridSection
-              apps={filteredApps}
-              webProjects={filteredWebProjects}
-              isLoading={isLoading}
-              onOpenDetail={(app) => handleOpenDetail(app, "versi")}
-              onOpenWebDetail={handleOpenWebDetail}
-              onDownload={handleDownload}
-              onResetSearch={() => setSearchQuery("")}
-              limit={3}
-            />
+        {/* Catalog List Section with Dual Filters (Aplikasi & Web) - Limit 3 di Beranda */}
+        <AppGridSection
+          apps={filteredApps}
+          webProjects={filteredWebProjects}
+          isLoading={isLoading}
+          onOpenDetail={(app) => handleOpenDetail(app, "versi")}
+          onOpenWebDetail={handleOpenWebDetail}
+          onDownload={handleDownload}
+          onResetSearch={() => setSearchQuery("")}
+          limit={3}
+        />
 
-            {/* Transparansi Status Cek Virus Aplikasi di Halaman Utama */}
-            <SecurityTransparencySection
-              apps={appsList}
-              isLoading={isLoading}
-              initialDetail={initialSecurityDetail}
-              onOpenSecurityDetail={(app) => handleOpenDetail(app, "keamanan")}
-              onOpenAppDetail={(app) => handleOpenDetail(app, "versi")}
-            />
+        {/* Transparansi Status Cek Virus Aplikasi di Halaman Utama */}
+        <SecurityTransparencySection
+          apps={appsList}
+          isLoading={isLoading}
+          initialDetail={initialSecurityDetail}
+          onOpenSecurityDetail={(app) => handleOpenDetail(app, "keamanan")}
+          onOpenAppDetail={(app) => handleOpenDetail(app, "versi")}
+        />
 
-            {/* Panduan Pasang APK Section */}
-            <ApkGuideSection
-              onOpenGuideModal={() => setGuideModalApp(selectedApp || appsList[0] || null)}
-            />
-          </>
-        ) : activeView === "detail" && selectedApp ? (
-          /* App Detail View */
-          <AppDetailView
-            app={selectedApp}
-            onBack={handleBackToCatalog}
-            onDownload={handleDownload}
-            initialTab={detailInitialTab}
-            breadcrumbs={[
-              {
-                label: "Beranda",
-                icon: Home,
-                onClick: handleBackToCatalog,
-              },
-              {
-                label: `Detail ${selectedApp.name}`,
-                isCurrent: true,
-              },
-            ]}
-          />
-        ) : activeView === "detail-web" && selectedWebProject ? (
-          /* Web Project Detail View */
-          <WebProjectDetailView
-            project={selectedWebProject}
-            onBack={handleBackToCatalog}
-            breadcrumbs={[
-              {
-                label: "Beranda",
-                icon: Home,
-                onClick: handleBackToCatalog,
-              },
-              {
-                label: `Detail ${selectedWebProject.name}`,
-                isCurrent: true,
-              },
-            ]}
-          />
-        ) : null}
+        {/* Panduan Pasang APK Section */}
+        <ApkGuideSection
+          onOpenGuideModal={() => setGuideModalApp(appsList[0] || null)}
+        />
       </main>
 
       {/* 3. Footer */}
       <Footer />
 
-      {/* Floating Bottom Bar Navigation (khusus tampilan mobile pada beranda katalog, disembunyikan pada tampilan detail) */}
-      {activeView === "catalog" && (
-        <FloatingBottomBar
-          activeNav={activeNav}
-          onNavClick={handleNavClick}
-        />
-      )}
+      {/* Floating Bottom Bar Navigation (khusus tampilan mobile pada beranda katalog) */}
+      <FloatingBottomBar
+        activeNav={activeNav}
+        onNavClick={handleNavClick}
+      />
 
       {/* 4. Download Multi-Platform Modal */}
       <DownloadModal

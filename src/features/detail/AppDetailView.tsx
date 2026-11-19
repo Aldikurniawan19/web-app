@@ -173,6 +173,13 @@ export function AppDetailView({
                   <span>{app.downloadsCount} Unduhan</span>
                 </div>
 
+                {/* Deskripsi Aplikasi (Terbaca langsung oleh pengunjung & crawler SEO) */}
+                {app.description && (
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl">
+                    {app.description}
+                  </p>
+                )}
+
                 {/* Status Verifikasi Keamanan APK (Dapat diklik untuk melihat laporan lengkap) */}
                 <div>
                   {app.securityScan?.status === "clean" ? (
@@ -335,6 +342,27 @@ export function AppDetailView({
                   </div>
                 </div>
               </div>
+
+              {app.features && app.features.length > 0 && (
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+                  <h3 className="text-base font-black text-slate-900 font-display select-none py-0.5 border-b border-slate-100 pb-3">
+                    Fitur Utama {app.name}
+                  </h3>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-slate-600">
+                    {app.features.map((feat, idx) => (
+                      <li
+                        key={`app-feat-${idx}`}
+                        className="flex items-start gap-2.5 rounded-xl border border-slate-100 bg-slate-50/70 p-3.5"
+                      >
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                          <Check className="h-3 w-3" strokeWidth={3} aria-hidden="true" />
+                        </span>
+                        <span className="leading-relaxed">{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
 

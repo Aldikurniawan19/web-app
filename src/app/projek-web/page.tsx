@@ -105,7 +105,7 @@ export default async function AllWebProjectsPage() {
             name: proj.name,
             description: proj.description,
             applicationCategory: proj.category || "WebApplication",
-            url: proj.liveUrl || getSiteUrl("/projek-web"),
+            url: getSiteUrl(`/projek-web/${encodeURIComponent(proj.id)}`),
           },
         })),
       },

@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { ExternalLink, Globe, Sparkles, Code2, Eye } from "lucide-react";
 import { WebProjectItem } from "@/types/web-project";
 import { isLocalOptimizedMediaUrl } from "@/lib/media-url";
-import { cn } from "@/lib/utils";
 
 interface WebProjectCardProps {
   project: WebProjectItem;
@@ -13,6 +13,8 @@ interface WebProjectCardProps {
 }
 
 export function WebProjectCard({ project, onOpenDetail }: WebProjectCardProps) {
+  const detailHref = `/projek-web/${encodeURIComponent(project.id)}`;
+
   return (
     <div
       onClick={() => onOpenDetail && onOpenDetail(project)}
@@ -124,17 +126,23 @@ export function WebProjectCard({ project, onOpenDetail }: WebProjectCardProps) {
 
       {/* Bottom Footer: Action Buttons */}
       <div className="px-5 pb-5 pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
-        <button
-          type="button"
+        <Link
+          href={detailHref}
           onClick={(e) => {
             e.stopPropagation();
-            if (onOpenDetail) onOpenDetail(project);
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
+              return;
+            }
+            if (onOpenDetail) {
+              e.preventDefault();
+              onOpenDetail(project);
+            }
           }}
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors"
         >
           <Eye className="h-3.5 w-3.5" />
           <span>Detail</span>
-        </button>
+        </Link>
 
         {project.liveUrl ? (
           <a
