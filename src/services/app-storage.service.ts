@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { withDbRetry as withRetry } from "@/lib/db-retry";
+import { isTransientDbError, withDbRetry as withRetry } from "@/lib/db-retry";
 import { AppItem, AppVersionItem, CreateAppInput, ReleaseNewVersionInput } from "@/types/store";
 import { GithubReleaseService } from "./github-release.service";
 import { ApkSecurityService } from "./apk-security.service";
@@ -216,7 +216,14 @@ export class AppStorageService {
         appCache.lastCacheTimestamp = Date.now();
         return mapped;
       } catch (err) {
-        console.error("Gagal membaca daftar aplikasi dari Supabase:", err);
+        if (isTransientDbError(err)) {
+          console.warn(
+            "[AppStorageService] Koneksi/DNS Supabase sedang tidak stabil, menggunakan cache/fallback:",
+            err instanceof Error ? err.message : String(err)
+          );
+        } else {
+          console.error("Gagal membaca daftar aplikasi dari Supabase:", err);
+        }
         if (appCache.cachedApps !== null) return appCache.cachedApps;
         return [];
       } finally {

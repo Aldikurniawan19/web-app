@@ -1,517 +1,131 @@
-﻿"use client";
+import type { Metadata } from "next";
+import { AppStorageService } from "@/services/app-storage.service";
+import { AllAppsPageClient } from "@/features/catalog/AllAppsPageClient";
+import { buildSeoKeywords, getSiteUrl, SITE_URL } from "@/lib/site-seo";
+import type { AppItem } from "@/types/store";
 
-import React, { useState, useEffect, useMemo, useRef } from "react";
-import Link from "next/link";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { AppCard } from "@/features/catalog/AppCard";
-import { AppCardSkeleton } from "@/features/catalog/AppCardSkeleton";
-import { AppDetailView } from "@/features/detail/AppDetailView";
-import { DownloadModal } from "@/features/download/DownloadModal";
-import { InstallGuideModal } from "@/features/guide/InstallGuideModal";
-import { AppItem, AppCategory } from "@/types/store";
-import { CATEGORIES } from "@/constants/app-store-data";
-import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
-import { Breadcrumb } from "@/components/ui/Breadcrumb";
-import { Search, Sparkles, ChevronLeft, ChevronRight, Smartphone, Home } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useCatalog } from "@/context/CatalogContext";
-import gsap from "gsap";
+export const revalidate = 60;
 
-export default function AllAppsPage() {
-  const { apps, isLoading } = useCatalog();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<AppCategory>("Semua");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedApp, setSelectedApp] = useState<AppItem | null>(null);
-  const [activeView, setActiveView] = useState<"catalog" | "detail">("catalog");
-  const [downloadModalApp, setDownloadModalApp] = useState<AppItem | null>(null);
-  const [guideModalApp, setGuideModalApp] = useState<AppItem | null>(null);
+export async function generateMetadata(): Promise<Metadata> {
+  let appKeywords: string[] = [];
+  let count = 0;
 
-  const catPillRef = useRef<HTMLDivElement>(null);
-  const catBtnRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const prevCatRef = useRef<AppCategory | null>(null);
-  const isInitialCatMount = useRef<boolean>(true);
+  try {
+    const apps = await AppStorageService.getPublicCatalogApps();
+    count = apps.length;
+    appKeywords = apps.flatMap((app) => [
+      app.name,
+      `${app.name} apk`,
+      `download ${app.name}`,
+      app.category,
+    ]);
+  } catch {
+    // Gunakan kata kunci dasar bila database belum terjangkau
+  }
 
-  const ITEMS_PER_PAGE = 7;
+  const description =
+    count > 0
+      ? `Unduh ${count} aplikasi Android APK gratis dan aman bebas virus di katalog resmi AllProjects (AlllProjek / AllProjek). Lengkap dengan riwayat versi dan verifikasi VirusTotal.`
+      : "Daftar lengkap aplikasi Android APK gratis dan aman bebas virus di katalog resmi AllProjects (AlllProjek / AllProjek) dengan verifikasi VirusTotal.";
 
-  const filteredApps = useMemo(() => {
-    return apps.filter((app) => {
-      const q = searchQuery.toLowerCase();
-      const matchesSearch =
-        searchQuery.trim() === "" ||
-        app.name.toLowerCase().includes(q) ||
-        app.description.toLowerCase().includes(q) ||
-        app.developer.toLowerCase().includes(q);
-
-      const matchesCat =
-        selectedCategory === "Semua" || app.category === selectedCategory;
-
-      return matchesSearch && matchesCat;
-    });
-  }, [apps, searchQuery, selectedCategory]);
-
-  const shouldPaginate = filteredApps.length > ITEMS_PER_PAGE;
-  const totalPages = shouldPaginate ? Math.ceil(filteredApps.length / ITEMS_PER_PAGE) : 1;
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedCategory]);
-
-  // Animasi Background Pill Kenyal untuk Filter Kategori Aplikasi (melar dari arah navigasi)
-  useEffect(() => {
-    const pillEl = catPillRef.current;
-    const targetBtn = catBtnRefs.current[selectedCategory];
-
-    if (!pillEl || !targetBtn) return;
-
-    const targetX = targetBtn.offsetLeft;
-    const targetY = targetBtn.offsetTop;
-    const targetWidth = targetBtn.offsetWidth;
-    const targetHeight = targetBtn.offsetHeight;
-
-    const catIndex = CATEGORIES.indexOf(selectedCategory);
-    const prevCat = prevCatRef.current;
-    const prevIndex = prevCat ? CATEGORIES.indexOf(prevCat) : -1;
-
-    if (isInitialCatMount.current || prevIndex === -1 || prevIndex === catIndex) {
-      gsap.set(pillEl, {
-        x: targetX,
-        y: targetY,
-        width: targetWidth,
-        height: targetHeight,
-        opacity: 1,
-        scaleX: 1,
-        scaleY: 1,
-        transformOrigin: "center center",
-      });
-      isInitialCatMount.current = false;
-      prevCatRef.current = selectedCategory;
-      return;
-    }
-
-    const currentX = gsap.getProperty(pillEl, "x") as number;
-    const currentWidth = gsap.getProperty(pillEl, "width") as number;
-    const startX = typeof currentX === "number" && !isNaN(currentX) ? currentX : targetX;
-    const startWidth = typeof currentWidth === "number" && !isNaN(currentWidth) ? currentWidth : targetWidth;
-
-    const startRight = startX + startWidth;
-    const targetRight = targetX + targetWidth;
-    const isMovingRight = targetX > startX;
-    const distance = Math.abs(catIndex - prevIndex);
-
-    gsap.killTweensOf(pillEl);
-
-    // Animasi pergerakan fluida independen: ujung depan melesat lebih dulu, ujung ekor menyusul
-    // sehingga pill benar-benar "molor" dan meluncur ke arah tujuan (bukan membesar di tempat)
-    const state = {
-      left: startX,
-      right: startRight,
-    };
-
-    const updatePill = () => {
-      const curWidth = Math.max(state.right - state.left, 24);
-      gsap.set(pillEl, {
-        x: state.left,
-        width: curWidth,
-        y: targetY,
-        height: targetHeight,
-      });
-    };
-
-    const tl = gsap.timeline();
-
-    if (isMovingRight) {
-      // BERGERAK KE KANAN:
-      // Ujung kanan (depan) melesat duluan ke target
-      tl.to(
-        state,
-        {
-          right: targetRight,
-          duration: 0.52,
-          ease: "power2.out",
-          onUpdate: updatePill,
-        },
-        0
-      );
-
-      // Ujung kiri (ekor) menyusul dengan jeda sedikit (molor ke arah kanan!)
-      tl.to(
-        state,
-        {
-          left: targetX,
-          duration: 0.62,
-          ease: "elastic.out(1.05, 0.72)",
-          onUpdate: updatePill,
-        },
-        0.08
-      );
-    } else {
-      // BERGERAK KE KIRI:
-      // Ujung kiri (depan) melesat duluan ke target
-      tl.to(
-        state,
-        {
-          left: targetX,
-          duration: 0.52,
-          ease: "power2.out",
-          onUpdate: updatePill,
-        },
-        0
-      );
-
-      // Ujung kanan (ekor) menyusul dengan jeda sedikit (molor ke arah kiri!)
-      tl.to(
-        state,
-        {
-          right: targetRight,
-          duration: 0.62,
-          ease: "elastic.out(1.05, 0.72)",
-          onUpdate: updatePill,
-        },
-        0.08
-      );
-    }
-
-    // Efek ketebalan fluida air: menipis saat melar memanjang, lalu membal kenyal di tujuan
-    tl.to(
-      pillEl,
-      {
-        scaleY: 0.88,
-        duration: 0.22,
-        ease: "power1.out",
-        transformOrigin: "center center",
+  return {
+    title: "Katalog Aplikasi Android APK Gratis & Bebas Virus",
+    description,
+    keywords: buildSeoKeywords([
+      "katalog aplikasi android",
+      "daftar apk gratis",
+      "download apk android aman",
+      "alllprojek aplikasi",
+      "allprojek apk",
+      ...appKeywords,
+    ]),
+    alternates: {
+      canonical: "/aplikasi",
+      languages: {
+        "id-ID": "/aplikasi",
       },
-      0
-    );
-    tl.to(
-      pillEl,
-      {
-        scaleY: 1.05,
-        duration: 0.26,
-        ease: "power1.inOut",
-        transformOrigin: "center center",
-      },
-      0.22
-    );
-    tl.to(
-      pillEl,
-      {
-        scaleY: 1,
-        duration: 0.3,
-        ease: "elastic.out(1.05, 0.65)",
-        transformOrigin: "center center",
-      },
-      0.48
-    );
-
-    if (distance > 1) {
-      // Efek air menipis samar-samar saat melompati menu di antaranya
-      tl.to(
-        pillEl,
-        {
-          opacity: 0.32,
-          duration: 0.26,
-          ease: "power2.in",
-        },
-        0
-      );
-      tl.to(
-        pillEl,
-        {
-          opacity: 1,
-          duration: 0.42,
-          ease: "power2.out",
-        },
-        0.24
-      );
-    }
-
-    prevCatRef.current = selectedCategory;
-  }, [selectedCategory]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      const pillEl = catPillRef.current;
-      const targetBtn = catBtnRefs.current[selectedCategory];
-
-      if (!pillEl || !targetBtn) return;
-
-      gsap.set(pillEl, {
-        x: targetBtn.offsetLeft,
-        y: targetBtn.offsetTop,
-        width: targetBtn.offsetWidth,
-        height: targetBtn.offsetHeight,
-        transformOrigin: "center center",
-      });
-    };
-
-    window.addEventListener("resize", handleResize);
-    if (typeof document !== "undefined" && document.fonts) {
-      document.fonts.ready.then(handleResize);
-    }
-    return () => window.removeEventListener("resize", handleResize);
-  }, [selectedCategory]);
-
-  const displayedApps = useMemo(() => {
-    if (!shouldPaginate) return filteredApps;
-    const start = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredApps.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredApps, currentPage, shouldPaginate]);
-
-  // Sinkronkan selectedApp dengan data terbaru di apps
-  useEffect(() => {
-    if (selectedApp && apps.length > 0) {
-      const latest = apps.find((a) => a.id === selectedApp.id);
-      if (
-        latest &&
-        (latest.version !== selectedApp.version ||
-          latest.apkUrl !== selectedApp.apkUrl ||
-          latest.fileSize !== selectedApp.fileSize ||
-          latest.lastUpdated !== selectedApp.lastUpdated)
-      ) {
-        setSelectedApp(latest);
-      }
-    }
-  }, [apps, selectedApp]);
-
-  const handleOpenDetail = (app: AppItem) => {
-    const latest = apps.find((a) => a.id === app.id) || app;
-    setSelectedApp(latest);
-    setActiveView("detail");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    openGraph: {
+      title: "Katalog Aplikasi Android APK Gratis & Bebas Virus | AllProjects",
+      description,
+      url: getSiteUrl("/aplikasi"),
+    },
   };
+}
 
-  const handleBackToCatalog = () => {
-    setActiveView("catalog");
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+export default async function AllAppsPage() {
+  let initialApps: AppItem[] = [];
+  let hasServerData = false;
 
-  const handleDownload = (app: AppItem) => {
-    const latestApp = apps.find((a) => a.id === app.id) || app;
-    setDownloadModalApp(latestApp);
-    setGuideModalApp(latestApp);
+  try {
+    initialApps = await AppStorageService.getPublicCatalogApps();
+    hasServerData = true;
+  } catch (error) {
+    console.error("[AllAppsPage] Gagal memuat daftar aplikasi di server:", error);
+  }
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        url: getSiteUrl("/aplikasi"),
+        name: "Katalog Aplikasi Android APK — AllProjects (AlllProjek)",
+        description:
+          "Katalog lengkap paket aplikasi Android APK terverifikasi VirusTotal di AllProjects.",
+        inLanguage: "id-ID",
+        isPartOf: { "@id": `${SITE_URL}/#website` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Beranda",
+            item: SITE_URL,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Katalog Aplikasi",
+            item: getSiteUrl("/aplikasi"),
+          },
+        ],
+      },
+      {
+        "@type": "ItemList",
+        name: "Daftar Aplikasi Android AllProjects",
+        numberOfItems: initialApps.length,
+        itemListElement: initialApps.slice(0, 20).map((app, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          item: {
+            "@type": "SoftwareApplication",
+            name: app.name,
+            description: app.description,
+            operatingSystem: "Android",
+            applicationCategory: app.category || "UtilitiesApplication",
+            softwareVersion: app.version,
+            fileSize: app.fileSize,
+            offers: {
+              "@type": "Offer",
+              price: "0",
+              priceCurrency: "IDR",
+            },
+          },
+        })),
+      },
+    ],
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-between">
-      {/* 1. Header & Navigation */}
-      <Navbar activeNav="aplikasi" />
-
-      {/* 2. Main Content Body */}
-      <main className="flex-1 w-full">
-        {activeView === "catalog" ? (
-          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
-            {/* Breadcrumb & Title */}
-              <div className="space-y-4">
-                <Breadcrumb
-                  items={[
-                    { label: "Beranda", icon: Home, href: "/" },
-                    { label: "Katalog Aplikasi", isCurrent: true },
-                  ]}
-                />
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h1 className="text-2xl sm:text-3xl font-extrabold tracking-normal font-display py-0.5">
-                      <span className="inline-block text-3d-bubble-main">Katalog Seluruh</span>{" "}
-                      <ShimmerTitleText>Aplikasi</ShimmerTitleText>
-                    </h1>
-                    <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                      Temukan dan unduh seluruh paket aplikasi Android resmi yang tersedia di ekosistem AllProjects.
-                    </p>
-                  </div>
-
-                  <span className="text-xs font-semibold text-slate-500 self-start sm:self-auto">
-                    {filteredApps.length} aplikasi ditemukan
-                  </span>
-                </div>
-              </div>
-
-              {/* Search & Category Filter Bar */}
-              <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center bg-white p-4 rounded-3xl border border-slate-200 shadow-sm">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Cari berdasarkan nama aplikasi atau developer..."
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 pl-10 pr-4 py-2.5 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-                  />
-                </div>
-
-                {/* Category Pills dengan background sliding kenyal dinamis */}
-                <div className="relative flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
-                  {/* Sliding Elastic Pill Indicator â€” Diposisikan top-0 left-0 agar presisi */}
-                  <div
-                    ref={catPillRef}
-                    className="absolute top-0 left-0 pointer-events-none rounded-xl bg-gradient-to-b from-blue-500 via-primary to-blue-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_0_#1d4ed8,0_3px_6px_rgba(37,99,235,0.25)] z-0 will-change-transform will-change-opacity"
-                    style={{ opacity: 0 }}
-                  />
-
-                  {CATEGORIES.map((cat) => {
-                    const isActive = selectedCategory === cat;
-                    return (
-                      <button
-                        key={cat}
-                        ref={(el) => {
-                          catBtnRefs.current[cat] = el;
-                        }}
-                        type="button"
-                        onClick={() => setSelectedCategory(cat)}
-                        className={cn(
-                          "relative z-10 rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-colors select-none",
-                          isActive
-                            ? "text-white"
-                            : "border border-slate-200 bg-slate-50 text-slate-600 hover:text-slate-900"
-                        )}
-                      >
-                        {cat}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Apps List */}
-              {isLoading ? (
-                <div className="flex flex-col gap-4 w-full min-h-[360px]">
-                  {Array.from({ length: 4 }).map((_, idx) => (
-                    <div key={`skel-${idx}`} className="w-full">
-                      <AppCardSkeleton delayMs={idx * 150} />
-                    </div>
-                  ))}
-                </div>
-              ) : displayedApps.length > 0 ? (
-                <div className="flex flex-col gap-4 w-full">
-                  {displayedApps.map((app) => (
-                    <div key={app.id} className="w-full">
-                      <AppCard
-                        app={app}
-                        onOpenDetail={handleOpenDetail}
-                        onDownload={handleDownload}
-                      />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center animate-in fade-in">
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-primary">
-                    <Smartphone className="h-6 w-6" />
-                  </div>
-                  <h3 className="mt-4 text-base font-bold text-foreground font-display">
-                    Tidak ada aplikasi ditemukan
-                  </h3>
-                  <p className="mt-1 text-xs text-slate-500">
-                    Coba sesuaikan kata kunci pencarian atau pilih kategori lain.
-                  </p>
-                  {(searchQuery || selectedCategory !== "Semua") && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSearchQuery("");
-                        setSelectedCategory("Semua");
-                      }}
-                      className="mt-4 rounded-xl bg-gradient-to-b from-blue-500 via-primary to-blue-700 px-5 py-2.5 text-xs font-bold text-white shadow-md hover:-translate-y-0.5 active:translate-y-0.5 transition-all"
-                    >
-                      Reset Filter
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* Pagination Bar */}
-              {!isLoading && shouldPaginate && totalPages > 1 && (
-                <div className="mt-12 flex items-center justify-center gap-2 animate-in fade-in">
-                  <button
-                    type="button"
-                    disabled={currentPage === 1}
-                    onClick={() => {
-                      setCurrentPage(currentPage - 1);
-                      window.scrollTo({ top: 120, behavior: "smooth" });
-                    }}
-                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:-translate-y-0.5 transition-all disabled:opacity-40"
-                    aria-label="Halaman sebelumnya"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                    <button
-                      key={pageNum}
-                      type="button"
-                      onClick={() => {
-                        setCurrentPage(pageNum);
-                        window.scrollTo({ top: 120, behavior: "smooth" });
-                      }}
-                      className={cn(
-                        "flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold transition-all",
-                        currentPage === pageNum
-                          ? "bg-primary text-white shadow-md scale-105"
-                          : "border border-slate-200 bg-white text-slate-700 hover:-translate-y-0.5"
-                      )}
-                    >
-                      {pageNum}
-                    </button>
-                  ))}
-
-                  <button
-                    type="button"
-                    disabled={currentPage === totalPages}
-                    onClick={() => {
-                      setCurrentPage(currentPage + 1);
-                      window.scrollTo({ top: 120, behavior: "smooth" });
-                    }}
-                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:-translate-y-0.5 transition-all disabled:opacity-40"
-                    aria-label="Halaman berikutnya"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : selectedApp ? (
-            <AppDetailView
-              app={selectedApp}
-              onBack={handleBackToCatalog}
-              onDownload={handleDownload}
-              breadcrumbs={[
-                {
-                  label: "Beranda",
-                  icon: Home,
-                  href: "/",
-                },
-                {
-                  label: "Katalog Aplikasi",
-                  onClick: handleBackToCatalog,
-                },
-                {
-                  label: `Detail ${selectedApp.name}`,
-                  isCurrent: true,
-                },
-              ]}
-            />
-          ) : null}
-      </main>
-
-      {/* 3. Footer */}
-      <Footer />
-
-
-      {/* Modals */}
-      <DownloadModal
-        app={downloadModalApp}
-        isOpen={downloadModalApp !== null}
-        onClose={() => setDownloadModalApp(null)}
-        onOpenGuide={(app) => setGuideModalApp(app)}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-
-      <InstallGuideModal
-        app={guideModalApp}
-        isOpen={guideModalApp !== null}
-        onClose={() => setGuideModalApp(null)}
-      />
-    </div>
+      <AllAppsPageClient initialApps={initialApps} hasServerData={hasServerData} />
+    </>
   );
 }

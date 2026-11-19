@@ -1,21 +1,27 @@
 import React from "react";
+import Link from "next/link";
 import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
 
   const navigations = [
-    { label: "Beranda", href: "#beranda" },
-    { label: "Katalog Aplikasi", href: "#katalog" },
-    { label: "Panduan Pasang APK", href: "#panduan-apk" },
-    { label: "Aplikasi Terbaru", href: "#katalog" },
+    { label: "Beranda", href: "/" },
+    { label: "Katalog Aplikasi Android", href: "/aplikasi" },
+    { label: "Katalog Projek Web", href: "/projek-web" },
+    { label: "Bukti Cek Virus APK", href: "/#keamanan" },
+    { label: "Panduan Pasang APK", href: "/#panduan-apk" },
   ];
 
-  const legals = [
-    { label: "Pusat Bantuan", href: "#" },
-    { label: "Kebijakan Privasi", href: "#" },
-    { label: "Syarat & Ketentuan", href: "#" },
-    { label: "Hubungi Tim AllProjects", href: "#" },
+  const resources = [
+    { label: "Download APK Terbaru", href: "/aplikasi" },
+    { label: "Koleksi Web App Modern", href: "/projek-web" },
+    { label: "Verifikasi VirusTotal", href: "/#keamanan" },
+    {
+      label: "GitHub AllProjects",
+      href: "https://github.com/Aldikurniawan19",
+      external: true,
+    },
   ];
 
   return (
@@ -28,6 +34,7 @@ export function Footer() {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           preserveAspectRatio="none"
+          aria-hidden="true"
         >
           {/* Layer 1: Atmospheric Back Wave with Soft Glow */}
           <path
@@ -50,53 +57,68 @@ export function Footer() {
             {/* Col 1: Brand Info (Spans 6 cols on md) */}
             <div className="space-y-4 md:col-span-6">
               <div className="flex items-center">
-                <span className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5 flex items-baseline">
+                <Link
+                  href="/"
+                  className="text-xl sm:text-2xl font-black tracking-tight font-display select-none py-0.5 flex items-baseline"
+                  aria-label="Beranda AllProjects"
+                >
                   <span className="inline-block font-script text-2xl sm:text-3xl font-bold text-3d-white pr-1">
                     All
                   </span>
                   <ShimmerTitleText variant="sky" showSparkles={true}>
                     Projects
                   </ShimmerTitleText>
-                </span>
+                </Link>
               </div>
               <p className="text-xs text-blue-100 leading-relaxed max-w-md">
-                Platform terpercaya untuk menemukan, mengeksplorasi, dan mengunduh berbagai aplikasi Android terbaik dengan cepat dan aman.
+                AllProjects (AlllProjek / AllProjek) adalah platform katalog untuk menemukan dan mengunduh aplikasi Android APK gratis yang terverifikasi bebas virus VirusTotal, sekaligus mengeksplorasi berbagai projek web modern.
               </p>
             </div>
 
             {/* Col 2: Navigasi (Spans 3 cols on md) */}
-            <div className="space-y-3 md:col-span-3">
-              <h4 className="text-xs font-black uppercase tracking-wider font-display select-none py-0.5 text-white">
+            <nav aria-label="Navigasi Footer" className="space-y-3 md:col-span-3">
+              <h3 className="text-xs font-black uppercase tracking-wider font-display select-none py-0.5 text-white">
                 Navigasi
-              </h4>
+              </h3>
               <ul className="space-y-2 text-xs text-blue-100">
                 {navigations.map((nav) => (
                   <li key={nav.label}>
-                    <a
+                    <Link
                       href={nav.href}
                       className="hover:text-white transition-colors block py-0.5"
                     >
                       {nav.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
-            </div>
+            </nav>
 
-            {/* Col 3: Dukungan & Legal (Spans 3 cols on md) */}
+            {/* Col 3: Ekosistem & Tautan (Spans 3 cols on md) */}
             <div className="space-y-3 md:col-span-3">
-              <h4 className="text-xs font-black uppercase tracking-wider font-display select-none py-0.5 text-white">
-                Dukungan & Legal
-              </h4>
+              <h3 className="text-xs font-black uppercase tracking-wider font-display select-none py-0.5 text-white">
+                Ekosistem
+              </h3>
               <ul className="space-y-2 text-xs text-blue-100">
-                {legals.map((legal) => (
-                  <li key={legal.label}>
-                    <a
-                      href={legal.href}
-                      className="hover:text-white transition-colors block py-0.5"
-                    >
-                      {legal.label}
-                    </a>
+                {resources.map((item) => (
+                  <li key={item.label}>
+                    {item.external ? (
+                      <a
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-white transition-colors block py-0.5"
+                      >
+                        {item.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={item.href}
+                        className="hover:text-white transition-colors block py-0.5"
+                      >
+                        {item.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -105,9 +127,14 @@ export function Footer() {
 
           {/* Bottom Copyright Bar */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-blue-500/30 pt-8 pb-16 md:pb-0 text-xs text-blue-200/90">
-            <p>© {currentYear} AllProject Studio.</p>
+            <p>© {currentYear} AllProjects Studio (alllprojects.my.id).</p>
             <div className="flex items-center gap-6 text-xs text-blue-100">
-             
+              <Link href="/aplikasi" className="hover:text-white transition-colors">
+                Aplikasi Android
+              </Link>
+              <Link href="/projek-web" className="hover:text-white transition-colors">
+                Projek Web
+              </Link>
             </div>
           </div>
         </div>

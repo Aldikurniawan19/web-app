@@ -1,5 +1,30 @@
 /**
- * Helper auto-retry untuk query Prisma ketika terjadi gangguan koneksi transien
+ * Memeriksa apakah error database bersifat transien (gangguan jaringan/DNS sementara,
+ * koneksi terputus, atau antrean pool sementara) yang aman untuk dicoba ulang.
+ */
+export function isTransientDbError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return (
+    msg.includes("Connection terminated") ||
+    msg.includes("closed") ||
+    msg.includes("timeout") ||
+    msg.includes("57014") ||
+    msg.includes("ECONNRESET") ||
+    msg.includes("ENOTFOUND") ||
+    msg.includes("EAI_AGAIN") ||
+    msg.includes("ETIMEDOUT") ||
+    msg.includes("ECONNREFUSED") ||
+    msg.includes("ENETUNREACH") ||
+    msg.includes("EHOSTUNREACH") ||
+    msg.includes("getaddrinfo") ||
+    msg.includes("connection pool") ||
+    msg.includes("max clients") ||
+    msg.includes("EMAXCONNSESSION")
+  );
+}
+
+/**
+ * Helper auto-retry untuk query Prisma ketika terjadi gangguan koneksi/DNS transien
  * atau lonjakan sementara pool koneksi PostgreSQL/Supabase.
  */
 export async function withDbRetry<T>(
@@ -14,22 +39,12 @@ export async function withDbRetry<T>(
     } catch (err: unknown) {
       attempt++;
       const msg = err instanceof Error ? err.message : String(err);
-      const isTransient =
-        msg.includes("Connection terminated") ||
-        msg.includes("closed") ||
-        msg.includes("timeout") ||
-        msg.includes("57014") ||
-        msg.includes("ECONNRESET") ||
-        msg.includes("ENOTFOUND") ||
-        msg.includes("connection pool") ||
-        msg.includes("max clients") ||
-        msg.includes("EMAXCONNSESSION");
 
-      if (isTransient && attempt < maxRetries) {
+      if (isTransientDbError(err) && attempt < maxRetries) {
         console.warn(
-          `[${contextLabel}] Percobaan ke-${attempt + 1} setelah error: ${msg.slice(0, 90)}`
+          `[${contextLabel}] Percobaan ke-${attempt + 1} setelah gangguan jaringan/DB sementara: ${msg.slice(0, 90)}`
         );
-        await new Promise((r) => setTimeout(r, 250 * attempt));
+        await new Promise((r) => setTimeout(r, 350 * attempt));
         continue;
       }
       throw err;

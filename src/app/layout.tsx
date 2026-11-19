@@ -1,6 +1,16 @@
 import type { Metadata } from "next";
 import { Outfit, DM_Sans, JetBrains_Mono, Dancing_Script } from "next/font/google";
 import { CatalogProvider } from "@/context/CatalogContext";
+import {
+  buildSeoKeywords,
+  getSiteUrl,
+  SITE_ALTERNATE_NAMES,
+  SITE_GITHUB_URL,
+  SITE_LOGO_PATH,
+  SITE_NAME,
+  SITE_PUBLISHER,
+  SITE_URL,
+} from "@/lib/site-seo";
 import "./globals.css";
 
 const fontDisplay = Outfit({
@@ -31,50 +41,71 @@ const fontScript = Dancing_Script({
   display: "swap",
 });
 
+const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+
 export const metadata: Metadata = {
-  title: "Allprojects — Temukan dan Download Aplikasi Android Terbaik",
-  description:
-    "Download berbagai aplikasi Android terbaik dengan format APK yang mudah, cepat dan aman. Semua kebutuhan digitalmu ada di Allprojects!",
-  applicationName: "Allprojects",
-  authors: [{ name: "Allprojects Studio", url: "https://allprojects.com" }],
-  keywords: [
-    "Allprojects",
-    "AllProjects",
-    "Download Aplikasi",
-    "Aplikasi Android",
-    "APK Download",
-    "Notely",
-    "EduLearn",
-    "KasirPro",
-    "PhotoEditor",
-    "Android Store",
-  ],
-  metadataBase: new URL("https://allprojects.com"),
-  alternates: {
-    canonical: "/",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "AllProjects (AlllProjek) — Pusat Aplikasi Android APK Aman & Projek Web",
+    template: `%s | ${SITE_NAME}`,
   },
+  description:
+    "AllProjects (AlllProjek / AllProjek) adalah pusat download aplikasi Android APK gratis, aman, dan terverifikasi bebas virus VirusTotal, serta koleksi projek web modern dalam satu platform.",
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_PUBLISHER, url: SITE_URL }],
+  creator: SITE_PUBLISHER,
+  publisher: SITE_PUBLISHER,
+  category: "technology",
+  keywords: buildSeoKeywords(),
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  ...(googleVerification
+    ? {
+        verification: {
+          google: googleVerification,
+        },
+      }
+    : {}),
   openGraph: {
-    title: "Allprojects — Temukan dan Download Aplikasi Android Terbaik",
+    title: "AllProjects (AlllProjek) — Pusat Aplikasi Android APK Aman & Projek Web",
     description:
-      "Download berbagai aplikasi Android terbaik dengan format APK yang mudah, cepat dan aman.",
-    url: "https://allprojects.com",
-    siteName: "Allprojects",
+      "Unduh berkas APK Android terverifikasi bebas virus dengan riwayat versi rapi dan jelajahi koleksi projek web modern di AllProjects (alllprojects.my.id).",
+    url: SITE_URL,
+    siteName: SITE_NAME,
     locale: "id_ID",
     type: "website",
+    images: [
+      {
+        url: SITE_LOGO_PATH,
+        width: 512,
+        height: 512,
+        alt: "Logo AllProjects — Pusat Aplikasi Android & Projek Web",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Allprojects — Temukan dan Download Aplikasi Android Terbaik",
+    title: "AllProjects (AlllProjek) — Pusat Aplikasi Android APK & Projek Web",
     description:
-      "Download berbagai aplikasi Android terbaik dengan format APK yang mudah, cepat dan aman.",
+      "Download aplikasi Android APK aman bebas virus VirusTotal dan jelajahi katalog projek web modern di AllProjects.",
+    images: [SITE_LOGO_PATH],
   },
   icons: {
     icon: [
-      { url: "/assets/logoAllProjects.png" },
-      { url: "/assets/logoAllProjects.png", type: "image/png" },
+      { url: SITE_LOGO_PATH },
+      { url: SITE_LOGO_PATH, type: "image/png" },
     ],
-    shortcut: "/assets/logoAllProjects.png",
-    apple: "/assets/logoAllProjects.png",
+    shortcut: SITE_LOGO_PATH,
+    apple: SITE_LOGO_PATH,
   },
 };
 
@@ -83,20 +114,44 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Structured Data JSON-LD
+  // Structured Data JSON-LD Global (Organization & WebSite dengan alternateName & SearchAction)
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "Allprojects",
-    operatingSystem: "Android",
-    applicationCategory: "MobileApplication",
-    description:
-      "Download berbagai aplikasi Android terbaik dengan format APK yang mudah, cepat dan aman.",
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.8",
-      ratingCount: "5420",
-    },
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${SITE_URL}/#organization`,
+        name: SITE_NAME,
+        alternateName: [...SITE_ALTERNATE_NAMES],
+        url: SITE_URL,
+        logo: {
+          "@type": "ImageObject",
+          url: getSiteUrl(SITE_LOGO_PATH),
+        },
+        sameAs: [SITE_GITHUB_URL],
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${SITE_URL}/#website`,
+        url: SITE_URL,
+        name: SITE_NAME,
+        alternateName: [...SITE_ALTERNATE_NAMES],
+        description:
+          "Pusat aplikasi Android APK terverifikasi bebas virus VirusTotal dan koleksi projek web modern di alllprojects.my.id.",
+        inLanguage: "id-ID",
+        publisher: {
+          "@id": `${SITE_URL}/#organization`,
+        },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: `${SITE_URL}/?q={search_term_string}`,
+          },
+          "query-input": "required name=search_term_string",
+        },
+      },
+    ],
   };
 
   return (
@@ -105,9 +160,9 @@ export default function RootLayout({
       className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable} ${fontScript.variable} scroll-smooth`}
     >
       <head>
-        <link rel="icon" href="/assets/logoAllProjects.png" type="image/png" sizes="any" />
-        <link rel="shortcut icon" href="/assets/logoAllProjects.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/assets/logoAllProjects.png" />
+        <link rel="icon" href={SITE_LOGO_PATH} type="image/png" sizes="any" />
+        <link rel="shortcut icon" href={SITE_LOGO_PATH} type="image/png" />
+        <link rel="apple-touch-icon" href={SITE_LOGO_PATH} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

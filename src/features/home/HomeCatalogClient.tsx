@@ -72,6 +72,16 @@ export function HomeCatalogClient({
   const [detailInitialTab, setDetailInitialTab] = useState<AppDetailTab>("versi");
   const [selectedWebProject, setSelectedWebProject] = useState<WebProjectItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+
+  // Sinkronkan parameter pencarian ?q= dari URL (mendukung Google Sitelinks SearchAction)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q")?.trim();
+    if (q) {
+      setSearchQuery(q);
+    }
+  }, []);
   const [downloadModalApp, setDownloadModalApp] = useState<AppItem | null>(null);
   const [guideModalApp, setGuideModalApp] = useState<AppItem | null>(null);
   const [activeNav, setActiveNav] = useState<string>("beranda");

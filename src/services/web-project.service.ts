@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { withDbRetry as withRetry } from "@/lib/db-retry";
+import { isTransientDbError, withDbRetry as withRetry } from "@/lib/db-retry";
 import { WebProjectItem, CreateWebProjectInput, UpdateWebProjectInput } from "@/types/web-project";
 import { decodeDataImageUri, DecodedImageData } from "@/lib/media-decode";
 
@@ -180,7 +180,14 @@ export class WebProjectService {
         webCache.lastCacheTimestamp = Date.now();
         return mapped;
       } catch (err) {
-        console.error("Gagal membaca projek web dari database Supabase:", err);
+        if (isTransientDbError(err)) {
+          console.warn(
+            "[WebProjectService] Koneksi/DNS Supabase sedang tidak stabil, menggunakan cache/fallback:",
+            err instanceof Error ? err.message : String(err)
+          );
+        } else {
+          console.error("Gagal membaca projek web dari database Supabase:", err);
+        }
         if (webCache.cachedWebProjects !== null) return webCache.cachedWebProjects;
         return [];
       } finally {
