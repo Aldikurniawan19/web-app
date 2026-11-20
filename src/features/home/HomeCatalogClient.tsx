@@ -15,6 +15,7 @@ import { AppItem } from "@/types/store";
 import { WebProjectItem } from "@/types/web-project";
 import type { ApkSecurityReportDetail } from "@/types/security";
 import { useCatalog } from "@/context/CatalogContext";
+import { smoothScrollTo } from "@/lib/smooth-scroll";
 
 const DownloadModal = dynamic(
   () => import("@/features/download/DownloadModal").then((m) => m.DownloadModal),
@@ -236,7 +237,7 @@ export function HomeCatalogClient({
     }, 850);
 
     if (navId === "beranda") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      smoothScrollTo(0);
       return;
     }
 
@@ -251,13 +252,7 @@ export function HomeCatalogClient({
 
     const element = document.getElementById(targetId);
     if (element) {
-      const navbarHeight = 64;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
-      window.scrollTo({
-        top: Math.max(0, offsetPosition),
-        behavior: "smooth",
-      });
+      smoothScrollTo(element, { offset: -64 });
     }
   };
 

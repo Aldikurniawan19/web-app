@@ -13,6 +13,7 @@ import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Search, ChevronLeft, ChevronRight, Smartphone, Home } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { smoothScrollTo } from "@/lib/smooth-scroll";
 import { useCatalog } from "@/context/CatalogContext";
 import gsap from "gsap";
 
@@ -425,7 +426,7 @@ export function AllAppsPageClient({
                   disabled={currentPage === 1}
                   onClick={() => {
                     setCurrentPage(currentPage - 1);
-                    window.scrollTo({ top: 120, behavior: "smooth" });
+                    smoothScrollTo(120);
                   }}
                   className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:-translate-y-0.5 transition-all disabled:opacity-40"
                   aria-label="Halaman sebelumnya"
@@ -439,7 +440,7 @@ export function AllAppsPageClient({
                     type="button"
                     onClick={() => {
                       setCurrentPage(pageNum);
-                      window.scrollTo({ top: 120, behavior: "smooth" });
+                      smoothScrollTo(120);
                     }}
                     className={cn(
                       "flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold transition-all",
@@ -457,7 +458,7 @@ export function AllAppsPageClient({
                   disabled={currentPage === totalPages}
                   onClick={() => {
                     setCurrentPage(currentPage + 1);
-                    window.scrollTo({ top: 120, behavior: "smooth" });
+                    smoothScrollTo(120);
                   }}
                   className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm hover:-translate-y-0.5 transition-all disabled:opacity-40"
                   aria-label="Halaman berikutnya"

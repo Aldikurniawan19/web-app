@@ -10,6 +10,7 @@ import { AppCardSkeleton } from "@/features/catalog/AppCardSkeleton";
 import { WebProjectCard } from "@/features/catalog/WebProjectCard";
 import { WebProjectCardSkeleton } from "@/features/catalog/WebProjectCardSkeleton";
 import { cn } from "@/lib/utils";
+import { smoothScrollTo } from "@/lib/smooth-scroll";
 import { ShimmerTitleText } from "@/components/ui/ShimmerTitleText";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
@@ -171,15 +172,7 @@ export function AppGridSection({
   const scrollToKatalogTop = () => {
     const katalogEl = document.getElementById("katalog");
     if (katalogEl) {
-      const navbarHeight = 64;
-      const topBuffer = 16;
-      const elementPosition = katalogEl.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - navbarHeight - topBuffer;
-
-      window.scrollTo({
-        top: Math.max(0, offsetPosition),
-        behavior: "smooth",
-      });
+      smoothScrollTo(katalogEl, { offset: -80 });
     }
   };
 

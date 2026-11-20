@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, DM_Sans, JetBrains_Mono, Dancing_Script } from "next/font/google";
 import { CatalogProvider } from "@/context/CatalogContext";
+import { SmoothScrollProvider } from "@/components/layout/SmoothScrollProvider";
 import {
   buildSeoKeywords,
   getSiteUrl,
@@ -162,7 +163,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable} ${fontScript.variable} scroll-smooth`}
+      className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable} ${fontScript.variable}`}
     >
       <head>
         <script
@@ -171,7 +172,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-background text-foreground antialiased selection:bg-primary selection:text-white transition-colors duration-200">
-        <CatalogProvider>{children}</CatalogProvider>
+        <SmoothScrollProvider>
+          <CatalogProvider>{children}</CatalogProvider>
+        </SmoothScrollProvider>
       </body>
     </html>
   );

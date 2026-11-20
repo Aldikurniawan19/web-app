@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   ChevronLeft,
@@ -14,6 +14,7 @@ import {
 import { AppScreenshot } from "@/types/store";
 import { cn } from "@/lib/utils";
 import { isLocalOptimizedMediaUrl } from "@/lib/media-url";
+import { lockSmoothScroll, unlockSmoothScroll } from "@/lib/smooth-scroll";
 
 interface ScreenshotSliderProps {
   appName: string;
@@ -26,6 +27,22 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const isLightboxOpen = lightboxIndex !== null;
+
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+    lockSmoothScroll();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setLightboxIndex(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      unlockSmoothScroll();
+    };
+  }, [isLightboxOpen]);
 
   // Periksa apakah ada screenshot nyata yang memiliki imageUrl
   const realScreenshots = screenshots.filter((s) => Boolean(s.imageUrl));
@@ -430,6 +447,7 @@ export function ScreenshotSlider({ appName, screenshots = [] }: ScreenshotSlider
       {/* 3. Fullscreen Lightbox Modal */}
       {lightboxIndex !== null && hasRealScreenshots && (
         <div
+          data-lenis-prevent
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in"
           onClick={() => setLightboxIndex(null)}
         >

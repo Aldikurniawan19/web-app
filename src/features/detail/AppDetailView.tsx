@@ -18,6 +18,7 @@ import { PlatformBadge } from "@/components/ui/PlatformBadge";
 import { Button } from "@/components/ui/Button";
 import { ScreenshotSlider } from "@/features/detail/ScreenshotSlider";
 import { cn } from "@/lib/utils";
+import { smoothScrollTo } from "@/lib/smooth-scroll";
 import { VersionHistoryTab } from "@/features/detail/VersionHistoryTab";
 import { AppSecurityReport } from "@/features/detail/AppSecurityReport";
 import gsap from "gsap";
@@ -56,13 +57,7 @@ export function AppDetailView({
       setTimeout(() => {
         const target = detailTabsRef.current;
         if (!target) return;
-        const navbarOffset = 80;
-        const top =
-          target.getBoundingClientRect().top + window.scrollY - navbarOffset;
-        window.scrollTo({
-          top: Math.max(0, top),
-          behavior: "smooth",
-        });
+        smoothScrollTo(target, { offset: -80 });
       }, 60);
     });
   };

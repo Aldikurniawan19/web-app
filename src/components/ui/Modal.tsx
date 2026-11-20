@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { lockSmoothScroll, unlockSmoothScroll } from "@/lib/smooth-scroll";
 import gsap from "gsap";
 
 export interface ModalProps {
@@ -34,6 +35,7 @@ export function Modal({
 
     if (isOpen) {
       document.body.style.overflow = "hidden";
+      lockSmoothScroll();
       window.addEventListener("keydown", handleKeyDown);
 
       // GSAP animate entrance
@@ -51,10 +53,15 @@ export function Modal({
           { opacity: 1, scale: 1, y: 0, duration: 0.35, ease: "power3.out" }
         );
       }
+
+      return () => {
+        document.body.style.overflow = "unset";
+        unlockSmoothScroll();
+        window.removeEventListener("keydown", handleKeyDown);
+      };
     }
 
     return () => {
-      document.body.style.overflow = "unset";
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, onClose]);
@@ -66,6 +73,7 @@ export function Modal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
+      data-lenis-prevent
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
     >
       {/* Backdrop */}

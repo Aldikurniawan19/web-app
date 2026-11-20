@@ -1,9 +1,10 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { Check } from "lucide-react";
 import { AppItem } from "@/types/store";
 import { cn } from "@/lib/utils";
+import { lockSmoothScroll, unlockSmoothScroll } from "@/lib/smooth-scroll";
 import gsap from "gsap";
 
 export interface InstallGuideModalProps {
@@ -59,6 +60,7 @@ export function InstallGuideModal({
     if (isOpen) {
       setIsUnderstood(false);
       document.body.style.overflow = "hidden";
+      lockSmoothScroll();
 
       if (backdropRef.current) {
         gsap.fromTo(
@@ -74,13 +76,15 @@ export function InstallGuideModal({
           { opacity: 1, scale: 1, y: 0, duration: 0.28, ease: "power3.out" }
         );
       }
-    } else {
-      document.body.style.overflow = "unset";
+
+      return () => {
+        document.body.style.overflow = "unset";
+        unlockSmoothScroll();
+      };
     }
 
-    return () => {
-      document.body.style.overflow = "unset";
-    };
+    document.body.style.overflow = "unset";
+    return undefined;
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -133,6 +137,7 @@ export function InstallGuideModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="guide-canvas-title"
+      data-lenis-prevent
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
     >
       {/* Backdrop (Tanpa opsi tutup sebelum dicentang) */}

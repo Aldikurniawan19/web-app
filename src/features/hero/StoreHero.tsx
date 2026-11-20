@@ -17,6 +17,7 @@ import {
 import { APP_STORE_ITEMS } from "@/constants/app-store-data";
 import { AppItem } from "@/types/store";
 import { cn } from "@/lib/utils";
+import { smoothScrollTo } from "@/lib/smooth-scroll";
 
 const STICKY_NAVBAR_OFFSET_PX = 64;
 const MAX_SHOWCASE_APPS = 6;
@@ -46,9 +47,7 @@ function scrollToSection(sectionId: string) {
   const target = document.getElementById(sectionId);
   if (!target) return;
 
-  const top =
-    target.getBoundingClientRect().top + window.scrollY - STICKY_NAVBAR_OFFSET_PX;
-  window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  smoothScrollTo(target, { offset: -STICKY_NAVBAR_OFFSET_PX });
 }
 
 /**
